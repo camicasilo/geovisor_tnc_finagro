@@ -1,0 +1,4 @@
+{
+  "composeId": "UbmKkI1BHgN4RBx4gRae9",
+  "composeFile": "version: '3.8'\nservices:\n  minio:\n    image: minio/minio\n    container_name: minio\n    environment:\n      MINIO_ROOT_USER: admin\n      MINIO_ROOT_PASSWORD: AgroHoney2026!\n      MINIO_BROWSER_REDIRECT_URL: https://minio.agrohoney.com\n      MINIO_SERVER_URL: https://s3.agrohoney.com\n    volumes:\n      - minio_data:/data\n    command: server /data --console-address \":9001\"\n    restart: always\n    labels:\n      - \"traefik.enable=true\"\n      - \"traefik.http.middlewares.minio-limit.buffering.maxRequestBodyBytes=1073741824\"\n      - \"traefik.http.routers.minio-api-r.middlewares=minio-limit\"\n      - \"traefik.http.routers.minio-console-r.middlewares=minio-limit\"\n      - \"traefik.http.routers.minio-api.middlewares=minio-limit\"\n      - \"traefik.http.routers.minio-console.middlewares=minio-limit\"\n\nvolumes:\n  minio_data:"
+}

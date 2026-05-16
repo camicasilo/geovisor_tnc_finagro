@@ -2,6 +2,7 @@
 
 | Hash | Fecha | Descripcion |
 |------|-------|-------------|
+| 93e0910 | 2026-05-16 | docs: refinamiento de indexacion en etiquetas y descripciones detalladas de simulacion |
 | 3651d08 | 2026-05-16 | docs: indexacion completa de UI, integracion de vision de propuesta en TDR y actualizacion de Wiki |
 | 03452ea | 2026-05-16 | feat: modernizacion arquitectura DuckDB-WASM, Deck.gl, GeoParquet y Dropdowns de Cristal |
 | 1106148 | 2026-05-16 | fix: sincronizar fallbackData local con Ayuda.json completo e indexar título SIGAGRO |
@@ -16,4 +17,3 @@
 | 98a9179 | 2026-05-16 | style: añadir emoji a la opción de normal climática |
 | e2afde7 | 2026-05-16 | fix: corregir error de sintaxis que bloqueaba la UI y completar lógica de consola |
 | 9729dd8 | 2026-05-16 | feat: añadir escenarios climáticos avanzados (DeepMindCast, SAAMM) al simulador |
-| d196ccb | 2026-05-16 | feat: modernizar Geovisor con Consola Info, Estructura de Árbol y Super-Conversor de Parquet robusto |

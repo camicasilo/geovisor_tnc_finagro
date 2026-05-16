@@ -58,6 +58,12 @@ def ejecutar_conversion():
     extension = os.path.splitext(INPUT_FILE)[1].lower()
     base_name = os.path.splitext(os.path.basename(INPUT_FILE))[0]
     
+    # Crear una subcarpeta automáticamente para mantener todo organizado
+    carpeta_salida = os.path.join(OUTPUT_DIR, f"{base_name}_Parquet")
+    if not os.path.exists(carpeta_salida):
+        os.makedirs(carpeta_salida)
+        print(f"📁 Se creó una nueva carpeta para guardar los resultados:\n   {carpeta_salida}\n")
+    
     print(f"📂 Archivo detectado: {os.path.basename(INPUT_FILE)}")
     print(f"⚙️ Formato: {extension}\n")
 
@@ -75,11 +81,11 @@ def ejecutar_conversion():
 
     for capa in capas_a_procesar:
         if capa:
-            output_file = os.path.join(OUTPUT_DIR, f"{base_name}_{capa}.parquet")
+            output_file = os.path.join(carpeta_salida, f"{base_name}_{capa}.parquet")
             print(f"🚀 Procesando capa: '{capa}' -> {os.path.basename(output_file)}")
             comando = ["gpio", "convert", INPUT_FILE, output_file, "--layer", capa]
         else:
-            output_file = os.path.join(OUTPUT_DIR, f"{base_name}.parquet")
+            output_file = os.path.join(carpeta_salida, f"{base_name}.parquet")
             print(f"🚀 Iniciando conversión -> {os.path.basename(output_file)}")
             comando = ["gpio", "convert", INPUT_FILE, output_file]
 

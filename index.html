@@ -8,12 +8,11 @@
     <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
     
-    <!-- Loaders.gl -->
+    <!-- Loaders.gl (Solo Core, quitamos Parquet que da error) -->
     <script src="https://unpkg.com/@loaders.gl/core@3.4.4/dist/dist.min.js"></script>
-    <script src="https://unpkg.com/@loaders.gl/parquet@3.4.4/dist/dist.min.js"></script>
     
-    <!-- Plugin de Esri para MapLibre -->
-    <script src="https://unpkg.com/@esri/maplibre-arcgis@latest/dist/maplibre-arcgis.umd.js"></script>
+    <!-- Plugin de Esri para MapLibre (Version especifica para evitar error MIME) -->
+    <script src="https://unpkg.com/@esri/maplibre-arcgis@1.2.0/dist/maplibre-arcgis.umd.js"></script>
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
@@ -764,7 +763,7 @@
         map.addSource('bg-topo', { type: 'raster', tiles: ['https://tile.opentopomap.org/{z}/{x}/{y}.png'], tileSize: 256 });
         map.addLayer({ id: 'layer-topo', type: 'raster', source: 'bg-topo', layout: { visibility: 'none' } }, firstSymbolId);
 
-        // Capas Operacionales
+        // Capas Operacionales (URLs corregidas para evitar 400 Bad Request)
         map.addSource('subregiones-source', { type: 'geojson', data: subregionesUrl + '/query?where=1%3D1&outFields=*&outSR=4326&f=geojson' });
         map.addSource('municipios-source', { type: 'geojson', data: municipiosUrl + '/query?where=1%3D1&outFields=*&outSR=4326&f=geojson' });
 
@@ -1129,11 +1128,20 @@
             dbInstance = new duckdb.AsyncDuckDB(new duckdb.ConsoleLogger(), worker);
             await dbInstance.instantiate(bundle.mainModule, bundle.pthreadWorker);
             
-            // Configurar S3 / HTTPFS
+            // Configurar S3 / HTTPFS / Spatial
             const conn = await dbInstance.connect();
+            
+            // Forzar instalación y carga ANTES de configurar
             await conn.query(`
-                INSTALL httpfs;
-                LOAD httpfs;
+                SET autoinstall_known_extensions=1;
+                SET autoload_known_extensions=1;
+            `);
+            
+            await conn.query(`INSTALL httpfs; LOAD httpfs;`);
+            await conn.query(`INSTALL spatial; LOAD spatial;`);
+
+            // Ahora sí configuramos S3
+            await conn.query(`
                 SET s3_endpoint='s3.agrohoney.com';
                 SET s3_access_key_id='admin';
                 SET s3_secret_access_key='AgroHoney2026!';
@@ -1142,7 +1150,7 @@
             `);
             await conn.close();
             
-            console.log("🚀 Motor DuckDB-WASM listo con soporte S3.");
+            console.log("🚀 Motor DuckDB-WASM listo con soporte S3 y Espacial.");
             return true;
         } catch (e) {
             console.error("Error al iniciar DuckDB:", e);

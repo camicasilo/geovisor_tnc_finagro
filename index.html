@@ -231,43 +231,49 @@
         ::-webkit-scrollbar-thumb:hover { background-color: rgba(44, 95, 45, 0.8); }
         ::-webkit-scrollbar-corner { background: transparent; }
 
-        /* Consola Informativa (Nuevo Elemento) */
+        /* Centro de Información (Consola Inferior) */
         .info-console {
             position: absolute;
-            bottom: 20px;
-            right: 380px;
-            width: 300px;
-            max-height: 180px;
-            padding: 15px;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 700px;
+            max-height: 120px;
+            padding: 12px 20px;
             font-family: 'Courier New', Courier, monospace;
-            font-size: 0.8rem;
-            color: #2c3e50;
+            font-size: 0.85rem;
+            color: #1a1a1a;
             overflow-y: auto;
-            border-left: 4px solid #2c5f2d;
+            border-bottom: 3px solid #2c5f2d;
+            background: rgba(255, 255, 255, 0.5) !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
             transition: all 0.3s;
+            text-align: center;
         }
-        .info-console.collapsed { transform: translateY(200px); opacity: 0; }
-        .console-header { font-weight: 800; font-size: 0.7rem; color: #2c5f2d; margin-bottom: 8px; text-transform: uppercase; display: flex; align-items: center; gap: 5px; }
-        .console-text { line-height: 1.4; color: #444; }
-        .console-highlight { color: #2c5f2d; font-weight: bold; }
+        .info-console.collapsed { transform: translate(-50%, 200px); opacity: 0; }
+        .console-header { font-weight: 800; font-size: 0.7rem; color: #2c5f2d; margin-bottom: 5px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; opacity: 0.8; }
+        .console-text { line-height: 1.5; color: #111; font-weight: 500; }
+        .console-highlight { color: #2c5f2d; font-weight: 800; background: rgba(44, 95, 45, 0.1); padding: 0 4px; border-radius: 3px; }
+
 
         /* Estructura de Árbol para Capas */
-        .dataset-group { margin-left: 10px; margin-top: 8px; border-left: 1px solid rgba(44, 95, 45, 0.2); padding-left: 15px; position: relative; }
-        .dataset-group::before { content: ''; position: absolute; top: 12px; left: 0; width: 10px; border-top: 1px solid rgba(44, 95, 45, 0.2); }
-        .dataset-title { font-size: 0.8rem; font-weight: 700; color: #444; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: color 0.2s; }
-        .dataset-title i { color: #2c5f2d; font-size: 0.9rem; }
-        .dataset-title:hover { color: #2c5f2d; }
+        .dataset-group { margin-left: 5px; margin-top: 5px; border-left: 1px solid rgba(44, 95, 45, 0.15); padding-left: 10px; position: relative; }
+        .dataset-title { font-size: 0.8rem; font-weight: 700; color: #333; margin-bottom: 5px; display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
+        .dataset-title i.toggle-icon { font-size: 0.7rem; color: #2c5f2d; transition: transform 0.2s; }
+        .dataset-group.collapsed .dataset-content { display: none; }
+        .dataset-group.collapsed i.toggle-icon { transform: rotate(-90deg); }
         
         .layer-item.nested { 
-            margin-left: 12px; 
+            margin-left: 10px; 
             background: transparent; 
             border: none; 
-            padding: 5px 0; 
+            padding: 4px 0; 
             position: relative;
         }
-        .layer-item.nested::before { content: ''; position: absolute; top: 15px; left: -12px; width: 10px; border-top: 1px solid rgba(44, 95, 45, 0.2); }
-        .layer-item.nested span { font-size: 0.75rem; color: #555; font-weight: 500; }
-        .layer-item.nested:hover span { color: #000; }
+        .layer-item.nested::before { content: ''; position: absolute; top: 14px; left: -10px; width: 8px; border-top: 1px solid rgba(44, 95, 45, 0.15); }
+        .layer-item.nested span { font-size: 0.75rem; color: #444; }
+
 
 
 
@@ -377,12 +383,13 @@
             
             <!-- Dataset 1: Catastro IGAC -->
             <div class="dataset-group">
-                <div class="dataset-title" title="Modelo de Datos Catastro Multipropósito">
+                <div class="dataset-title" onclick="this.parentElement.classList.toggle('collapsed')">
+                    <i class="fas fa-chevron-down toggle-icon"></i>
                     <i class="fas fa-folder-open"></i> Catastro Nacional (IGAC)
                 </div>
                 <div class="dataset-content">
                     <div class="layer-item nested" onmouseover="updateConsole('R_TERRENO')">
-                        <span>R_TERRENO (Predios Formales)</span>
+                        <span>R_TERRENO</span>
                         <label class="switch"><input type="checkbox" id="layer-r-terreno"><span class="slider"></span></label>
                     </div>
                     <div class="layer-item nested" onmouseover="updateConsole('R_TERRENO_INFORMAL')">
@@ -398,7 +405,7 @@
                         <label class="switch"><input type="checkbox" id="layer-r-construccion-informal"><span class="slider"></span></label>
                     </div>
                     <div class="layer-item nested" onmouseover="updateConsole('R_VEREDA')">
-                        <span>R_VEREDA (Límites Veredales)</span>
+                        <span>R_VEREDA</span>
                         <label class="switch"><input type="checkbox" id="layer-r-vereda"><span class="slider"></span></label>
                     </div>
                     <div class="layer-item nested" onmouseover="updateConsole('R_SECTOR')">
@@ -417,8 +424,9 @@
             </div>
 
             <!-- Dataset 2: Geografía Administrativa -->
-            <div class="dataset-group">
-                <div class="dataset-title">
+            <div class="dataset-group collapsed">
+                <div class="dataset-title" onclick="this.parentElement.classList.toggle('collapsed')">
+                    <i class="fas fa-chevron-down toggle-icon"></i>
                     <i class="fas fa-folder"></i> Divipola Administrativa
                 </div>
                 <div class="dataset-content">
@@ -432,6 +440,7 @@
                     </div>
                 </div>
             </div>
+
 
         </div>
     </div>
@@ -508,13 +517,14 @@
     <div id="md-properties"></div>
 </div>
 
-<!-- Consola Informativa (Nuevo Panel) -->
+<!-- CENTRO DE INFORMACIÓN (Consola Inferior) -->
 <div class="glass-panel info-console" id="info-console">
-    <div class="console-header"><i class="fas fa-terminal"></i> Knowledge Base / MVP Engine</div>
+    <div class="console-header"><i class="fas fa-info-circle"></i> CENTRO DE INFORMACIÓN</div>
     <div class="console-text" id="console-output">
-        Bienvenido al <span class="console-highlight">Centro de Comando Geovisor</span>. Selecciona o pasa el mouse sobre una capa para ver sus especificaciones técnicas.
+        Pasa el mouse sobre cualquier elemento para obtener detalles técnicos.
     </div>
 </div>
+
 
 
 <script>

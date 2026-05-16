@@ -292,17 +292,18 @@
 
 <!-- Barra de Herramientas Flotante -->
 <div class="toolbar" id="toolbar-panel">
-    <div class="toolbar-btn active" id="tool-hand" title="Modo Paneo (Mover Mapa)"><i class="fas fa-hand-paper"></i></div>
-    <div class="toolbar-btn" id="tool-select" title="Seleccionar Entidad (Modo Global)"><i class="fas fa-mouse-pointer"></i></div>
-    <div class="toolbar-btn" id="tool-labels" title="Supresión Dinámica de Etiquetas"><i class="fas fa-eye-slash"></i></div>
+    <div class="toolbar-btn active" id="tool-hand" title="Modo Paneo" onmouseover="updateConsole('HERRAMIENTA_MANO')"><i class="fas fa-hand-paper"></i></div>
+    <div class="toolbar-btn" id="tool-select" title="Seleccionar Entidad" onmouseover="updateConsole('HERRAMIENTA_SELECCION')"><i class="fas fa-mouse-pointer"></i></div>
+    <div class="toolbar-btn" id="tool-labels" title="Supresión de Etiquetas" onmouseover="updateConsole('SUPRESION_ETIQUETAS')"><i class="fas fa-eye-slash"></i></div>
 </div>
+
 
 <!-- Panel Izquierdo: Simulador What-If -->
 <div class="glass-panel left-sidebar" id="left-panel">
     <h1><i class="fas fa-seedling"></i> SIGAGRO</h1>
     <div class="subtitle">Simulador de Escenarios · TNC / FINAGRO</div>
 
-    <div class="control-group">
+    <div class="control-group" onmouseover="updateConsole('PRODUCTOR')">
         <label><i class="fas fa-tractor"></i> Tipo de productor</label>
         <select id="productorType">
             <option value="pequeno_bajos">Pequeño de ingresos bajos</option>
@@ -312,31 +313,33 @@
         </select>
     </div>
 
-    <div class="control-group">
+    <div class="control-group" onmouseover="updateConsole('ESCENARIO_DESC')">
         <label><i class="fas fa-cloud-sun-rain"></i> Escenario climático</label>
         <select id="escenario">
-            <option value="normal">🌿 0. Normal climática (1981-2010)</option>
-            <option value="nino_extremo">☀️ Escenario 1: El Niño Extremo (Sequía/Estrés)</option>
-            <option value="nina_activo">🌧️ Escenario 2: La Niña Activo (Inundaciones)</option>
-            <option value="deepmind_cast">🧠 Escenario 3: Google DeepMindCast (IA Forecast)</option>
-            <option value="riesgo_sanitario">📉 Escenario 4: Riesgo Sanitario (Plagas/Clima)</option>
-            <option value="finagro_saamm">🏦 Escenario 5: Financiero FINAGRO (SAAMM)</option>
+            <option value="normal" onmouseover="updateConsole('NORMAL_CLIMA')">🌿 0. Normal climática (1981-2010)</option>
+            <option value="nino_extremo" onmouseover="updateConsole('NINO_EXTREMO')">☀️ Escenario 1: El Niño Extremo (Sequía/Estrés)</option>
+            <option value="nina_activo" onmouseover="updateConsole('NINA_ACTIVO')">🌧️ Escenario 2: La Niña Activo (Inundaciones)</option>
+            <option value="deepmind_cast" onmouseover="updateConsole('DEEPMIND_CAST')">🧠 Escenario 3: Google DeepMindCast (IA Forecast)</option>
+            <option value="riesgo_sanitario" onmouseover="updateConsole('RIESGO_SANITARIO')">📉 Escenario 4: Riesgo Sanitario (Plagas/Clima)</option>
+            <option value="finagro_saamm" onmouseover="updateConsole('SAAMM')">🏦 Escenario 5: Financiero FINAGRO (SAAMM)</option>
         </select>
     </div>
 
+
     <div class="control-group" style="border-bottom: none; margin-bottom: 0;">
         <label><i class="fas fa-sliders-h"></i> Variables Económicas</label>
-        <div class="metric">
+        <div class="metric" onmouseover="updateConsole('TASA_INTERES')">
             <span>Tasa de interés (%)</span>
             <input type="range" id="tasaInteres" min="0" max="100" step="1" value="12">
             <span id="tasaValor" style="width: 45px; text-align: right; display: inline-block; font-weight: 600;">12%</span>
         </div>
-        <div class="metric">
+        <div class="metric" onmouseover="updateConsole('PRECIO_PRODUCTO')">
             <span>Precio producto (%)</span>
             <input type="range" id="precioFactor" min="0" max="100" step="1" value="100">
             <span id="precioValor" style="width: 45px; text-align: right; display: inline-block; font-weight: 600;">100%</span>
         </div>
-        <button class="btn-primary" id="simularBtn"><i class="fas fa-bolt"></i> Actualizar Modelo</button>
+        <button class="btn-primary" id="simularBtn" onmouseover="updateConsole('SIMULAR_BTN')"><i class="fas fa-bolt"></i> Actualizar Modelo</button>
+
     </div>
 </div>
 
@@ -353,23 +356,24 @@
         </div>
         <div class="layer-group-content">
             <input type="text" class="layer-search" placeholder="Buscar capa base...">
-            <label class="radio-container">Positron (Claro / Defecto)
+            <label class="radio-container" onmouseover="updateConsole('BASE_POSITRON')">Positron (Claro / Defecto)
                 <input type="radio" name="baselayer" value="positron" checked>
                 <span class="checkmark"></span>
             </label>
-            <label class="radio-container">CartoDB Dark Matter
+            <label class="radio-container" onmouseover="updateConsole('BASE_DARK')">CartoDB Dark Matter
                 <input type="radio" name="baselayer" value="dark">
                 <span class="checkmark"></span>
             </label>
-            <label class="radio-container">OpenStreetMap Clásico
+            <label class="radio-container" onmouseover="updateConsole('BASE_OSM')">OpenStreetMap Clásico
                 <input type="radio" name="baselayer" value="osm">
                 <span class="checkmark"></span>
             </label>
-            <label class="radio-container">OpenTopoMap (Topográfico)
+            <label class="radio-container" onmouseover="updateConsole('BASE_TOPO')">OpenTopoMap (Topográfico)
                 <input type="radio" name="baselayer" value="topo">
                 <span class="checkmark"></span>
             </label>
         </div>
+
     </div>
 
     <!-- Acordeón: Capas de Trabajo (Estructura de Árbol) -->
@@ -446,19 +450,18 @@
     </div>
 
     
-    <!-- Acordeón: Modelos de Riesgo (Sin active para iniciar retraído) -->
-    <div class="layer-group accordion">
+    <div class="layer-group accordion" onmouseover="updateConsole('MODELO_RIESGO')">
         <div class="layer-group-title">
             <i class="fas fa-fire-alt main-icon"></i> Modelos de Riesgo
             <i class="fas fa-chevron-down accordion-icon"></i>
         </div>
         <div class="layer-group-content">
             <input type="text" class="layer-search" placeholder="Buscar modelo de riesgo...">
-            <div class="layer-item">
+            <div class="layer-item" onmouseover="updateConsole('RIESGO_CLIMA')">
                 <span>Riesgo Climático (Heatmap)</span>
                 <label class="switch"><input type="checkbox" id="layer-riesgo"><span class="slider"></span></label>
             </div>
-            <div class="layer-item">
+            <div class="layer-item" onmouseover="updateConsole('ZONAS_INUNDABLES')">
                 <span>Zonas Inundables</span>
                 <label class="switch"><input type="checkbox" id="layer-inundacion"><span class="slider"></span></label>
             </div>
@@ -466,7 +469,8 @@
     </div>
     
     <!-- Carga de Datos Locales (Sin active para iniciar retraído) -->
-    <div class="layer-group accordion">
+    <div class="layer-group accordion" onmouseover="updateConsole('CARGAR_LOCAL')">
+
         <div class="layer-group-title">
             <i class="fas fa-file-upload main-icon"></i> Cargar Capas Locales
             <i class="fas fa-chevron-down accordion-icon"></i>
@@ -932,15 +936,15 @@
     }
 
     // Vincular eventos a controles del simulador
-    document.getElementById('productorType').addEventListener('mouseover', () => updateConsole('PRODUCTOR'));
-    document.getElementById('escenario').addEventListener('mouseover', () => {
-        const val = document.getElementById('escenario').value;
-        if (val === 'nino_extremo') updateConsole('NINO_EXTREMO');
-        else if (val === 'nina_activo') updateConsole('NINA_ACTIVO');
-        else if (val === 'deepmind_cast') updateConsole('DEEPMIND_CAST');
-        else if (val === 'finagro_saamm') updateConsole('SAAMM');
-        else updateConsole('WELCOME');
+    document.getElementById('productorType').addEventListener('mouseover', () => {
+        const val = document.getElementById('productorType').value.toUpperCase();
+        updateConsole(val);
     });
+    document.getElementById('escenario').addEventListener('mouseover', () => {
+        const val = document.getElementById('escenario').value.toUpperCase();
+        updateConsole(val);
+    });
+
     document.querySelector('.metric:nth-child(2)').addEventListener('mouseover', () => updateConsole('TASA_INTERES'));
     document.querySelector('.metric:nth-child(3)').addEventListener('mouseover', () => updateConsole('PRECIO_PRODUCTO'));
 

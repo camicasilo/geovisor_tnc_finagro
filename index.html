@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
     
-    <!-- Loaders.gl para soportar GeoJSON/Parquet experimentalmente -->
+    <!-- Loaders.gl -->
     <script src="https://unpkg.com/@loaders.gl/core@3.4.4/dist/dist.min.js"></script>
     <script src="https://unpkg.com/@loaders.gl/parquet@3.4.4/dist/dist.min.js"></script>
     
@@ -24,8 +24,10 @@
         .map-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
         #map { width: 100%; height: 100%; }
         
-        /* Cursor Selector */
+        /* Cursor Modifiers */
         .cursor-select .maplibregl-canvas-container.maplibregl-interactive { cursor: crosshair !important; }
+        .cursor-grab .maplibregl-canvas-container.maplibregl-interactive { cursor: grab !important; }
+        .cursor-grabbing .maplibregl-canvas-container.maplibregl-interactive { cursor: grabbing !important; }
 
         /* Estilo Glassmorphism para paneles flotantes */
         .glass-panel {
@@ -58,7 +60,7 @@
             position: absolute;
             top: 20px;
             right: 20px;
-            width: 320px;
+            width: 340px;
             max-height: calc(100vh - 40px);
             overflow-y: auto;
             padding: 24px;
@@ -88,21 +90,21 @@
         #left-collapse-btn { left: 360px; border-radius: 0 8px 8px 0; border-left: none; }
         #left-collapse-btn.collapsed { left: 0; transform: translateX(0); border-radius: 0 8px 8px 0; }
         
-        #right-collapse-btn { right: 340px; border-radius: 8px 0 0 8px; border-right: none; }
+        #right-collapse-btn { right: 360px; border-radius: 8px 0 0 8px; border-right: none; }
         #right-collapse-btn.collapsed { right: 0; transform: translateX(0); border-radius: 8px 0 0 8px; }
 
         /* Toolbar vertical (Herramientas) */
         .toolbar {
             position: absolute;
             top: 80px;
-            right: 360px; 
+            right: 380px; 
             display: flex;
             flex-direction: column;
             gap: 10px;
             z-index: 10;
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .toolbar.collapsed { transform: translateX(340px); }
+        .toolbar.collapsed { transform: translateX(360px); }
         
         .toolbar-btn {
             background: rgba(255, 255, 255, 0.95);
@@ -129,7 +131,7 @@
         
         .control-group { margin-bottom: 20px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 15px; }
         .control-group label { font-weight: 600; display: block; margin-bottom: 8px; color: #2c3e50; font-size: 0.9rem;}
-        select, button { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; background: white; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; }
+        select, button { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; background: white; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; outline: none; }
         select:hover, button:hover { border-color: #2c5f2d; }
         .btn-primary { background-color: #2c5f2d; color: white; font-weight: bold; border: none; margin-top: 8px; }
         .btn-primary:hover { background-color: #1e3a1f; }
@@ -138,11 +140,20 @@
         .metric { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 0.85rem; color: #333; }
         .metric input[type="range"] { flex: 1; margin: 0 12px; }
         
-        /* Layer Toggle Items */
-        .layer-group { margin-bottom: 20px; }
-        .layer-group-title { font-weight: 600; font-size: 0.95rem; color: #1e466e; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;}
-        .layer-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.9rem; background: rgba(0,0,0,0.03); padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.05); transition: background 0.2s; }
-        .layer-item:hover { background: rgba(0,0,0,0.05); }
+        /* Acordeones y Layers */
+        .layer-group { margin-bottom: 10px; background: rgba(0,0,0,0.02); border-radius: 8px; border: 1px solid rgba(0,0,0,0.05); overflow: hidden; }
+        .layer-group-title { font-weight: 600; font-size: 0.95rem; color: #1e466e; padding: 12px; display: flex; align-items: center; cursor: pointer; transition: background 0.2s; }
+        .layer-group-title:hover { background: rgba(0,0,0,0.05); color: #2c5f2d; }
+        .layer-group-title i.main-icon { margin-right: 8px; width: 16px; text-align: center; }
+        .accordion-icon { margin-left: auto; transition: transform 0.3s; color: #888; font-size: 0.8rem; }
+        .layer-group.active .accordion-icon { transform: rotate(180deg); }
+        
+        .layer-group-content { display: none; padding: 0 12px 12px 12px; }
+        .layer-group.active .layer-group-content { display: block; }
+        
+        .layer-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 0.9rem; background: rgba(255,255,255,0.5); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.05); transition: background 0.2s; }
+        .layer-item:hover { background: rgba(255,255,255,0.8); }
+        .layer-item:last-child { margin-bottom: 0; }
         
         /* Switch/Toggle CSS */
         .switch { position: relative; display: inline-block; width: 36px; height: 20px; }
@@ -151,10 +162,25 @@
         .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         input:checked + .slider { background-color: #2c5f2d; }
         input:checked + .slider:before { transform: translateX(16px); }
+        
+        /* Radio Base Layer */
+        .radio-container { display: block; position: relative; padding-left: 28px; margin-bottom: 8px; cursor: pointer; font-size: 0.9rem; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+        .radio-container input { position: absolute; opacity: 0; cursor: pointer; }
+        .checkmark { position: absolute; top: 0; left: 0; height: 18px; width: 18px; background-color: #ccc; border-radius: 50%; }
+        .radio-container:hover input ~ .checkmark { background-color: #bbb; }
+        .radio-container input:checked ~ .checkmark { background-color: #2c5f2d; }
+        .checkmark:after { content: ""; position: absolute; display: none; }
+        .radio-container input:checked ~ .checkmark:after { display: block; }
+        .radio-container .checkmark:after { top: 5px; left: 5px; width: 8px; height: 8px; border-radius: 50%; background: white; }
 
-        /* File Upload */
-        input[type="file"] { width: 100%; border: 1px dashed #ccc; padding: 10px; border-radius: 8px; background: rgba(255,255,255,0.5); cursor: pointer; }
-        input[type="file"]::file-selector-button { background: #2c5f2d; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 10px; }
+        /* File Upload Custom UI */
+        .file-upload-wrapper { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+        .file-input-group { display: flex; gap: 6px; }
+        .file-text { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 0.8rem; background: rgba(255,255,255,0.7); color: #555; outline: none; }
+        .btn-browse { width: auto; padding: 8px 12px; background: #eee; border: 1px solid #ccc; color: #333; font-size: 0.8rem; }
+        .btn-browse:hover { background: #e0e0e0; }
+        .btn-load { display: none; background: #1976d2; color: white; padding: 10px; font-size: 0.9rem; margin-top: 4px; }
+        .btn-load:hover { background: #1565c0; }
 
         /* Micro-dashboard Popup */
         .micro-dashboard {
@@ -179,7 +205,7 @@
         .md-stat-value { font-size: 1.4rem; font-weight: 800; color: #1e466e; margin-top: 6px; }
         .md-stat-label { font-size: 0.75rem; color: #555; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
         
-        #md-properties { max-height: 100px; overflow-y: auto; font-size: 0.8rem; margin-top: 10px; display: none; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid #eee; }
+        #md-properties { max-height: 150px; overflow-y: auto; font-size: 0.8rem; margin-top: 10px; display: none; background: rgba(255,255,255,0.8); padding: 12px; border-radius: 6px; border: 1px solid #eee; line-height: 1.4;}
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
@@ -192,7 +218,7 @@
 <body>
 
 <!-- Mapa Central -->
-<div class="map-container cursor-select" id="map-wrap">
+<div class="map-container cursor-grab" id="map-wrap">
     <div id="map"></div>
 </div>
 
@@ -202,8 +228,8 @@
 
 <!-- Barra de Herramientas Flotante -->
 <div class="toolbar" id="toolbar-panel">
-    <div class="toolbar-btn active" id="tool-select" title="Seleccionar Entidad (Modo Global)"><i class="fas fa-mouse-pointer"></i></div>
-    <div class="toolbar-btn" id="tool-polygon" title="Selección Múltiple"><i class="fas fa-draw-polygon"></i></div>
+    <div class="toolbar-btn active" id="tool-hand" title="Modo Paneo (Mover Mapa)"><i class="fas fa-hand-paper"></i></div>
+    <div class="toolbar-btn" id="tool-select" title="Seleccionar Entidad (Modo Global)"><i class="fas fa-mouse-pointer"></i></div>
     <div class="toolbar-btn" id="tool-labels" title="Supresión Dinámica de Etiquetas"><i class="fas fa-eye-slash"></i></div>
 </div>
 
@@ -252,45 +278,89 @@
     <h2><i class="fas fa-layer-group"></i> Capas del Mapa</h2>
     <div class="subtitle">Gestión de datos espaciales</div>
 
-    <div class="layer-group">
-        <div class="layer-group-title"><i class="fas fa-map"></i> Capas Base</div>
-        <div class="layer-item">
-            <span>OpenStreetMap</span>
-            <label class="switch"><input type="checkbox" id="layer-osm"><span class="slider"></span></label>
+    <!-- Acordeón: Capas Base -->
+    <div class="layer-group accordion active">
+        <div class="layer-group-title">
+            <i class="fas fa-map main-icon"></i> Capas Base
+            <i class="fas fa-chevron-down accordion-icon"></i>
+        </div>
+        <div class="layer-group-content">
+            <label class="radio-container">Positron (Claro / Defecto)
+                <input type="radio" name="baselayer" value="positron" checked>
+                <span class="checkmark"></span>
+            </label>
+            <label class="radio-container">CartoDB Dark Matter
+                <input type="radio" name="baselayer" value="dark">
+                <span class="checkmark"></span>
+            </label>
+            <label class="radio-container">OpenStreetMap Clásico
+                <input type="radio" name="baselayer" value="osm">
+                <span class="checkmark"></span>
+            </label>
+            <label class="radio-container">OpenTopoMap (Topográfico)
+                <input type="radio" name="baselayer" value="topo">
+                <span class="checkmark"></span>
+            </label>
         </div>
     </div>
 
-    <div class="layer-group">
-        <div class="layer-group-title"><i class="fas fa-border-all"></i> Administrativo / Catastro</div>
-        <div class="layer-item">
-            <span>Subregiones / Provincias</span>
-            <label class="switch"><input type="checkbox" id="layer-provincias" checked><span class="slider"></span></label>
+    <!-- Acordeón: Capas de Trabajo -->
+    <div class="layer-group accordion active">
+        <div class="layer-group-title">
+            <i class="fas fa-border-all main-icon"></i> Capas de Trabajo
+            <i class="fas fa-chevron-down accordion-icon"></i>
         </div>
-        <div class="layer-item">
-            <span>Límites Municipales</span>
-            <label class="switch"><input type="checkbox" id="layer-municipios" checked><span class="slider"></span></label>
+        <div class="layer-group-content" id="working-layers">
+            <div class="layer-item">
+                <span>Subregiones / Provincias</span>
+                <label class="switch"><input type="checkbox" id="layer-provincias" checked><span class="slider"></span></label>
+            </div>
+            <div class="layer-item">
+                <span>Límites Municipales</span>
+                <label class="switch"><input type="checkbox" id="layer-municipios" checked><span class="slider"></span></label>
+            </div>
         </div>
     </div>
     
-    <div class="layer-group">
-        <div class="layer-group-title"><i class="fas fa-fire-alt"></i> Modelos de Riesgo</div>
-        <div class="layer-item">
-            <span>Riesgo Climático (Heatmap)</span>
-            <label class="switch"><input type="checkbox" id="layer-riesgo"><span class="slider"></span></label>
+    <!-- Acordeón: Modelos de Riesgo -->
+    <div class="layer-group accordion active">
+        <div class="layer-group-title">
+            <i class="fas fa-fire-alt main-icon"></i> Modelos de Riesgo
+            <i class="fas fa-chevron-down accordion-icon"></i>
         </div>
-        <div class="layer-item">
-            <span>Zonas Inundables</span>
-            <label class="switch"><input type="checkbox" id="layer-inundacion"><span class="slider"></span></label>
+        <div class="layer-group-content">
+            <div class="layer-item">
+                <span>Riesgo Climático (Heatmap)</span>
+                <label class="switch"><input type="checkbox" id="layer-riesgo"><span class="slider"></span></label>
+            </div>
+            <div class="layer-item">
+                <span>Zonas Inundables</span>
+                <label class="switch"><input type="checkbox" id="layer-inundacion"><span class="slider"></span></label>
+            </div>
         </div>
     </div>
     
     <!-- Carga de Datos Locales -->
-    <div class="layer-group">
-        <div class="layer-group-title"><i class="fas fa-file-upload"></i> Cargar Capas Locales</div>
-        <div style="font-size: 0.8rem; color: #666; margin-bottom: 10px;">Formatos soportados: .parquet, .gpkg, .geojson</div>
-        <input type="file" id="file-upload" accept=".parquet,.gpkg,.geojson,.json">
-        <div id="upload-status" style="font-size: 0.75rem; color: #2c5f2d; margin-top: 5px; display: none;">Procesando archivo...</div>
-        <div id="upload-error" style="font-size: 0.75rem; color: #d32f2f; margin-top: 5px; display: none;"></div>
+    <div class="layer-group accordion active">
+        <div class="layer-group-title">
+            <i class="fas fa-file-upload main-icon"></i> Cargar Capas Locales
+            <i class="fas fa-chevron-down accordion-icon"></i>
+        </div>
+        <div class="layer-group-content">
+            <div style="font-size: 0.75rem; color: #666; margin-bottom: 8px;">Formatos: .parquet, .gpkg, .geojson</div>
+            
+            <div class="file-upload-wrapper">
+                <div class="file-input-group">
+                    <input type="text" id="file-name-display" readonly placeholder="Ningún archivo..." class="file-text">
+                    <button id="btn-browse" class="btn-browse">Examinar</button>
+                </div>
+                <input type="file" id="real-file-input" accept=".parquet,.gpkg,.geojson,.json" style="display: none;">
+                <button id="btn-load" class="btn-primary btn-load" style="display:none;"><i class="fas fa-upload"></i> Cargar Capa al Mapa</button>
+            </div>
+            
+            <div id="upload-status" style="font-size: 0.75rem; color: #2c5f2d; margin-top: 8px; display: none; font-weight: bold;">Procesando archivo...</div>
+            <div id="upload-error" style="font-size: 0.75rem; color: #d32f2f; margin-top: 8px; display: none;"></div>
+        </div>
     </div>
 </div>
 
@@ -323,7 +393,7 @@
 </div>
 
 <script>
-    // --- 1. Lógica de Paneles Ocultables ---
+    // --- 1. Lógica de Paneles Ocultables y Acordeones ---
     const leftPanel = document.getElementById('left-panel');
     const leftBtn = document.getElementById('left-collapse-btn');
     leftBtn.addEventListener('click', () => {
@@ -342,7 +412,37 @@
         rightBtn.innerHTML = rightPanel.classList.contains('collapsed') ? '<i class="fas fa-chevron-left"></i>' : '<i class="fas fa-chevron-right"></i>';
     });
 
-    // --- 2. Inicialización del Mapa ---
+    document.querySelectorAll('.layer-group-title').forEach(title => {
+        title.addEventListener('click', function() {
+            this.parentElement.classList.toggle('active');
+        });
+    });
+
+    // --- 2. Herramientas: Manito y Paneo Central ---
+    let selectMode = false; // Modo mano por defecto
+    const mapWrap = document.getElementById('map-wrap');
+    
+    const toolHand = document.getElementById('tool-hand');
+    const toolSelect = document.getElementById('tool-select');
+    const toolLabels = document.getElementById('tool-labels');
+    
+    toolHand.addEventListener('click', () => {
+        toolHand.classList.add('active');
+        toolSelect.classList.remove('active');
+        mapWrap.className = 'map-container cursor-grab'; // reset to hand
+        selectMode = false;
+        document.getElementById('entity-dashboard').style.display = 'none';
+        if (map.getLayer('layer-municipios-highlight')) map.setFilter('layer-municipios-highlight', ['in', 'OBJECTID', '']);
+    });
+
+    toolSelect.addEventListener('click', () => {
+        toolSelect.classList.add('active');
+        toolHand.classList.remove('active');
+        mapWrap.className = 'map-container cursor-select';
+        selectMode = true;
+    });
+
+    // --- 3. Inicialización del Mapa ---
     const map = new maplibregl.Map({
         container: 'map',
         style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
@@ -356,43 +456,66 @@
     const subregionesUrl = 'https://services3.arcgis.com/goZBWrqGYED1vW4P/arcgis/rest/services/Subregiones_Provincias_de_Colombia/FeatureServer/0';
     const municipiosUrl = 'https://services3.arcgis.com/goZBWrqGYED1vW4P/arcgis/rest/services/Municipios_de_Colombia/FeatureServer/0';
 
+    // Lógica para Paneo con el botón central (rueda del ratón)
+    let isMiddleDragging = false;
+    map.on('mousedown', (e) => {
+        if (e.originalEvent.button === 1) { // Middle button
+            e.preventDefault();
+            isMiddleDragging = true;
+            mapWrap.className = 'map-container cursor-grabbing';
+        }
+    });
+    window.addEventListener('mousemove', (e) => {
+        if (isMiddleDragging) {
+            map.panBy([-e.movementX, -e.movementY], { duration: 0 });
+        }
+    });
+    window.addEventListener('mouseup', (e) => {
+        if (e.button === 1 || isMiddleDragging) {
+            isMiddleDragging = false;
+            mapWrap.className = selectMode ? 'map-container cursor-select' : 'map-container cursor-grab';
+        }
+    });
+    
+    // Cambiar cursor a grabbing solo en modo manito al arrastrar con botón izquierdo
+    map.on('dragstart', (e) => {
+        if (!selectMode && e.originalEvent && e.originalEvent.button === 0) {
+            mapWrap.className = 'map-container cursor-grabbing';
+        }
+    });
+    map.on('dragend', () => {
+        if (!selectMode && !isMiddleDragging) {
+            mapWrap.className = 'map-container cursor-grab';
+        }
+    });
+
     map.on('load', () => {
         
-        // --- 3. Cargar Capas Base y Datos ---
-        // OpenStreetMap Layer
-        map.addSource('osm', {
-            type: 'raster',
-            tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
-            tileSize: 256,
-            attribution: '&copy; OpenStreetMap'
-        });
-        map.addLayer({
-            id: 'layer-osm',
-            type: 'raster',
-            source: 'osm',
-            layout: { visibility: 'none' }
-        }, map.getStyle().layers[0].id);
+        // --- 4. Cargar Fuentes y Capas Base Adicionales ---
+        // Se cargan por debajo de todas las capas para no tapar los datos
+        const firstSymbolId = map.getStyle().layers.find(l => l.type === 'symbol')?.id;
 
-        map.addSource('subregiones-source', {
-            type: 'geojson',
-            data: subregionesUrl + '/query?where=1%3D1&outFields=*&outSR=4326&f=geojson'
-        });
+        // Dark Matter
+        map.addSource('bg-dark', { type: 'raster', tiles: ['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'], tileSize: 256 });
+        map.addLayer({ id: 'layer-dark', type: 'raster', source: 'bg-dark', layout: { visibility: 'none' } }, firstSymbolId);
 
-        map.addSource('municipios-source', {
-            type: 'geojson',
-            data: municipiosUrl + '/query?where=1%3D1&outFields=*&outSR=4326&f=geojson'
-        });
+        // OpenStreetMap
+        map.addSource('bg-osm', { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256 });
+        map.addLayer({ id: 'layer-osm', type: 'raster', source: 'bg-osm', layout: { visibility: 'none' } }, firstSymbolId);
 
-        // Capa interactiva oculta para atrapar clics de relleno (si las lineas son muy finas)
+        // OpenTopoMap
+        map.addSource('bg-topo', { type: 'raster', tiles: ['https://tile.opentopomap.org/{z}/{x}/{y}.png'], tileSize: 256 });
+        map.addLayer({ id: 'layer-topo', type: 'raster', source: 'bg-topo', layout: { visibility: 'none' } }, firstSymbolId);
+
+        // Capas Operacionales
+        map.addSource('subregiones-source', { type: 'geojson', data: subregionesUrl + '/query?where=1%3D1&outFields=*&outSR=4326&f=geojson' });
+        map.addSource('municipios-source', { type: 'geojson', data: municipiosUrl + '/query?where=1%3D1&outFields=*&outSR=4326&f=geojson' });
+
         map.addLayer({
             id: 'layer-municipios',
             type: 'fill',
             source: 'municipios-source',
-            paint: {
-                'fill-color': '#1e466e',
-                'fill-opacity': 0.15,
-                'fill-outline-color': '#ffffff'
-            }
+            paint: { 'fill-color': '#1e466e', 'fill-opacity': 0.15, 'fill-outline-color': '#ffffff' }
         });
         
         map.addLayer({
@@ -410,53 +533,41 @@
             paint: { 'line-color': '#2c5f2d', 'line-width': 1.5, 'line-opacity': 0.8 }
         });
         
-        // --- 4. Selección Global (Cursor Tool) ---
-        let selectMode = true; 
-        const mapWrap = document.getElementById('map-wrap');
-        
-        // En lugar de atar el clic a una capa, lo atamos al mapa general
+        // --- 5. Lógica de Selección Global ---
         map.on('click', (e) => {
             if (!selectMode) return;
             
-            // Buscar características renderizadas bajo el clic
             const features = map.queryRenderedFeatures(e.point);
             
             if (features.length === 0) {
-                // Clic en vacío
                 document.getElementById('entity-dashboard').style.display = 'none';
                 if (map.getLayer('layer-municipios-highlight')) map.setFilter('layer-municipios-highlight', ['in', 'OBJECTID', '']);
                 return;
             }
             
-            // Tomamos la entidad superior (excluyendo capas base o etiquetas puras si es posible)
-            const feature = features.find(f => f.source !== 'composite' && f.source !== 'osm' && f.layer.type !== 'raster') || features[0];
+            const feature = features.find(f => f.source !== 'composite' && f.layer.type !== 'raster' && f.layer.type !== 'background') || features[0];
             
-            if (!feature || feature.layer.type === 'raster') return; // Ignorar clic en raster base
+            if (!feature || feature.layer.type === 'raster' || feature.layer.type === 'background') return;
 
-            // Highlight si es de la capa municipios
             if (feature.source === 'municipios-source' && feature.properties.OBJECTID) {
                 map.setFilter('layer-municipios-highlight', ['in', 'OBJECTID', feature.properties.OBJECTID]);
                 document.getElementById('md-stats-container').style.display = 'grid';
                 document.getElementById('md-properties').style.display = 'none';
             } else {
-                // Otra capa (ej. la subida por el usuario)
                 if (map.getLayer('layer-municipios-highlight')) map.setFilter('layer-municipios-highlight', ['in', 'OBJECTID', '']);
                 
-                // Ocultar stats estáticos y mostrar propiedades crudas
                 document.getElementById('md-stats-container').style.display = 'none';
                 const propsDiv = document.getElementById('md-properties');
                 propsDiv.style.display = 'block';
-                propsDiv.innerHTML = '<strong>Propiedades:</strong><br/>';
+                propsDiv.innerHTML = '<strong style="color:#2c5f2d; font-size: 0.9rem; margin-bottom:5px; display:block;">Propiedades:</strong>';
                 Object.keys(feature.properties).forEach(k => {
-                    propsDiv.innerHTML += `<b>${k}:</b> ${feature.properties[k]}<br/>`;
+                    propsDiv.innerHTML += `<div style="border-bottom:1px solid #eee; padding:3px 0;"><b>${k}:</b> <span style="color:#555;">${feature.properties[k]}</span></div>`;
                 });
             }
             
-            // Nombre entidad
             const nombre = feature.properties.MPIO_CNMBR || feature.properties.MPIO_CNM || feature.properties.name || feature.properties.Nombre || feature.layer.id;
             document.getElementById('md-entity-name').textContent = nombre;
             
-            // Si es municipio, simular indicadores SIGAGRO
             if (feature.source === 'municipios-source') {
                 const seed = feature.properties.OBJECTID || Math.random() * 1000;
                 const el = ((seed * 1.34) % 800 + 50).toFixed(2);
@@ -478,19 +589,53 @@
             
             document.getElementById('entity-dashboard').style.display = 'block';
         });
-
     });
 
-    // --- 5. Lógica de Archivos (GeoParquet / GeoPackage) ---
-    const fileUpload = document.getElementById('file-upload');
+    // --- 6. Cambiador de Capas Base (Radios) ---
+    const baseLayers = ['positron', 'dark', 'osm', 'topo'];
+    document.querySelectorAll('input[name="baselayer"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            const selected = e.target.value;
+            // Positron es el fondo del mapa, no tiene capa raster extra a menos que la apaguemos
+            // Lo más limpio es mostrar la capa raster por encima de positron si es distinta a positron
+            baseLayers.forEach(layer => {
+                if(layer !== 'positron' && map.getLayer(`layer-${layer}`)) {
+                    map.setLayoutProperty(`layer-${layer}`, 'visibility', layer === selected ? 'visible' : 'none');
+                }
+            });
+        });
+    });
+
+    // --- 7. Lógica UI Mejorada de Subida de Archivos ---
+    const realInput = document.getElementById('real-file-input');
+    const browseBtn = document.getElementById('btn-browse');
+    const nameDisplay = document.getElementById('file-name-display');
+    const loadBtn = document.getElementById('btn-load');
     const uploadStatus = document.getElementById('upload-status');
     const uploadError = document.getElementById('upload-error');
     let customLayerCounter = 1;
 
-    fileUpload.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
+    browseBtn.addEventListener('click', () => {
+        realInput.click();
+    });
+
+    realInput.addEventListener('change', () => {
+        if (realInput.files.length > 0) {
+            nameDisplay.value = realInput.files[0].name;
+            loadBtn.style.display = 'block';
+            uploadStatus.style.display = 'none';
+            uploadError.style.display = 'none';
+        } else {
+            nameDisplay.value = '';
+            loadBtn.style.display = 'none';
+        }
+    });
+
+    loadBtn.addEventListener('click', async () => {
+        const file = realInput.files[0];
         if (!file) return;
 
+        loadBtn.style.display = 'none';
         uploadStatus.style.display = 'block';
         uploadStatus.textContent = `Procesando ${file.name}...`;
         uploadError.style.display = 'none';
@@ -500,23 +645,19 @@
             let geojson = null;
 
             if (file.name.endsWith('.parquet')) {
-                // Usando loaders.gl para Parquet
                 if(window.loaders && window.loaders.ParquetLoader) {
                     const data = await window.loaders.parse(arrayBuffer, window.loaders.ParquetLoader);
-                    // Convertir a GeoJSON simplificado (Depende de si el Parquet tiene WKB, si no, es complejo en frontend)
-                    // Para demostración asumimos un parquet con x,y o ya en formato parseable
-                    alert('Soporte nativo completo para WKB en GeoParquet requiere librerías adicionales. Se cargaron los datos crudos en consola.');
+                    alert('Soporte nativo WKB GeoParquet en frontend es parcial. Datos leídos crudos en consola.');
                     console.log("Parquet data:", data);
-                    throw new Error("GeoParquet WKB parsing en desarrollo.");
+                    throw new Error("El parseo de geometría binaria (GeoParquet) requiere conversor WKB o backend.");
                 } else {
-                    throw new Error("Librería Parquet no cargada correctamente.");
+                    throw new Error("Librería Parquet no cargada.");
                 }
             } else if (file.name.endsWith('.geojson') || file.name.endsWith('.json')) {
                 const text = new TextDecoder().decode(arrayBuffer);
                 geojson = JSON.parse(text);
             } else if (file.name.endsWith('.gpkg')) {
-                // GeoPackage en Frontend es complejo, simularemos el rechazo amigable o uso de SQL.js si estuviera
-                throw new Error("El soporte directo de GeoPackage (.gpkg) en el navegador requiere un backend o SQL.js. Por favor, convierte a GeoJSON o Parquet para uso offline completo.");
+                throw new Error("El GeoPackage (.gpkg) local requiere SQL.js integrado. Se recomienda convertir a GeoJSON.");
             } else {
                 throw new Error("Formato no soportado.");
             }
@@ -527,7 +668,6 @@
                 
                 map.addSource(sourceId, { type: 'geojson', data: geojson });
                 
-                // Intentar deducir el tipo (Point vs Polygon)
                 const isPoint = geojson.features && geojson.features[0] && geojson.features[0].geometry && geojson.features[0].geometry.type === 'Point';
                 
                 if (isPoint) {
@@ -546,34 +686,40 @@
                     });
                 }
 
-                // Añadir al menú de capas dinámicamente
-                const layerMenu = document.querySelector('.layer-group:nth-child(4)'); // Asumiendo que es el tercer o cuarto
+                const workingLayers = document.getElementById('working-layers');
                 const newItem = document.createElement('div');
                 newItem.className = 'layer-item';
                 newItem.innerHTML = `
-                    <span style="overflow: hidden; text-overflow: ellipsis; max-width: 150px; white-space: nowrap;">${file.name}</span>
+                    <span style="overflow: hidden; text-overflow: ellipsis; max-width: 150px; white-space: nowrap;" title="${file.name}">${file.name}</span>
                     <label class="switch"><input type="checkbox" id="toggle-${layerId}" checked><span class="slider"></span></label>
                 `;
-                // Insertarlo antes del input de archivo
-                fileUpload.parentNode.insertBefore(newItem, fileUpload);
+                workingLayers.appendChild(newItem);
                 
                 document.getElementById(`toggle-${layerId}`).addEventListener('change', (ev) => {
                     map.setLayoutProperty(layerId, 'visibility', ev.target.checked ? 'visible' : 'none');
                 });
 
                 customLayerCounter++;
+                uploadStatus.style.color = '#2c5f2d';
                 uploadStatus.textContent = `¡Cargado con éxito!`;
-                setTimeout(() => uploadStatus.style.display = 'none', 3000);
+                
+                // Reset form
+                setTimeout(() => {
+                    uploadStatus.style.display = 'none';
+                    nameDisplay.value = '';
+                    realInput.value = '';
+                }, 3000);
             }
 
         } catch (error) {
             uploadStatus.style.display = 'none';
             uploadError.style.display = 'block';
             uploadError.textContent = error.message;
+            loadBtn.style.display = 'block'; // Volver a mostrar por si quiere reintentar
         }
     });
 
-    // --- 6. Eventos de la Interfaz Estándar ---
+    // --- 8. Eventos Generales UI ---
     document.getElementById('tasaInteres').addEventListener('input', function() { document.getElementById('tasaValor').textContent = this.value + '%'; });
     document.getElementById('precioFactor').addEventListener('input', function() { document.getElementById('precioValor').textContent = this.value + '%'; });
 
@@ -592,31 +738,11 @@
             });
         }
     };
-    
     toggleLayer('layer-provincias', 'layer-provincias');
     toggleLayer('layer-municipios', 'layer-municipios');
-    toggleLayer('layer-osm', 'layer-osm');
 
-    const toolSelect = document.getElementById('tool-select');
-    const toolPolygon = document.getElementById('tool-polygon');
-    const toolLabels = document.getElementById('tool-labels');
+    // Supresión de Etiquetas (Deconfliction)
     let labelsVisible = true;
-
-    toolSelect.addEventListener('click', () => {
-        toolSelect.classList.add('active');
-        toolPolygon.classList.remove('active');
-        document.getElementById('map-wrap').classList.add('cursor-select');
-        selectMode = true;
-    });
-
-    toolPolygon.addEventListener('click', () => {
-        toolPolygon.classList.add('active');
-        toolSelect.classList.remove('active');
-        document.getElementById('map-wrap').classList.remove('cursor-select');
-        selectMode = false;
-        alert('Herramienta Polígono. (Requiere @mapbox/mapbox-gl-draw)');
-    });
-
     toolLabels.addEventListener('click', function() {
         labelsVisible = !labelsVisible;
         this.innerHTML = labelsVisible ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';

@@ -68,53 +68,67 @@ def ejecutar_conversion():
         start_time = time.time()
         if capa:
             output_file = os.path.join(carpeta_salida, f"{base_name}_{capa}.parquet")
-            print(f"\n🚀 Convirtiendo capa: '{capa}'")
+            print(f"\n🚀 Procesando capa: '{capa}'")
         else:
             output_file = os.path.join(carpeta_salida, f"{base_name}.parquet")
             print(f"\n🚀 Iniciando conversión...")
 
-        try:
-            # MÉTODO 1: Intento estándar con geoparquet-io (incluye Hilbert sorting y BBOX)
-            print(f"⚙️ Leyendo datos y calculando metadatos...")
-            dataset = gpio.read(INPUT_FILE, layer=capa)
-            dataset.write(output_file)
-            
-            elapsed = time.time() - start_time
-            print(f"✅ ¡ÉXITO! Guardado en: {os.path.basename(output_file)} ({elapsed:.1f}s)")
-            
-        except Exception as e:
-            error_msg = str(e).lower()
-            if "bounds" in error_msg or "extent" in error_msg:
-                print(f"⚠️ Falló el cálculo de límites (geometrías inválidas detectadas).")
-                print(f"🔄 Iniciando limpieza y conversión forzada vía DuckDB...")
-                
-                try:
-                    # MÉTODO 2: Fallback con DuckDB Directo
-                    # Filtramos geometrías nulas que suelen causar el error de bounds
-                    con = duckdb.connect()
-                    con.execute("INSTALL spatial; LOAD spatial;")
-                    
-                    # DuckDB lee el GPKG, filtra nulos y exporta a Parquet
-                    # Nota: ST_Read en DuckDB es extremadamente rápido
-                    query = f"COPY (SELECT * FROM st_read('{INPUT_FILE}', layer='{capa}') WHERE geom IS NOT NULL) TO '{output_file}' (FORMAT 'PARQUET')"
-                    con.execute(query)
-                    con.close()
-                    
-                    # Intentamos inyectar los metadatos de GeoParquet al archivo generado por DuckDB
-                    # para que sea compatible con el Geovisor
-                    try:
-                        gpio.add_bbox_metadata(output_file)
-                    except:
-                        pass
-                        
-                    elapsed = time.time() - start_time
-                    print(f"✅ ¡ÉXITO FORZADO! Capa limpia y convertida ({elapsed:.1f}s)")
-                except Exception as e2:
-                    print(f"❌ Falló incluso el método de respaldo: {e2}")
-            else:
-                print(f"❌ ERROR inesperado en la capa '{capa}': {e}")
+        # Omitir si ya existe (para ahorrar tiempo)
+        if os.path.exists(output_file):
+            print(f"⏩ La capa ya existe, saltando... ({os.path.basename(output_file)})")
+            continue
 
-    print("\n🎉 Proceso finalizado.")
+        try:
+            # MÉTODO PRINCIPAL: DuckDB (Ultra-rápido y robusto para GPKG)
+            print(f"⚙️ Iniciando motor DuckDB Spatial...")
+            con = duckdb.connect()
+            con.execute("INSTALL spatial; LOAD spatial;")
+            
+            try:
+                print(f"📦 Analizando estructura de la capa...")
+                # Primero detectamos qué columnas hay y cuál es la de geometría
+                info = con.execute(f"SELECT * FROM st_read('{INPUT_FILE}', layer='{capa}') LIMIT 0").df()
+                columnas = info.columns.tolist()
+                
+                # Buscamos nombres comunes de geometría
+                geom_col = None
+                for candidate in ['geom', 'geometry', 'GEOMETRY', 'GEOM', 'shape', 'SHAPE', 'SHP']:
+                    if candidate in columnas:
+                        geom_col = candidate
+                        break
+                
+                if geom_col:
+                    print(f"✨ Geometría detectada en columna: '{geom_col}'")
+                    # Usamos ST_AsWKB para asegurar que la geometría sea legible si es compleja
+                    query = f"COPY (SELECT * FROM st_read('{INPUT_FILE}', layer='{capa}') WHERE {geom_col} IS NOT NULL) TO '{output_file}' (FORMAT 'PARQUET')"
+                else:
+                    print(f"ℹ️ No se detectó columna de geometría estándar. Intentando copia directa...")
+                    query = f"COPY (SELECT * FROM st_read('{INPUT_FILE}', layer='{capa}')) TO '{output_file}' (FORMAT 'PARQUET')"
+                
+                print(f"🚀 Extrayendo y convirtiendo...")
+                con.execute(query)
+                con.close()
+                
+                # Inyectamos metadatos de GeoParquet
+                print(f"📝 Inyectando metadatos GeoParquet...")
+                try:
+                    gpio.add_bbox_metadata(output_file)
+                except:
+                    pass
+                
+                elapsed = time.time() - start_time
+                print(f"✅ ¡ÉXITO! Capa convertida en {elapsed:.1f}s")
+
+            except Exception as e_duck:
+                con.close()
+                print(f"❌ Error en DuckDB para la capa '{capa}': {e_duck}")
+                print(f"⏭️ Saltando a la siguiente capa...")
+
+        except Exception as e:
+            print(f"❌ ERROR crítico en el motor para la capa '{capa}': {e}")
+            print(f"⏭️ Saltando a la siguiente capa...")
+
+    print("\n🎉 Proceso de conversión finalizado.")
 
 if __name__ == "__main__":
     # Aseguramos salida UTF-8 para emojis en Windows

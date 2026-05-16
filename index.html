@@ -231,6 +231,34 @@
         ::-webkit-scrollbar-thumb:hover { background-color: rgba(44, 95, 45, 0.8); }
         ::-webkit-scrollbar-corner { background: transparent; }
 
+        /* Consola Informativa (Nuevo Elemento) */
+        .info-console {
+            position: absolute;
+            bottom: 20px;
+            right: 380px;
+            width: 300px;
+            max-height: 180px;
+            padding: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.8rem;
+            color: #2c3e50;
+            overflow-y: auto;
+            border-left: 4px solid #2c5f2d;
+            transition: all 0.3s;
+        }
+        .info-console.collapsed { transform: translateY(200px); opacity: 0; }
+        .console-header { font-weight: 800; font-size: 0.7rem; color: #2c5f2d; margin-bottom: 8px; text-transform: uppercase; display: flex; align-items: center; gap: 5px; }
+        .console-text { line-height: 1.4; color: #444; }
+        .console-highlight { color: #2c5f2d; font-weight: bold; }
+
+        /* Estructura de Árbol para Capas */
+        .dataset-group { margin-left: 10px; margin-top: 5px; border-left: 1px dashed rgba(44, 95, 45, 0.3); padding-left: 10px; }
+        .dataset-title { font-size: 0.8rem; font-weight: 700; color: #555; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; cursor: pointer; }
+        .dataset-title:hover { color: #2c5f2d; }
+        .layer-item.nested { margin-left: 5px; background: transparent; border: none; padding: 4px 0; }
+        .layer-item.nested span { font-size: 0.8rem; color: #666; }
+
+
     </style>
 </head>
 <body>
@@ -323,24 +351,51 @@
         </div>
     </div>
 
-    <!-- Acordeón: Capas de Trabajo (Sin active para iniciar retraído) -->
+    <!-- Acordeón: Capas de Trabajo (Estructura de Árbol) -->
     <div class="layer-group accordion">
         <div class="layer-group-title">
-            <i class="fas fa-border-all main-icon"></i> Capas de Trabajo
+            <i class="fas fa-project-diagram main-icon"></i> Capas de Trabajo
             <i class="fas fa-chevron-down accordion-icon"></i>
         </div>
         <div class="layer-group-content" id="working-layers">
-            <input type="text" class="layer-search" placeholder="Buscar capa de trabajo...">
-            <div class="layer-item">
-                <span>Subregiones / Provincias</span>
-                <label class="switch"><input type="checkbox" id="layer-provincias" checked><span class="slider"></span></label>
+            <input type="text" class="layer-search" placeholder="Buscar en datasets...">
+            
+            <!-- Dataset 1: Catastro IGAC -->
+            <div class="dataset-group">
+                <div class="dataset-title" title="Modelo de Datos Catastro Multipropósito">
+                    <i class="fas fa-database"></i> Catastro Nacional (IGAC)
+                </div>
+                <div class="dataset-content">
+                    <div class="layer-item nested" onmouseover="updateConsole('R_TERRENO')" onclick="updateConsole('R_TERRENO')">
+                        <span>R_TERRENO (Predios)</span>
+                        <label class="switch"><input type="checkbox" id="layer-terreno"><span class="slider"></span></label>
+                    </div>
+                    <div class="layer-item nested" onmouseover="updateConsole('R_CONSTRUCCION')" onclick="updateConsole('R_CONSTRUCCION')">
+                        <span>R_CONSTRUCCION (Edificios)</span>
+                        <label class="switch"><input type="checkbox" id="layer-construccion"><span class="slider"></span></label>
+                    </div>
+                </div>
             </div>
-            <div class="layer-item">
-                <span>Límites Municipales</span>
-                <label class="switch"><input type="checkbox" id="layer-municipios" checked><span class="slider"></span></label>
+
+            <!-- Dataset 2: Geografía Administrativa -->
+            <div class="dataset-group">
+                <div class="dataset-title">
+                    <i class="fas fa-map-marked-alt"></i> Divipola Administrativa
+                </div>
+                <div class="dataset-content">
+                    <div class="layer-item nested" onmouseover="updateConsole('MUNICIPIOS')" onclick="updateConsole('MUNICIPIOS')">
+                        <span>Límites Municipales</span>
+                        <label class="switch"><input type="checkbox" id="layer-municipios" checked><span class="slider"></span></label>
+                    </div>
+                    <div class="layer-item nested" onmouseover="updateConsole('PROVINCIAS')" onclick="updateConsole('PROVINCIAS')">
+                        <span>Subregiones / Provincias</span>
+                        <label class="switch"><input type="checkbox" id="layer-provincias" checked><span class="slider"></span></label>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
     
     <!-- Acordeón: Modelos de Riesgo (Sin active para iniciar retraído) -->
     <div class="layer-group accordion">
@@ -412,6 +467,15 @@
     <!-- Tabla de propiedades para capas customizadas -->
     <div id="md-properties"></div>
 </div>
+
+<!-- Consola Informativa (Nuevo Panel) -->
+<div class="glass-panel info-console" id="info-console">
+    <div class="console-header"><i class="fas fa-terminal"></i> Knowledge Base / MVP Engine</div>
+    <div class="console-text" id="console-output">
+        Bienvenido al <span class="console-highlight">Centro de Comando Geovisor</span>. Selecciona o pasa el mouse sobre una capa para ver sus especificaciones técnicas.
+    </div>
+</div>
+
 
 <script>
     // --- 1. Lógica de Paneles Ocultables y Acordeones ---
@@ -793,6 +857,28 @@
                     map.setLayoutProperty(layer.id, 'visibility', labelsVisible ? 'visible' : 'none');
                 }
             });
+        }
+    // --- 9. Lógica de Consola Informativa ---
+    const consoleData = {
+        'R_TERRENO': 'Capa fundamental del <span class="console-highlight">Modelo Catastro IGAC</span>. Contiene la delimitación geométrica de los predios rurales. Vital para el análisis de tenencia y riesgo parcelario.',
+        'R_CONSTRUCCION': 'Representa las huellas de edificación dentro de los predios rústicos. Permite evaluar la exposición física de infraestructuras.',
+        'MUNICIPIOS': 'Límites políticos de la Divipola (DANE). Base para el reporte de estadísticas municipales de FINAGRO.',
+        'PROVINCIAS': 'Agrupaciones regionales que comparten características económicas similares, facilitando el análisis de carteras colectivas.',
+        'BASE': 'Contexto geográfico para orientación espacial.'
+    };
+
+    function updateConsole(id) {
+        const output = document.getElementById('console-output');
+        if (output && consoleData[id]) {
+            output.innerHTML = consoleData[id];
+        }
+    }
+
+    // Ocultar consola cuando el panel derecho se cierra
+    rightBtn.addEventListener('click', () => {
+        const consoleEl = document.getElementById('info-console');
+        if (consoleEl) {
+            consoleEl.classList.toggle('collapsed', rightPanel.classList.contains('collapsed'));
         }
     });
 

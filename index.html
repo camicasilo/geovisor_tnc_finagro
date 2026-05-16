@@ -581,7 +581,8 @@
         input.addEventListener('input', function() {
             const filter = this.value.toLowerCase();
             const container = this.parentElement;
-            // Buscar items de tipo radio o switches
+            
+            // 1. Filtrar los items individuales
             const items = container.querySelectorAll('.layer-item, .radio-container');
             items.forEach(item => {
                 const text = item.textContent || item.innerText;
@@ -589,6 +590,33 @@
                     item.style.display = "";
                 } else {
                     item.style.display = "none";
+                }
+            });
+
+            // 2. Gestionar la visibilidad y expansión de los Datasets (Carpetas)
+            const datasetGroups = container.querySelectorAll('.dataset-group');
+            datasetGroups.forEach(group => {
+                const groupItems = group.querySelectorAll('.layer-item');
+                let hasVisibleChild = false;
+                
+                groupItems.forEach(item => {
+                    if (item.style.display !== "none") {
+                        hasVisibleChild = true;
+                    }
+                });
+
+                if (filter !== "") {
+                    // Si el usuario está buscando y hay coincidencia, expandir la carpeta
+                    if (hasVisibleChild) {
+                        group.style.display = "";
+                        group.classList.remove('collapsed');
+                    } else {
+                        // Si no hay coincidencia en esta carpeta, ocultarla entera
+                        group.style.display = "none";
+                    }
+                } else {
+                    // Si borra la búsqueda, mostrar todas las carpetas (el estado collapsed se mantiene o resetea)
+                    group.style.display = "";
                 }
             });
         });

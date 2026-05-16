@@ -231,30 +231,38 @@
         ::-webkit-scrollbar-thumb:hover { background-color: rgba(44, 95, 45, 0.8); }
         ::-webkit-scrollbar-corner { background: transparent; }
 
-        /* Centro de Información (Consola Inferior) */
+        /* Centro de Información (Consola Inferior - Apple Glass Style) */
         .info-console {
             position: absolute;
-            bottom: 15px;
+            bottom: 25px;
             left: 50%;
             transform: translateX(-50%);
-            width: 700px;
-            max-height: 120px;
-            padding: 12px 20px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.85rem;
-            color: #1a1a1a;
+            width: 750px;
+            max-height: 110px;
+            padding: 14px 24px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 0.9rem;
+            color: #000;
             overflow-y: auto;
-            border-bottom: 3px solid #2c5f2d;
-            background: rgba(255, 255, 255, 0.5) !important;
-            backdrop-filter: blur(8px) !important;
-            -webkit-backdrop-filter: blur(8px) !important;
-            transition: all 0.3s;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.25) !important; /* Ultra transparente */
+            backdrop-filter: blur(20px) saturate(180%) !important; /* Apple Glass effect */
+            -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center;
         }
+        .info-console.hidden-glass {
+            opacity: 0;
+            pointer-events: none;
+            transform: translate(-50%, 20px);
+        }
         .info-console.collapsed { transform: translate(-50%, 200px); opacity: 0; }
-        .console-header { font-weight: 800; font-size: 0.7rem; color: #2c5f2d; margin-bottom: 5px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; opacity: 0.8; }
-        .console-text { line-height: 1.5; color: #111; font-weight: 500; }
-        .console-highlight { color: #2c5f2d; font-weight: 800; background: rgba(44, 95, 45, 0.1); padding: 0 4px; border-radius: 3px; }
+        .console-header { font-weight: 700; font-size: 0.75rem; color: #1e466e; margin-bottom: 6px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; letter-spacing: 1px; }
+        .console-text { line-height: 1.4; color: #222; font-weight: 400; }
+        .console-text b { color: #2c5f2d; font-weight: 600; }
+
 
 
         /* Estructura de Árbol para Capas */
@@ -292,9 +300,9 @@
 
 <!-- Barra de Herramientas Flotante -->
 <div class="toolbar" id="toolbar-panel">
-    <div class="toolbar-btn active" id="tool-hand" title="Modo Paneo" onmouseover="updateConsole('HERRAMIENTA_MANO')"><i class="fas fa-hand-paper"></i></div>
-    <div class="toolbar-btn" id="tool-select" title="Seleccionar Entidad" onmouseover="updateConsole('HERRAMIENTA_SELECCION')"><i class="fas fa-mouse-pointer"></i></div>
-    <div class="toolbar-btn" id="tool-labels" title="Supresión de Etiquetas" onmouseover="updateConsole('SUPRESION_ETIQUETAS')"><i class="fas fa-eye-slash"></i></div>
+    <div class="toolbar-btn active" id="tool-hand" title="Modo Paneo" onmouseover="updateConsole('HERRAMIENTA_MANO')" onmouseout="resetConsole()"><i class="fas fa-hand-paper"></i></div>
+    <div class="toolbar-btn" id="tool-select" title="Seleccionar Entidad" onmouseover="updateConsole('HERRAMIENTA_SELECCION')" onmouseout="resetConsole()"><i class="fas fa-mouse-pointer"></i></div>
+    <div class="toolbar-btn" id="tool-labels" title="Supresión de Etiquetas" onmouseover="updateConsole('SUPRESION_ETIQUETAS')" onmouseout="resetConsole()"><i class="fas fa-eye-slash"></i></div>
 </div>
 
 
@@ -356,19 +364,19 @@
         </div>
         <div class="layer-group-content">
             <input type="text" class="layer-search" placeholder="Buscar capa base...">
-            <label class="radio-container" onmouseover="updateConsole('BASE_POSITRON')">Positron (Claro / Defecto)
+            <label class="radio-container" onmouseover="updateConsole('BASE_POSITRON')" onmouseout="resetConsole()">Positron (Claro / Defecto)
                 <input type="radio" name="baselayer" value="positron" checked>
                 <span class="checkmark"></span>
             </label>
-            <label class="radio-container" onmouseover="updateConsole('BASE_DARK')">CartoDB Dark Matter
+            <label class="radio-container" onmouseover="updateConsole('BASE_DARK')" onmouseout="resetConsole()">CartoDB Dark Matter
                 <input type="radio" name="baselayer" value="dark">
                 <span class="checkmark"></span>
             </label>
-            <label class="radio-container" onmouseover="updateConsole('BASE_OSM')">OpenStreetMap Clásico
+            <label class="radio-container" onmouseover="updateConsole('BASE_OSM')" onmouseout="resetConsole()">OpenStreetMap Clásico
                 <input type="radio" name="baselayer" value="osm">
                 <span class="checkmark"></span>
             </label>
-            <label class="radio-container" onmouseover="updateConsole('BASE_TOPO')">OpenTopoMap (Topográfico)
+            <label class="radio-container" onmouseover="updateConsole('BASE_TOPO')" onmouseout="resetConsole()">OpenTopoMap (Topográfico)
                 <input type="radio" name="baselayer" value="topo">
                 <span class="checkmark"></span>
             </label>
@@ -392,35 +400,35 @@
                     <i class="fas fa-folder-open"></i> Catastro Nacional (IGAC)
                 </div>
                 <div class="dataset-content">
-                    <div class="layer-item nested" onmouseover="updateConsole('R_TERRENO')">
+                    <div class="layer-item nested" onmouseover="updateConsole('R_TERRENO')" onmouseout="resetConsole()">
                         <span>R_TERRENO</span>
                         <label class="switch"><input type="checkbox" id="layer-r-terreno"><span class="slider"></span></label>
                     </div>
-                    <div class="layer-item nested" onmouseover="updateConsole('R_TERRENO_INFORMAL')">
+                    <div class="layer-item nested" onmouseover="updateConsole('R_TERRENO_INFORMAL')" onmouseout="resetConsole()">
                         <span>R_TERRENO_INFORMAL</span>
                         <label class="switch"><input type="checkbox" id="layer-r-terreno-informal"><span class="slider"></span></label>
                     </div>
-                    <div class="layer-item nested" onmouseover="updateConsole('R_CONSTRUCCION')">
+                    <div class="layer-item nested" onmouseover="updateConsole('R_CONSTRUCCION')" onmouseout="resetConsole()">
                         <span>R_CONSTRUCCION</span>
                         <label class="switch"><input type="checkbox" id="layer-r-construccion"><span class="slider"></span></label>
                     </div>
-                    <div class="layer-item nested" onmouseover="updateConsole('R_CONSTRUCCION_INFORMAL')">
+                    <div class="layer-item nested" onmouseover="updateConsole('R_CONSTRUCCION_INFORMAL')" onmouseout="resetConsole()">
                         <span>R_CONSTRUCCION_INFORMAL</span>
                         <label class="switch"><input type="checkbox" id="layer-r-construccion-informal"><span class="slider"></span></label>
                     </div>
-                    <div class="layer-item nested" onmouseover="updateConsole('R_VEREDA')">
+                    <div class="layer-item nested" onmouseover="updateConsole('R_VEREDA')" onmouseout="resetConsole()">
                         <span>R_VEREDA</span>
                         <label class="switch"><input type="checkbox" id="layer-r-vereda"><span class="slider"></span></label>
                     </div>
-                    <div class="layer-item nested" onmouseover="updateConsole('R_SECTOR')">
+                    <div class="layer-item nested" onmouseover="updateConsole('R_SECTOR')" onmouseout="resetConsole()">
                         <span>R_SECTOR</span>
                         <label class="switch"><input type="checkbox" id="layer-r-sector"><span class="slider"></span></label>
                     </div>
-                    <div class="layer-item nested" onmouseover="updateConsole('R_NOMENCLATURA_DOMICILIARIA')">
+                    <div class="layer-item nested" onmouseover="updateConsole('R_NOMENCLATURA_DOMICILIARIA')" onmouseout="resetConsole()">
                         <span>R_NOMENCLATURA_DOMICILIARIA</span>
                         <label class="switch"><input type="checkbox" id="layer-r-nom-dom"><span class="slider"></span></label>
                     </div>
-                    <div class="layer-item nested" onmouseover="updateConsole('R_NOMENCLATURA_VIAL')">
+                    <div class="layer-item nested" onmouseover="updateConsole('R_NOMENCLATURA_VIAL')" onmouseout="resetConsole()">
                         <span>R_NOMENCLATURA_VIAL</span>
                         <label class="switch"><input type="checkbox" id="layer-r-nom-vial"><span class="slider"></span></label>
                     </div>
@@ -434,11 +442,11 @@
                     <i class="fas fa-folder"></i> Divipola Administrativa
                 </div>
                 <div class="dataset-content">
-                    <div class="layer-item nested" onmouseover="updateConsole('MUNICIPIOS')">
+                    <div class="layer-item nested" onmouseover="updateConsole('MUNICIPIOS')" onmouseout="resetConsole()">
                         <span>Límites Municipales (DANE)</span>
                         <label class="switch"><input type="checkbox" id="layer-municipios" checked><span class="slider"></span></label>
                     </div>
-                    <div class="layer-item nested" onmouseover="updateConsole('PROVINCIAS')">
+                    <div class="layer-item nested" onmouseover="updateConsole('PROVINCIAS')" onmouseout="resetConsole()">
                         <span>Subregiones / Provincias</span>
                         <label class="switch"><input type="checkbox" id="layer-provincias" checked><span class="slider"></span></label>
                     </div>
@@ -457,11 +465,11 @@
         </div>
         <div class="layer-group-content">
             <input type="text" class="layer-search" placeholder="Buscar modelo de riesgo...">
-            <div class="layer-item" onmouseover="updateConsole('RIESGO_CLIMA')">
+            <div class="layer-item" onmouseover="updateConsole('RIESGO_CLIMA')" onmouseout="resetConsole()">
                 <span>Riesgo Climático (Heatmap)</span>
                 <label class="switch"><input type="checkbox" id="layer-riesgo"><span class="slider"></span></label>
             </div>
-            <div class="layer-item" onmouseover="updateConsole('ZONAS_INUNDABLES')">
+            <div class="layer-item" onmouseover="updateConsole('ZONAS_INUNDABLES')" onmouseout="resetConsole()">
                 <span>Zonas Inundables</span>
                 <label class="switch"><input type="checkbox" id="layer-inundacion"><span class="slider"></span></label>
             </div>
@@ -914,41 +922,82 @@
         }
     });
 
-    // --- 9. Lógica de Consola Informativa (Carga de JSON) ---
-    let helpData = {};
+    // --- 9. Lógica de Consola Informativa (Carga de JSON como Diccionario) ---
+    let helpDataMap = new Map();
+    const infoConsole = document.getElementById('info-console');
     
     // Cargar datos de ayuda desde JSON
     fetch('Ayuda.json')
         .then(response => response.json())
         .then(data => {
-            helpData = data.Definicion_Elementos;
-            console.log("Ayuda cargada correctamente.");
+            if (data.diccionario_geovisor) {
+                // Convertir el Array de Diccionarios a un Map en memoria (Búsqueda O(1))
+                data.diccionario_geovisor.forEach(item => {
+                    helpDataMap.set(item.id, item.explicacion);
+                });
+                console.log("Diccionario de ayuda cargado:", helpDataMap.size, "elementos.");
+            }
         })
         .catch(err => console.error("Error cargando Ayuda.json:", err));
 
     function updateConsole(id) {
         const output = document.getElementById('console-output');
-        if (output && helpData[id]) {
-            output.innerHTML = helpData[id];
-        } else if (output && id === 'WELCOME') {
-             output.innerHTML = 'Bienvenido al <span class="console-highlight">Centro de Comando Geovisor</span>. Selecciona o pasa el mouse sobre una capa para ver sus especificaciones técnicas.';
+        if (!output) return;
+        
+        if (helpDataMap.has(id)) {
+            output.innerHTML = helpDataMap.get(id);
+            infoConsole.classList.remove('hidden-glass');
+        } else if (id === 'WELCOME' && helpDataMap.has('WELCOME')) {
+             output.innerHTML = helpDataMap.get('WELCOME');
+             infoConsole.classList.remove('hidden-glass');
         }
+    }
+    
+    function resetConsole() {
+        // Al quitar el mouse, se podría ocultar o volver a WELCOME
+        updateConsole('WELCOME');
+        // Si prefieres que desaparezca por completo, usa: infoConsole.classList.add('hidden-glass');
     }
 
     // Vincular eventos a controles del simulador
-    document.getElementById('productorType').addEventListener('mouseover', () => {
-        const val = document.getElementById('productorType').value.toUpperCase();
-        updateConsole(val);
-    });
-    document.getElementById('escenario').addEventListener('mouseover', () => {
-        const val = document.getElementById('escenario').value.toUpperCase();
-        updateConsole(val);
-    });
+    const linkHover = (elemId, helpId) => {
+        const el = document.getElementById(elemId);
+        if(el) {
+            el.addEventListener('mouseover', () => updateConsole(helpId));
+            el.addEventListener('mouseout', resetConsole);
+        }
+    };
 
-    document.querySelector('.metric:nth-child(2)').addEventListener('mouseover', () => updateConsole('TASA_INTERES'));
-    document.querySelector('.metric:nth-child(3)').addEventListener('mouseover', () => updateConsole('PRECIO_PRODUCTO'));
+    linkHover('productorType', 'PRODUCTOR');
+    
+    const escSelect = document.getElementById('escenario');
+    if(escSelect) {
+        escSelect.addEventListener('mouseover', () => {
+            const val = escSelect.value.toUpperCase();
+            updateConsole(val);
+        });
+        escSelect.addEventListener('mouseout', resetConsole);
+    }
+
+    document.querySelectorAll('.metric').forEach((el, index) => {
+        const id = index === 0 ? 'TASA_INTERES' : 'PRECIO_PRODUCTO';
+        el.addEventListener('mouseover', () => updateConsole(id));
+        el.addEventListener('mouseout', resetConsole);
+    });
+    
+    const simBtn = document.getElementById('simularBtn');
+    if(simBtn) {
+        simBtn.addEventListener('mouseover', () => updateConsole('SIMULAR_BTN'));
+        simBtn.addEventListener('mouseout', resetConsole);
+    }
+    
+    // Vincular mouseout general a los paneles para limpiar la consola
+    document.getElementById('left-panel').addEventListener('mouseleave', resetConsole);
+    document.getElementById('right-panel').addEventListener('mouseleave', resetConsole);
+    document.getElementById('toolbar-panel').addEventListener('mouseleave', resetConsole);
 
     // Ocultar consola cuando el panel derecho se cierra
+
     rightBtn.addEventListener('click', () => {
         const consoleEl = document.getElementById('info-console');
         if (consoleEl) {

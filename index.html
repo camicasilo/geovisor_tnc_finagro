@@ -998,6 +998,104 @@
     toggleLayer('layer-provincias', 'layer-provincias');
     toggleLayer('layer-municipios', 'layer-municipios');
 
+    // --- Mapeo de Capas S3 ---
+    const s3LayerRegistry = {
+        'layer-r-terreno': 'CatastroPublicoMarzo2026_R_TERRENO.parquet',
+        'layer-r-terreno-informal': 'CatastroPublicoMarzo2026_R_TERRENO_INFORMAL.parquet',
+        'layer-r-construccion': 'CatastroPublicoMarzo2026_R_CONSTRUCCION.parquet',
+        'layer-r-construccion-informal': 'CatastroPublicoMarzo2026_R_CONSTRUCCION_INFORMAL.parquet',
+        'layer-r-vereda': 'CatastroPublicoMarzo2026_R_VEREDA.parquet',
+        'layer-r-sector': 'CatastroPublicoMarzo2026_R_SECTOR.parquet',
+        'layer-r-nom-dom': 'CatastroPublicoMarzo2026_U_NOMENCLATURA_DOMICILIARIA.parquet',
+        'layer-r-nom-vial': 'CatastroPublicoMarzo2026_R_NOMENCLATURA_VIAL.parquet'
+    };
+
+    // Estilos por tipo de capa
+    const getLayerStyle = (layerId) => {
+        if (layerId.includes('construccion') || layerId.includes('manzana')) {
+            return { type: 'fill', paint: { 'fill-color': '#e67e22', 'fill-opacity': 0.6, 'fill-outline-color': '#d35400' } };
+        } else if (layerId.includes('vereda') || layerId.includes('sector')) {
+            return { type: 'line', paint: { 'line-color': '#2c3e50', 'line-width': 1.5, 'line-dasharray': [2, 1] } };
+        } else if (layerId.includes('nomenclatura')) {
+            return { type: 'circle', paint: { 'circle-radius': 3, 'circle-color': '#e74c3c' } };
+        }
+        // Default: Terreno
+        return { type: 'fill', paint: { 'fill-color': '#2c5f2d', 'fill-opacity': 0.3, 'fill-outline-color': '#1e3a1f' } };
+    };
+
+    // Carga de Capas desde S3
+    async function toggleS3Layer(checkboxId) {
+        const checkbox = document.getElementById(checkboxId);
+        const fileName = s3LayerRegistry[checkboxId];
+        const layerId = `s3-${checkboxId}`;
+        const sourceId = `s3-source-${checkboxId}`;
+
+        if (!checkbox.checked) {
+            if (map.getLayer(layerId)) map.setLayoutProperty(layerId, 'visibility', 'none');
+            return;
+        }
+
+        if (map.getLayer(layerId)) {
+            map.setLayoutProperty(layerId, 'visibility', 'visible');
+            return;
+        }
+
+        // Si no existe, cargarla
+        updateConsole('WELCOME'); // Mostrar mensaje de carga
+        document.getElementById('console-output').innerHTML = `<b>Cargando capa:</b> ${fileName} desde MinIO...`;
+        infoConsole.classList.add('visible');
+
+        if (!dbInstance) await initDuckDBEngine();
+        
+        try {
+            const conn = await dbInstance.connect();
+            const url = `s3://geovisor-tnc-finagro/${fileName}`;
+            
+            // Instalar extensión espacial si no está
+            await conn.query(`INSTALL spatial; LOAD spatial;`);
+            
+            // Consultar datos (limitamos a 5000 para no saturar el mapa inicial)
+            // En una versión futura añadiríamos filtro por BBox
+            const query = `
+                SELECT *, ST_AsGeoJSON(geometry) as json_geom 
+                FROM read_parquet('${url}') 
+                LIMIT 5000;
+            `;
+            const results = await conn.query(query);
+            const geojson = {
+                type: 'FeatureCollection',
+                features: results.toArray().map(row => ({
+                    type: 'Feature',
+                    properties: Object.fromEntries(Object.entries(row).filter(([k]) => k !== 'geometry' && k !== 'json_geom')),
+                    geometry: JSON.parse(row.json_geom)
+                }))
+            };
+
+            map.addSource(sourceId, { type: 'geojson', data: geojson });
+            const style = getLayerStyle(checkboxId);
+            map.addLayer({
+                id: layerId,
+                type: style.type,
+                source: sourceId,
+                paint: style.paint
+            });
+
+            console.log(`✅ Capa ${layerId} cargada.`);
+            updateConsole('WELCOME');
+            document.getElementById('console-output').innerHTML = `<b>Carga Exitosa:</b> ${fileName} se ha añadido al mapa.`;
+            await conn.close();
+        } catch (e) {
+            console.error(`Error cargando capa S3:`, e);
+            document.getElementById('console-output').innerHTML = `<b style="color:red;">Error:</b> No se pudo cargar ${fileName}.`;
+        }
+    }
+
+    // Vincular todos los checkboxes de S3
+    Object.keys(s3LayerRegistry).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('change', () => toggleS3Layer(id));
+    });
+
     // Supresión de Etiquetas (Deconfliction)
     let labelsVisible = true;
     toolLabels.addEventListener('click', function() {
@@ -1020,8 +1118,9 @@
     let deckLayer = null;
     const infoConsole = document.getElementById('info-console');
     
-    // Inicialización global de DuckDB
+    // Inicialización global de DuckDB con soporte S3
     async function initDuckDBEngine() {
+        if (dbInstance) return true;
         try {
             const duckdb = await import('https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.28.0/+esm');
             const JSDELIVR_BUNDLES = duckdb.getJsDelivrBundles();
@@ -1029,7 +1128,21 @@
             const worker = new Worker(URL.createObjectURL(new Blob([`importScripts("${bundle.mainWorker}");`], { type: 'text/javascript' })));
             dbInstance = new duckdb.AsyncDuckDB(new duckdb.ConsoleLogger(), worker);
             await dbInstance.instantiate(bundle.mainModule, bundle.pthreadWorker);
-            console.log("🚀 Motor DuckDB-WASM listo.");
+            
+            // Configurar S3 / HTTPFS
+            const conn = await dbInstance.connect();
+            await conn.query(`
+                INSTALL httpfs;
+                LOAD httpfs;
+                SET s3_endpoint='s3.agrohoney.com';
+                SET s3_access_key_id='admin';
+                SET s3_secret_access_key='AgroHoney2026!';
+                SET s3_use_ssl=true;
+                SET s3_url_style='path';
+            `);
+            await conn.close();
+            
+            console.log("🚀 Motor DuckDB-WASM listo con soporte S3.");
             return true;
         } catch (e) {
             console.error("Error al iniciar DuckDB:", e);

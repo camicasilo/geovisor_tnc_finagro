@@ -764,9 +764,8 @@
         map.addSource('bg-topo', { type: 'raster', tiles: ['https://tile.opentopomap.org/{z}/{x}/{y}.png'], tileSize: 256 });
         map.addLayer({ id: 'layer-topo', type: 'raster', source: 'bg-topo', layout: { visibility: 'none' } }, firstSymbolId);
 
-        // Capas Operacionales (Simplificado para evitar Error 400)
-        map.addSource('subregiones-source', { type: 'geojson', data: subregionesUrl + '/query?where=1%3D1&outFields=*&f=geojson' });
-        map.addSource('municipios-source', { type: 'geojson', data: municipiosUrl + '/query?where=1%3D1&outFields=*&f=geojson' });
+        // Capas Operacionales (Municipios desactivados temporalmente para evitar Error 400)
+        // map.addSource('municipios-source', { type: 'geojson', data: municipiosUrl + '/query?where=1%3D1&outFields=*&f=geojson' });
 
         map.addLayer({
             id: 'layer-municipios',
@@ -1132,20 +1131,21 @@
             // Configurar S3 / HTTPFS / Spatial
             const conn = await dbInstance.connect();
             
-            // Configuración de Repositorio de Extensiones para WASM
-            // Esto le dice a DuckDB que descargue las extensiones desde el CDN oficial de WASM
+            // Configuración AGRESIVA de extensiones
             await conn.query(`
                 SET autoinstall_known_extensions=1;
                 SET autoload_known_extensions=1;
                 SET custom_extension_repository='https://wasm-extensions.duckdb.org';
             `);
             
+            // Intentar cargar HTTPFS primero para habilitar S3
             try {
-                // Intentamos instalar directamente
+                await conn.query(`LOAD httpfs;`);
+                await conn.query(`LOAD spatial;`);
+            } catch (e) {
+                console.warn("⚠️ Intentando instalación manual...");
                 await conn.query(`INSTALL httpfs; LOAD httpfs;`);
                 await conn.query(`INSTALL spatial; LOAD spatial;`);
-            } catch (err) {
-                console.warn("⚠️ Fallback de extensiones activado:", err);
             }
 
             // Configuración S3

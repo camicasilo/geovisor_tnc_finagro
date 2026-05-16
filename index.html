@@ -17,6 +17,10 @@
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
+    <!-- Deck.gl & Mapbox Adapter (Para visualización de GeoParquet masivo) -->
+    <script src="https://unpkg.com/deck.gl@latest/dist.min.js"></script>
+    <script src="https://unpkg.com/@deck.gl/mapbox@latest/dist.min.js"></script>
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; scrollbar-width: thin; scrollbar-color: rgba(44, 95, 45, 0.6) rgba(0, 0, 0, 0.02); }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #000; overflow: hidden; }
@@ -129,8 +133,54 @@
         
         .control-group { margin-bottom: 20px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 15px; }
         .control-group label { font-weight: 600; display: block; margin-bottom: 8px; color: #2c3e50; font-size: 0.9rem;}
-        select, button { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; background: white; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; outline: none; }
-        select:hover, button:hover { border-color: #2c5f2d; }
+        
+        /* Custom Glass Dropdown */
+        .custom-select-container { position: relative; width: 100%; margin-top: 5px; }
+        .custom-select-trigger { 
+            background: rgba(255, 255, 255, 0.7); 
+            border: 1px solid rgba(44, 95, 45, 0.2); 
+            padding: 10px 14px; 
+            border-radius: 10px; 
+            font-size: 0.85rem; 
+            cursor: pointer; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            transition: all 0.2s; 
+            color: #2c3e50;
+        }
+        .custom-select-trigger:hover { background: rgba(255, 255, 255, 0.9); border-color: #2c5f2d; }
+        .custom-select-options { 
+            position: absolute; 
+            top: 105%; 
+            left: 0; 
+            right: 0; 
+            background: rgba(255, 255, 255, 0.98); 
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(44, 95, 45, 0.2); 
+            border-radius: 12px; 
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15); 
+            z-index: 1000; 
+            display: none; 
+            overflow: hidden;
+            animation: fadeInScale 0.2s ease-out;
+        }
+        @keyframes fadeInScale { from { opacity: 0; transform: translateY(-10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .custom-select-container.open .custom-select-options { display: block; }
+        .custom-option { 
+            padding: 12px 16px; 
+            font-size: 0.85rem; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+            color: #444;
+        }
+        .custom-option:last-child { border-bottom: none; }
+        .custom-option:hover { background: rgba(44, 95, 45, 0.1); color: #2c5f2d; font-weight: 600; padding-left: 20px; }
+        .custom-option.selected { background: rgba(44, 95, 45, 0.05); color: #2c5f2d; font-weight: 700; }
+
+        button { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; background: white; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; outline: none; }
+        button:hover { border-color: #2c5f2d; }
         .btn-primary { background-color: #2c5f2d; color: white; font-weight: bold; border: none; margin-top: 8px; }
         .btn-primary:hover { background-color: #1e3a1f; }
 
@@ -234,32 +284,33 @@
         /* Centro de Información (Consola Inferior - Apple Glass Style / Dropdown Logic) */
         .info-console {
             position: absolute;
-            bottom: 25px;
+            bottom: 30px; /* Un poco más de holgura desde el borde inferior */
             left: 50%;
             /* Estado Inicial: Oculto y un poco más abajo */
             transform: translate(-50%, 20px);
             opacity: 0;
             pointer-events: none; /* Evita que estorbe cuando está invisible */
             
-            width: 750px;
-            max-height: 110px;
-            padding: 14px 24px;
+            width: 450px; /* Ancho ultra-compacto para evitar solapamiento */
+            max-height: 140px; /* Aumentado verticalmente para compensar el ancho */
+            padding: 16px 28px;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             font-size: 0.9rem;
             color: #000;
             overflow-y: auto;
-            border-radius: 20px;
+            border-radius: 24px;
             
-            /* Ultra Transparente */
-            background: rgba(255, 255, 255, 0.08) !important; 
-            backdrop-filter: blur(12px) !important; 
-            -webkit-backdrop-filter: blur(12px) !important;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            /* Ultra Transparente Apple Glass */
+            background: rgba(255, 255, 255, 0.05) !important; 
+            backdrop-filter: blur(16px) !important; 
+            -webkit-backdrop-filter: blur(16px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             
             /* Transición suave estilo Dropdown */
-            transition: all 0.3s ease-out;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
             text-align: center;
+            z-index: 100; /* Asegurar que esté por encima de otros elementos base */
         }
         
         /* Clase para mostrar la consola en Hover */
@@ -337,12 +388,12 @@
     <div class="control-group" onmouseenter="updateConsole('ESCENARIO_DESC')">
         <label><i class="fas fa-cloud-sun-rain"></i> Escenario climático</label>
         <select id="escenario">
-            <option value="normal" onmouseenter="updateConsole('NORMAL_CLIMA')">🌿 0. Normal climática (1981-2010)</option>
-            <option value="nino_extremo" onmouseenter="updateConsole('NINO_EXTREMO')">☀️ Escenario 1: El Niño Extremo (Sequía/Estrés)</option>
-            <option value="nina_activo" onmouseenter="updateConsole('NINA_ACTIVO')">🌧️ Escenario 2: La Niña Activo (Inundaciones)</option>
-            <option value="deepmind_cast" onmouseenter="updateConsole('DEEPMIND_CAST')">🧠 Escenario 3: Google DeepMindCast (IA Forecast)</option>
-            <option value="riesgo_sanitario" onmouseenter="updateConsole('RIESGO_SANITARIO')">📉 Escenario 4: Riesgo Sanitario (Plagas/Clima)</option>
-            <option value="finagro_saamm" onmouseenter="updateConsole('SAAMM')">🏦 Escenario 5: Financiero FINAGRO (SAAMM)</option>
+            <option value="normal">🌿 0. Normal climática (1981-2010)</option>
+            <option value="nino_extremo">☀️ Escenario 1: El Niño Extremo (Sequía/Estrés)</option>
+            <option value="nina_activo">🌧️ Escenario 2: La Niña Activo (Inundaciones)</option>
+            <option value="deepmind_cast">🧠 Escenario 3: Google DeepMindCast (IA Forecast)</option>
+            <option value="riesgo_sanitario">📉 Escenario 4: Riesgo Sanitario (Plagas/Clima)</option>
+            <option value="finagro_saamm">🏦 Escenario 5: Financiero FINAGRO (SAAMM)</option>
         </select>
     </div>
 
@@ -963,30 +1014,139 @@
         }
     });
 
-    // --- 9. Lógica de Consola Informativa (Carga de JSON como Diccionario) ---
+    // --- 9. Arquitectura de Datos: DuckDB-WASM + Streaming Espacial ---
+    let dbInstance = null;
     let helpDataMap = new Map();
+    let deckLayer = null;
     const infoConsole = document.getElementById('info-console');
     
-    // Cargar datos de ayuda desde JSON
-    fetch('Ayuda.json')
-        .then(response => {
-            if (!response.ok) throw new Error("No se pudo cargar el JSON");
-            return response.json();
-        })
-        .then(data => {
-            if (data.diccionario_geovisor) {
-                data.diccionario_geovisor.forEach(item => {
-                    helpDataMap.set(item.id, item.explicacion);
-                });
-                console.log("Diccionario de ayuda cargado:", helpDataMap.size, "elementos.");
+    // Inicialización global de DuckDB
+    async function initDuckDBEngine() {
+        try {
+            const duckdb = await import('https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.28.0/+esm');
+            const JSDELIVR_BUNDLES = duckdb.getJsDelivrBundles();
+            const bundle = await duckdb.selectBundle(JSDELIVR_BUNDLES);
+            const worker = new Worker(URL.createObjectURL(new Blob([`importScripts("${bundle.mainWorker}");`], { type: 'text/javascript' })));
+            dbInstance = new duckdb.AsyncDuckDB(new duckdb.ConsoleLogger(), worker);
+            await dbInstance.instantiate(bundle.mainModule, bundle.pthreadWorker);
+            console.log("🚀 Motor DuckDB-WASM listo.");
+            return true;
+        } catch (e) {
+            console.error("Error al iniciar DuckDB:", e);
+            return false;
+        }
+    }
+
+    // Cargar Ayuda desde Parquet
+    async function loadHelpSystem() {
+        if (!dbInstance) await initDuckDBEngine();
+        if (!dbInstance) { loadFallbackHelp(); return; }
+        
+        try {
+            const conn = await dbInstance.connect();
+            const response = await fetch('diccionario.parquet');
+            if (!response.ok) throw new Error("Parquet not found");
+            const buffer = await response.arrayBuffer();
+            await dbInstance.registerFileBuffer('diccionario.parquet', new Uint8Array(buffer));
+            
+            const results = await conn.query(`SELECT id, explicacion FROM 'diccionario.parquet'`);
+            results.toArray().forEach(row => helpDataMap.set(row.id, row.explicacion));
+            console.log("✅ Diccionario cargado via SQL.");
+            await conn.close();
+        } catch (e) {
+            console.warn("⚠️ Fallback activado.");
+            loadFallbackHelp();
+        }
+    }
+
+    // Streaming de Capas Yosegi (GeoParquet Piramidal)
+    async function updateSpatialStreaming() {
+        if (!dbInstance || !map) return;
+        
+        const bounds = map.getBounds();
+        const zoom = Math.floor(map.getZoom());
+        
+        try {
+            const conn = await dbInstance.connect();
+            
+            // Si es la primera vez, intentamos registrar el archivo de catastro
+            // Nota: En producción esto vendría de una URL de S3/Cloudfront
+            try {
+                if (!window.catastroLoaded) {
+                    const resp = await fetch('catastro_pyramid.parquet');
+                    if (resp.ok) {
+                        const buf = await resp.arrayBuffer();
+                        await dbInstance.registerFileBuffer('catastro_pyramid.parquet', new Uint8Array(buf));
+                        window.catastroLoaded = true;
+                    }
+                }
+            } catch (e) {}
+
+            if (!window.catastroLoaded) {
+                await conn.close();
+                return;
             }
-        })
-        .catch(err => {
-            console.warn("⚠️ Error cargando Ayuda.json (Posible bloqueo por ejecutar localmente file://). Usando fallback en memoria.", err);
-            // Fallback en memoria por si el usuario abre el archivo sin servidor local
-            const fallbackData = [{"id": "TITULO_SIGAGRO", "categoria": "Interfaz", "explicacion": "<b>SIGAGRO Geovisor:</b> Plataforma analítica avanzada para la simulación de riesgo agropecuario y toma de decisiones financieras."}, {"id": "R_TERRENO", "categoria": "Capa Catastro", "explicacion": "<b>Predios Formales:</b> Límites de fincas, parcelas y lotes con soporte jurídico y registral completo."}, {"id": "R_TERRENO_INFORMAL", "categoria": "Capa Catastro", "explicacion": "<b>Informalidad de la Tierra:</b> Ocupaciones o posesiones que no tienen título formalizado pero existen físicamente."}, {"id": "R_CONSTRUCCION", "categoria": "Capa Catastro", "explicacion": "<b>Huellas de Edificación:</b> Plantas de casas, bodegas y establos dentro de predios formales."}, {"id": "R_CONSTRUCCION_INFORMAL", "categoria": "Capa Catastro", "explicacion": "<b>Edificaciones Informales:</b> Construcciones levantadas en terrenos sin títulos o licencias formalizadas."}, {"id": "R_VEREDA", "categoria": "Capa Administrativa", "explicacion": "<b>Límites Veredales:</b> División político-administrativa interna del municipio rural. Vital para zonificación."}, {"id": "R_SECTOR", "categoria": "Capa Administrativa", "explicacion": "<b>Sectores Catastrales:</b> División técnica del IGAC para organizar el territorio (agrupa veredas y terrenos)."}, {"id": "R_NOMENCLATURA_DOMICILIARIA", "categoria": "Capa Vial", "explicacion": "<b>Nomenclatura Domiciliaria:</b> Direcciones, nombres de fincas y accesos con sus coordenadas exactas."}, {"id": "R_NOMENCLATURA_VIAL", "categoria": "Capa Vial", "explicacion": "<b>Nomenclatura Vial:</b> Ejes viales rurales, caminos, carreteables y servidumbres de paso."}, {"id": "MUNICIPIOS", "categoria": "Capa Divipola", "explicacion": "<b>Municipios:</b> Límites políticos de la Divipola (DANE). Base para el reporte de estadísticas de FINAGRO."}, {"id": "PROVINCIAS", "categoria": "Capa Divipola", "explicacion": "<b>Provincias/Subregiones:</b> Agrupaciones regionales que comparten características económicas y agroecológicas."}, {"id": "PRODUCTOR", "categoria": "Control Simulador", "explicacion": "<b>Tipo de Productor:</b> Define el perfil socioeconómico. Ajusta la vulnerabilidad y la capacidad de resiliencia en el modelo."}, {"id": "PEQUENO_BAJOS", "categoria": "Tipo Productor", "explicacion": "<b>Ingresos Bajos:</b> Productores con alta dependencia del ciclo climático y activos limitados."}, {"id": "PEQUENO", "categoria": "Tipo Productor", "explicacion": "<b>Pequeño Productor:</b> Escala familiar con acceso moderado a crédito de fomento y asistencia técnica."}, {"id": "MEDIANO", "categoria": "Tipo Productor", "explicacion": "<b>Mediano Productor:</b> Capacidad técnica intermedia, mayor diversificación y solvencia financiera."}, {"id": "GRANDE", "categoria": "Tipo Productor", "explicacion": "<b>Gran Productor:</b> Escala industrial, alta tecnificación y gran capacidad de mitigación de riesgos."}, {"id": "TASA_INTERES", "categoria": "Control Económico", "explicacion": "<b>Tasa de Interés:</b> Costo financiero del crédito. Un aumento reduce el margen neto de utilidad del productor."}, {"id": "PRECIO_PRODUCTO", "categoria": "Control Económico", "explicacion": "<b>Precio Producto:</b> Factor de mercado. Simula caídas de precios que pueden llevar a la insolvencia técnica."}, {"id": "NORMAL_CLIMA", "categoria": "Escenario", "explicacion": "<b>🌿 Normal Climática:</b> Estado base del territorio según promedios históricos del IDEAM (1981-2010)."}, {"id": "NINO_EXTREMO", "categoria": "Escenario", "explicacion": "<b>☀️ El Niño Extremo:</b> Estrés hídrico severo, sequías prolongadas y riesgo de incendios forestales."}, {"id": "NINA_ACTIVO", "categoria": "Escenario", "explicacion": "<b>🌧️ La Niña Activa:</b> Exceso de lluvias, inundaciones, saturación de suelos y daños en infraestructura vial."}, {"id": "DEEPMIND_CAST", "categoria": "Escenario", "explicacion": "<b>🧠 Google DeepMindCast:</b> Pronóstico de alta precisión basado en IA para alertas tempranas de corto plazo."}, {"id": "RIESGO_SANITARIO", "categoria": "Escenario", "explicacion": "<b>📉 Riesgo Sanitario:</b> Simulación de brotes de plagas o enfermedades asociados a cambios bruscos de temperatura."}, {"id": "SAAMM", "categoria": "Escenario", "explicacion": "<b>🏦 Escenario SAAMM:</b> Sistema de Alerta FINAGRO que cruza saldos de cartera con zonas de alta afectación climática."}, {"id": "BASE_POSITRON", "categoria": "Capa Base", "explicacion": "<b>Capa Positron:</b> Mapa base claro y minimalista. Maximiza el contraste de las capas de riesgo."}, {"id": "BASE_DARK", "categoria": "Capa Base", "explicacion": "<b>Capa Dark Matter:</b> Mapa base oscuro. Ideal para resaltar mapas de calor (Heatmaps) y datos brillantes."}, {"id": "BASE_OSM", "categoria": "Capa Base", "explicacion": "<b>OpenStreetMap:</b> Mapa comunitario detallado con nombres de calles, puntos de interés e infraestructura."}, {"id": "BASE_TOPO", "categoria": "Capa Base", "explicacion": "<b>OpenTopoMap:</b> Visualiza el relieve, curvas de nivel y la geografía física del terreno."}, {"id": "RIESGO_CLIMA", "categoria": "Modelo Riesgo", "explicacion": "<b>Riesgo Climático:</b> Mapa de calor que identifica áreas con mayor probabilidad de pérdida por factores climáticos."}, {"id": "ZONAS_INUNDABLES", "categoria": "Modelo Riesgo", "explicacion": "<b>Zonas Inundables:</b> Modelado de áreas con recurrencia de inundación por desbordamiento de ríos o lluvias."}, {"id": "CARGAR_LOCAL", "categoria": "Sección", "explicacion": "<b>Carga de Capas:</b> Permite integrar tus propios datos (.parquet, .geojson) para análisis cruzado con el catastro."}, {"id": "CAPAS_BASE", "categoria": "Sección", "explicacion": "<b>Sección Capas Base:</b> Define el contexto visual y geográfico sobre el cual se montan los datos."}, {"id": "CAPAS_TRABAJO", "categoria": "Sección", "explicacion": "<b>Sección Capas de Trabajo:</b> Contiene la infraestructura de datos oficial del proyecto (Catastro e IGAC)."}, {"id": "MODELOS_RIESGO", "categoria": "Sección", "explicacion": "<b>Sección Modelos de Riesgo:</b> Capas inteligentes generadas por algoritmos de análisis geoespacial."}, {"id": "HERRAMIENTA_MANO", "categoria": "Herramienta", "explicacion": "<b>Modo Paneo:</b> Herramienta para navegar y desplazarse libremente por el mapa sin activar consultas."}, {"id": "HERRAMIENTA_SELECCION", "categoria": "Herramienta", "explicacion": "<b>Modo Selección:</b> Al activarse, permite hacer clic en el mapa para abrir el tablero detallado de cada entidad."}, {"id": "SUPRESION_ETIQUETAS", "categoria": "Herramienta", "explicacion": "<b>Control de Etiquetas:</b> Oculta los nombres de lugares para facilitar la lectura de capas técnicas densas."}, {"id": "SIMULAR_BTN", "categoria": "Boton", "explicacion": "<b>Actualizar Modelo:</b> Ejecuta el motor de cálculo 'What-If' recalculando el riesgo para todo el país."}, {"id": "WELCOME", "categoria": "Sistema", "explicacion": "Pasa el mouse sobre cualquier elemento (capas, botones o selectores) para ver sus detalles técnicos aquí."}];
-            fallbackData.forEach(item => helpDataMap.set(item.id, item.explicacion));
-        });
+
+            // Query Espacial con Pushdown de BBox y ZoomLevel (Yosegi Architecture)
+            const sql = `
+                SELECT id, ST_AsGeoJSON(ST_GeomFromWKB(geometry)) as geojson
+                FROM 'catastro_pyramid.parquet'
+                WHERE zoomlevel <= ${zoom}
+                  AND bbox.xmax >= ${bounds.getWest()}
+                  AND bbox.xmin <= ${bounds.getEast()}
+                  AND bbox.ymax >= ${bounds.getSouth()}
+                  AND bbox.ymin <= ${bounds.getNorth()}
+                LIMIT 3000;
+            `;
+            
+            const results = await conn.query(sql);
+            const features = results.toArray().map(row => ({
+                type: 'Feature',
+                properties: { id: row.id },
+                geometry: JSON.parse(row.geojson)
+            }));
+
+            // Actualizar o crear capa de Deck.gl
+            if (!deckLayer) {
+                deckLayer = new deck.MapboxLayer({
+                    id: 'igac-pyramid-layer',
+                    type: deck.GeoJsonLayer,
+                    data: features,
+                    filled: true,
+                    getFillColor: [44, 95, 45, 140],
+                    getLineColor: [255, 255, 255, 180],
+                    getLineWidth: 1,
+                    lineWidthUnits: 'pixels',
+                    pickable: true,
+                    onHover: info => {
+                        if (info.object) {
+                            // Aquí podríamos disparar consultas de atributos extendidos
+                            console.log("Propiedad detectada:", info.object.properties.id);
+                        }
+                    }
+                });
+                map.addLayer(deckLayer);
+            } else {
+                deckLayer.setProps({ data: features });
+            }
+            
+            await conn.close();
+        } catch (e) {
+            console.error("Error en streaming espacial:", e);
+        }
+    }
+
+    function loadFallbackHelp() {
+        const fallbackData = [{"id": "TITULO_SIGAGRO", "categoria": "Interfaz", "explicacion": "<b>SIGAGRO Geovisor:</b> Plataforma analítica avanzada para la simulación de riesgo agropecuario y toma de decisiones financieras."}, {"id": "R_TERRENO", "categoria": "Capa Catastro", "explicacion": "<b>Predios Formales:</b> Límites de fincas, parcelas y lotes con soporte jurídico y registral completo."}, {"id": "R_TERRENO_INFORMAL", "categoria": "Capa Catastro", "explicacion": "<b>Informalidad de la Tierra:</b> Ocupaciones o posesiones que no tienen título formalizado pero existen físicamente."}, {"id": "R_CONSTRUCCION", "categoria": "Capa Catastro", "explicacion": "<b>Huellas de Edificación:</b> Plantas de casas, bodegas y establos dentro de predios formales."}, {"id": "R_CONSTRUCCION_INFORMAL", "categoria": "Capa Catastro", "explicacion": "<b>Edificaciones Informales:</b> Construcciones levantadas en terrenos sin títulos o licencias formalizadas."}, {"id": "R_VEREDA", "categoria": "Capa Administrativa", "explicacion": "<b>Límites Veredales:</b> División político-administrativa interna del municipio rural. Vital para zonificación."}, {"id": "R_SECTOR", "categoria": "Capa Administrativa", "explicacion": "<b>Sectores Catastrales:</b> División técnica del IGAC para organizar el territorio (agrupa veredas y terrenos)."}, {"id": "R_NOMENCLATURA_DOMICILIARIA", "categoria": "Capa Vial", "explicacion": "<b>Nomenclatura Domiciliaria:</b> Direcciones, nombres de fincas y accesos con sus coordenadas exactas."}, {"id": "R_NOMENCLATURA_VIAL", "categoria": "Capa Vial", "explicacion": "<b>Nomenclatura Vial:</b> Ejes viales rurales, caminos, carreteables y servidumbres de paso."}, {"id": "MUNICIPIOS", "categoria": "Capa Divipola", "explicacion": "<b>Municipios:</b> Límites políticos de la Divipola (DANE). Base para el reporte de estadísticas de FINAGRO."}, {"id": "PROVINCIAS", "categoria": "Capa Divipola", "explicacion": "<b>Provincias/Subregiones:</b> Agrupaciones regionales que comparten características económicas y agroecológicas."}, {"id": "PRODUCTOR", "categoria": "Control Simulador", "explicacion": "<b>Tipo de Productor:</b> Define el perfil socioeconómico. Ajusta la vulnerabilidad y la capacidad de resiliencia en el modelo."}, {"id": "PEQUENO_BAJOS", "categoria": "Tipo Productor", "explicacion": "<b>Ingresos Bajos:</b> Productores con alta dependencia del ciclo climático y activos limitados."}, {"id": "PEQUENO", "categoria": "Tipo Productor", "explicacion": "<b>Pequeño Productor:</b> Escala familiar con acceso moderado a crédito de fomento y asistencia técnica."}, {"id": "MEDIANO", "categoria": "Tipo Productor", "explicacion": "<b>Mediano Productor:</b> Capacidad técnica intermedia, mayor diversificación y solvencia financiera."}, {"id": "GRANDE", "categoria": "Tipo Productor", "explicacion": "<b>Gran Productor:</b> Escala industrial, alta tecnificación y gran capacidad de mitigación de riesgos."}, {"id": "TASA_INTERES", "categoria": "Control Económico", "explicacion": "<b>Tasa de Interés:</b> Costo financiero del crédito. Un aumento reduce el margen neto de utilidad del productor."}, {"id": "PRECIO_PRODUCTO", "categoria": "Control Económico", "explicacion": "<b>Precio Producto:</b> Factor de mercado. Simula caídas de precios que pueden llevar a la insolvencia técnica."}, {"id": "NORMAL_CLIMA", "categoria": "Escenario", "explicacion": "<b>🌿 Normal Climática:</b> Estado base del territorio según promedios históricos del IDEAM (1981-2010)."}, {"id": "NINO_EXTREMO", "categoria": "Escenario", "explicacion": "<b>☀️ El Niño Extremo:</b> Estrés hídrico severo, sequías prolongadas y riesgo de incendios forestales."}, {"id": "NINA_ACTIVO", "categoria": "Escenario", "explicacion": "<b>🌧️ La Niña Activa:</b> Exceso de lluvias, inundaciones, saturación de suelos y daños en infraestructura vial."}, {"id": "DEEPMIND_CAST", "categoria": "Escenario", "explicacion": "<b>🧠 Google DeepMindCast:</b> Pronóstico de alta precisión basado en IA para alertas tempranas de corto plazo."}, {"id": "RIESGO_SANITARIO", "categoria": "Escenario", "explicacion": "<b>📉 Riesgo Sanitario:</b> Simulación de brotes de plagas o enfermedades asociados a cambios bruscos de temperatura."}, {"id": "SAAMM", "categoria": "Escenario", "explicacion": "<b>🏦 Escenario SAAMM:</b> Sistema de Alerta FINAGRO que cruza saldos de cartera con zonas de alta afectación climática."}, {"id": "BASE_POSITRON", "categoria": "Capa Base", "explicacion": "<b>Capa Positron:</b> Mapa base claro y minimalista. Maximiza el contraste de las capas de riesgo."}, {"id": "BASE_DARK", "categoria": "Capa Base", "explicacion": "<b>Capa Dark Matter:</b> Mapa base oscuro. Ideal para resaltar mapas de calor (Heatmaps) y datos brillantes."}, {"id": "BASE_OSM", "categoria": "Capa Base", "explicacion": "<b>OpenStreetMap:</b> Mapa comunitario detallado con nombres de calles, puntos de interés e infraestructura."}, {"id": "BASE_TOPO", "categoria": "Capa Base", "explicacion": "<b>OpenTopoMap:</b> Visualiza el relieve, curvas de nivel y la geografía física del terreno."}, {"id": "RIESGO_CLIMA", "categoria": "Modelo Riesgo", "explicacion": "<b>Riesgo Climático:</b> Mapa de calor que identifica áreas con mayor probabilidad de pérdida por factores climáticos."}, {"id": "ZONAS_INUNDABLES", "categoria": "Modelo Riesgo", "explicacion": "<b>Zonas Inundables:</b> Modelado de áreas con recurrencia de inundación por desbordamiento de ríos o lluvias."}, {"id": "CARGAR_LOCAL", "categoria": "Sección", "explicacion": "<b>Carga de Capas:</b> Permite integrar tus propios datos (.parquet, .geojson) para análisis cruzado con el catastro."}, {"id": "CAPAS_BASE", "categoria": "Sección", "explicacion": "<b>Sección Capas Base:</b> Define el contexto visual y geográfico sobre el cual se montan los datos."}, {"id": "CAPAS_TRABAJO", "categoria": "Sección", "explicacion": "<b>Sección Capas de Trabajo:</b> Contiene la infraestructura de datos oficial del proyecto (Catastro e IGAC)."}, {"id": "MODELOS_RIESGO", "categoria": "Sección", "explicacion": "<b>Sección Modelos de Riesgo:</b> Capas inteligentes generadas por algoritmos de análisis geoespacial."}, {"id": "HERRAMIENTA_MANO", "categoria": "Herramienta", "explicacion": "<b>Modo Paneo:</b> Herramienta para navegar y desplazarse libremente por el mapa sin activar consultas."}, {"id": "HERRAMIENTA_SELECCION", "categoria": "Herramienta", "explicacion": "<b>Modo Selección:</b> Al activarse, permite hacer clic en el mapa para abrir el tablero detallado de cada entidad."}, {"id": "SUPRESION_ETIQUETAS", "categoria": "Herramienta", "explicacion": "<b>Control de Etiquetas:</b> Oculta los nombres de lugares para facilitar la lectura de capas técnicas densas."}, {"id": "SIMULAR_BTN", "categoria": "Boton", "explicacion": "<b>Actualizar Modelo:</b> Ejecuta el motor de cálculo 'What-If' recalculando el riesgo para todo el país."}, {"id": "WELCOME", "categoria": "Sistema", "explicacion": "Pasa el mouse sobre cualquier elemento (capas, botones o selectores) para ver sus detalles técnicos aquí."}];
+        fallbackData.forEach(item => helpDataMap.set(item.id, item.explicacion));
+    }
+
+    // Iniciar arquitectura de datos
+    loadHelpSystem();
+    map.on('moveend', updateSpatialStreaming);
+    map.on('zoomend', updateSpatialStreaming);
+
+
 
 
     function updateConsole(id) {
@@ -1009,21 +1169,107 @@
     const linkHover = (elemId, helpId) => {
         const el = document.getElementById(elemId);
         if(el) {
-            el.addEventListener('mouseenter', () => updateConsole(helpId));
+            el.addEventListener('mouseenter', () => {
+                // Si es un select, intentar mostrar ayuda de la opción seleccionada primero
+                if (el.tagName === 'SELECT') {
+                    const selectedVal = el.value.toUpperCase();
+                    if (helpDataMap.has(selectedVal)) {
+                        updateConsole(selectedVal);
+                        return;
+                    }
+                }
+                updateConsole(helpId);
+            });
             el.addEventListener('mouseleave', resetConsole);
+            
+            // Si es un select, actualizar ayuda al cambiar selección
+            if (el.tagName === 'SELECT') {
+                el.addEventListener('change', () => {
+                    const selectedVal = el.value.toUpperCase();
+                    if (helpDataMap.has(selectedVal)) {
+                        updateConsole(selectedVal);
+                    }
+                });
+            }
         }
     };
 
-    linkHover('productorType', 'PRODUCTOR');
-    
-    const escSelect = document.getElementById('escenario');
-    if(escSelect) {
-        escSelect.addEventListener('mouseenter', () => {
-            const val = escSelect.value.toUpperCase();
-            updateConsole(val);
+    // --- 11. Conversión de Selects a Dropdowns de Cristal (Soporte Hover en Opciones) ---
+    function convertToCustomDropdown(selectId, baseHelpId) {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+
+        const container = document.createElement('div');
+        container.className = 'custom-select-container';
+        select.parentNode.insertBefore(container, select);
+        container.appendChild(select);
+        select.style.display = 'none';
+
+        const trigger = document.createElement('div');
+        trigger.className = 'custom-select-trigger';
+        trigger.innerHTML = `<span>${select.options[select.selectedIndex].text}</span> <i class="fas fa-chevron-down"></i>`;
+        container.appendChild(trigger);
+
+        const optionsContainer = document.createElement('div');
+        optionsContainer.className = 'custom-select-options';
+        container.appendChild(optionsContainer);
+
+        Array.from(select.options).forEach((opt, idx) => {
+            const customOpt = document.createElement('div');
+            customOpt.className = 'custom-option' + (opt.selected ? ' selected' : '');
+            customOpt.innerHTML = opt.text;
+            
+            // Map de ayuda
+            let helpId = opt.value.toUpperCase();
+            if (helpId === 'NORMAL') helpId = 'NORMAL_CLIMA';
+            if (helpId === 'FINAGRO_SAAMM') helpId = 'SAAMM';
+            if (helpId === 'PEQUENO_BAJOS') helpId = 'PEQUENO_BAJOS';
+
+            customOpt.addEventListener('mouseenter', () => {
+                if (helpDataMap.has(helpId)) {
+                    updateConsole(helpId);
+                }
+            });
+
+            customOpt.addEventListener('click', () => {
+                select.value = opt.value;
+                trigger.querySelector('span').innerText = opt.text;
+                container.classList.remove('open');
+                
+                // Limpiar seleccionados previos
+                container.querySelectorAll('.custom-option').forEach(o => o.classList.remove('selected'));
+                customOpt.classList.add('selected');
+                
+                // Disparar evento change original
+                select.dispatchEvent(new Event('change'));
+            });
+
+            optionsContainer.appendChild(customOpt);
         });
-        escSelect.addEventListener('mouseleave', resetConsole);
+
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            container.classList.toggle('open');
+        });
+
+        // Hover en el disparador principal muestra ayuda de la categoría o del actual
+        trigger.addEventListener('mouseenter', () => {
+            const currentVal = select.value.toUpperCase();
+            let currentHelp = currentVal === 'NORMAL' ? 'NORMAL_CLIMA' : (currentVal === 'FINAGRO_SAAMM' ? 'SAAMM' : currentVal);
+            if (helpDataMap.has(currentHelp)) {
+                updateConsole(currentHelp);
+            } else {
+                updateConsole(baseHelpId);
+            }
+        });
+        trigger.addEventListener('mouseleave', resetConsole);
+        
+        document.addEventListener('click', () => container.classList.remove('open'));
     }
+
+    // Inicializar dropdowns profesionales
+    convertToCustomDropdown('productorType', 'PRODUCTOR');
+    convertToCustomDropdown('escenario', 'NORMAL_CLIMA');
 
     document.querySelectorAll('.metric').forEach((el, index) => {
         const id = index === 0 ? 'TASA_INTERES' : 'PRECIO_PRODUCTO';

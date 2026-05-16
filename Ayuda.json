@@ -1,0 +1,20 @@
+{
+  "Definicion_Elementos": {
+    "R_TERRENO": "<b>Predios Formales:</b> Límites de fincas, parcelas y lotes con soporte jurídico y registral completo.",
+    "R_TERRENO_INFORMAL": "<b>Informalidad de la Tierra:</b> Ocupaciones o posesiones que no tienen título formalizado pero existen físicamente.",
+    "R_CONSTRUCCION": "<b>Huellas de Edificación:</b> Plantas de casas, bodegas y establos dentro de predios formales.",
+    "R_CONSTRUCCION_INFORMAL": "<b>Edificaciones Informales:</b> Construcciones levantadas en terrenos sin títulos o licencias formalizadas.",
+    "R_VEREDA": "<b>Límites Veredales:</b> División político-administrativa interna del municipio rural. Vital para zonificación.",
+    "R_SECTOR": "<b>Sectores Catastrales:</b> División técnica del IGAC para organizar el territorio (agrupa veredas y terrenos).",
+    "R_NOMENCLATURA_DOMICILIARIA": "<b>Nomenclatura Domiciliaria:</b> Direcciones, nombres de fincas y accesos con sus coordenadas exactas.",
+    "R_NOMENCLATURA_VIAL": "<b>Nomenclatura Vial:</b> Ejes viales rurales, caminos, carreteables y servidumbres de paso.",
+    "MUNICIPIOS": "Límites políticos municipales de la Divipola (DANE).",
+    "PROVINCIAS": "Agrupaciones regionales por características económicas comunes.",
+    "TASA_INTERES": "Tasa de interés aplicada a los créditos de fomento para el productor seleccionado.",
+    "PRECIO_PRODUCTO": "Factor de ajuste sobre el precio de mercado esperado para la cosecha.",
+    "NINO_EXTREMO": "Fenómeno de El Niño: Estrés hídrico alto, sequías prolongadas y riesgo de incendios.",
+    "NINA_ACTIVO": "Fenómeno de La Niña: Exceso de lluvias, inundaciones y deterioro de vías terciarias.",
+    "DEEPMIND_CAST": "Predicción climática de IA basada en modelos de aprendizaje profundo a corto plazo.",
+    "SAAMM": "Sistema de Alerta de Cartera FINAGRO: Cruces de riesgos financieros con variables climáticas."
+  }
+}

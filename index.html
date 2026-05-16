@@ -252,11 +252,23 @@
         .console-highlight { color: #2c5f2d; font-weight: bold; }
 
         /* Estructura de Árbol para Capas */
-        .dataset-group { margin-left: 10px; margin-top: 5px; border-left: 1px dashed rgba(44, 95, 45, 0.3); padding-left: 10px; }
-        .dataset-title { font-size: 0.8rem; font-weight: 700; color: #555; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; cursor: pointer; }
+        .dataset-group { margin-left: 10px; margin-top: 8px; border-left: 1px solid rgba(44, 95, 45, 0.2); padding-left: 15px; position: relative; }
+        .dataset-group::before { content: ''; position: absolute; top: 12px; left: 0; width: 10px; border-top: 1px solid rgba(44, 95, 45, 0.2); }
+        .dataset-title { font-size: 0.8rem; font-weight: 700; color: #444; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: color 0.2s; }
+        .dataset-title i { color: #2c5f2d; font-size: 0.9rem; }
         .dataset-title:hover { color: #2c5f2d; }
-        .layer-item.nested { margin-left: 5px; background: transparent; border: none; padding: 4px 0; }
-        .layer-item.nested span { font-size: 0.8rem; color: #666; }
+        
+        .layer-item.nested { 
+            margin-left: 12px; 
+            background: transparent; 
+            border: none; 
+            padding: 5px 0; 
+            position: relative;
+        }
+        .layer-item.nested::before { content: ''; position: absolute; top: 15px; left: -12px; width: 10px; border-top: 1px solid rgba(44, 95, 45, 0.2); }
+        .layer-item.nested span { font-size: 0.75rem; color: #555; font-weight: 500; }
+        .layer-item.nested:hover span { color: #000; }
+
 
 
     </style>
@@ -366,16 +378,40 @@
             <!-- Dataset 1: Catastro IGAC -->
             <div class="dataset-group">
                 <div class="dataset-title" title="Modelo de Datos Catastro Multipropósito">
-                    <i class="fas fa-database"></i> Catastro Nacional (IGAC)
+                    <i class="fas fa-folder-open"></i> Catastro Nacional (IGAC)
                 </div>
                 <div class="dataset-content">
-                    <div class="layer-item nested" onmouseover="updateConsole('R_TERRENO')" onclick="updateConsole('R_TERRENO')">
-                        <span>R_TERRENO (Predios)</span>
-                        <label class="switch"><input type="checkbox" id="layer-terreno"><span class="slider"></span></label>
+                    <div class="layer-item nested" onmouseover="updateConsole('R_TERRENO')">
+                        <span>R_TERRENO (Predios Formales)</span>
+                        <label class="switch"><input type="checkbox" id="layer-r-terreno"><span class="slider"></span></label>
                     </div>
-                    <div class="layer-item nested" onmouseover="updateConsole('R_CONSTRUCCION')" onclick="updateConsole('R_CONSTRUCCION')">
-                        <span>R_CONSTRUCCION (Edificios)</span>
-                        <label class="switch"><input type="checkbox" id="layer-construccion"><span class="slider"></span></label>
+                    <div class="layer-item nested" onmouseover="updateConsole('R_TERRENO_INFORMAL')">
+                        <span>R_TERRENO_INFORMAL</span>
+                        <label class="switch"><input type="checkbox" id="layer-r-terreno-informal"><span class="slider"></span></label>
+                    </div>
+                    <div class="layer-item nested" onmouseover="updateConsole('R_CONSTRUCCION')">
+                        <span>R_CONSTRUCCION</span>
+                        <label class="switch"><input type="checkbox" id="layer-r-construccion"><span class="slider"></span></label>
+                    </div>
+                    <div class="layer-item nested" onmouseover="updateConsole('R_CONSTRUCCION_INFORMAL')">
+                        <span>R_CONSTRUCCION_INFORMAL</span>
+                        <label class="switch"><input type="checkbox" id="layer-r-construccion-informal"><span class="slider"></span></label>
+                    </div>
+                    <div class="layer-item nested" onmouseover="updateConsole('R_VEREDA')">
+                        <span>R_VEREDA (Límites Veredales)</span>
+                        <label class="switch"><input type="checkbox" id="layer-r-vereda"><span class="slider"></span></label>
+                    </div>
+                    <div class="layer-item nested" onmouseover="updateConsole('R_SECTOR')">
+                        <span>R_SECTOR</span>
+                        <label class="switch"><input type="checkbox" id="layer-r-sector"><span class="slider"></span></label>
+                    </div>
+                    <div class="layer-item nested" onmouseover="updateConsole('R_NOMENCLATURA_DOMICILIARIA')">
+                        <span>R_NOMENCLATURA_DOMICILIARIA</span>
+                        <label class="switch"><input type="checkbox" id="layer-r-nom-dom"><span class="slider"></span></label>
+                    </div>
+                    <div class="layer-item nested" onmouseover="updateConsole('R_NOMENCLATURA_VIAL')">
+                        <span>R_NOMENCLATURA_VIAL</span>
+                        <label class="switch"><input type="checkbox" id="layer-r-nom-vial"><span class="slider"></span></label>
                     </div>
                 </div>
             </div>
@@ -383,19 +419,20 @@
             <!-- Dataset 2: Geografía Administrativa -->
             <div class="dataset-group">
                 <div class="dataset-title">
-                    <i class="fas fa-map-marked-alt"></i> Divipola Administrativa
+                    <i class="fas fa-folder"></i> Divipola Administrativa
                 </div>
                 <div class="dataset-content">
-                    <div class="layer-item nested" onmouseover="updateConsole('MUNICIPIOS')" onclick="updateConsole('MUNICIPIOS')">
-                        <span>Límites Municipales</span>
+                    <div class="layer-item nested" onmouseover="updateConsole('MUNICIPIOS')">
+                        <span>Límites Municipales (DANE)</span>
                         <label class="switch"><input type="checkbox" id="layer-municipios" checked><span class="slider"></span></label>
                     </div>
-                    <div class="layer-item nested" onmouseover="updateConsole('PROVINCIAS')" onclick="updateConsole('PROVINCIAS')">
+                    <div class="layer-item nested" onmouseover="updateConsole('PROVINCIAS')">
                         <span>Subregiones / Provincias</span>
                         <label class="switch"><input type="checkbox" id="layer-provincias" checked><span class="slider"></span></label>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -863,21 +900,39 @@
         }
     });
 
-    // --- 9. Lógica de Consola Informativa ---
-    const consoleData = {
-        'R_TERRENO': 'Capa fundamental del <span class="console-highlight">Modelo Catastro IGAC</span>. Contiene la delimitación geométrica de los predios rurales. Vital para el análisis de tenencia y riesgo parcelario.',
-        'R_CONSTRUCCION': 'Representa las huellas de edificación dentro de los predios rústicos. Permite evaluar la exposición física de infraestructuras.',
-        'MUNICIPIOS': 'Límites políticos de la Divipola (DANE). Base para el reporte de estadísticas municipales de FINAGRO.',
-        'PROVINCIAS': 'Agrupaciones regionales que comparten características económicas similares, facilitando el análisis de carteras colectivas.',
-        'BASE': 'Contexto geográfico para orientación espacial.'
-    };
+    // --- 9. Lógica de Consola Informativa (Carga de JSON) ---
+    let helpData = {};
+    
+    // Cargar datos de ayuda desde JSON
+    fetch('Ayuda.json')
+        .then(response => response.json())
+        .then(data => {
+            helpData = data.Definicion_Elementos;
+            console.log("Ayuda cargada correctamente.");
+        })
+        .catch(err => console.error("Error cargando Ayuda.json:", err));
 
     function updateConsole(id) {
         const output = document.getElementById('console-output');
-        if (output && consoleData[id]) {
-            output.innerHTML = consoleData[id];
+        if (output && helpData[id]) {
+            output.innerHTML = helpData[id];
+        } else if (output && id === 'WELCOME') {
+             output.innerHTML = 'Bienvenido al <span class="console-highlight">Centro de Comando Geovisor</span>. Selecciona o pasa el mouse sobre una capa para ver sus especificaciones técnicas.';
         }
     }
+
+    // Vincular eventos a controles del simulador
+    document.getElementById('productorType').addEventListener('mouseover', () => updateConsole('PRODUCTOR'));
+    document.getElementById('escenario').addEventListener('mouseover', () => {
+        const val = document.getElementById('escenario').value;
+        if (val === 'nino_extremo') updateConsole('NINO_EXTREMO');
+        else if (val === 'nina_activo') updateConsole('NINA_ACTIVO');
+        else if (val === 'deepmind_cast') updateConsole('DEEPMIND_CAST');
+        else if (val === 'finagro_saamm') updateConsole('SAAMM');
+        else updateConsole('WELCOME');
+    });
+    document.querySelector('.metric:nth-child(2)').addEventListener('mouseover', () => updateConsole('TASA_INTERES'));
+    document.querySelector('.metric:nth-child(3)').addEventListener('mouseover', () => updateConsole('PRECIO_PRODUCTO'));
 
     // Ocultar consola cuando el panel derecho se cierra
     rightBtn.addEventListener('click', () => {
@@ -888,5 +943,6 @@
     });
 
 </script>
+
 </body>
 </html>

@@ -8,17 +8,18 @@
     <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
     
-    <!-- Loaders.gl (Solo Core, quitamos Parquet que da error) -->
-    <script src="https://unpkg.com/@loaders.gl/core@3.4.4/dist/dist.min.js"></script>
+    <!-- Loaders.gl (Solo Core) -->
+    <script src="https://cdn.jsdelivr.net/npm/@loaders.gl/core@3.4.4/dist/dist.min.js"></script>
     
-    <!-- Plugin de Esri para MapLibre (Version especifica para evitar error MIME) -->
-    <script src="https://unpkg.com/@esri/maplibre-arcgis@1.2.0/dist/maplibre-arcgis.umd.js"></script>
+    <!-- Plugin de Esri para MapLibre (Cambiado a JSDelivr para evitar error MIME) -->
+    <script src="https://cdn.jsdelivr.net/npm/@esri/maplibre-arcgis@1.2.1/dist/maplibre-arcgis.umd.js"></script>
+
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
-    <!-- Deck.gl & Mapbox Adapter (Para visualización de GeoParquet masivo) -->
-    <script src="https://unpkg.com/deck.gl@latest/dist.min.js"></script>
-    <script src="https://unpkg.com/@deck.gl/mapbox@latest/dist.min.js"></script>
+    <!-- Deck.gl & Mapbox Adapter -->
+    <script src="https://cdn.jsdelivr.net/npm/deck.gl@8.9.33/dist.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@deck.gl/mapbox@8.9.33/dist.min.js"></script>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; scrollbar-width: thin; scrollbar-color: rgba(44, 95, 45, 0.6) rgba(0, 0, 0, 0.02); }
@@ -763,9 +764,9 @@
         map.addSource('bg-topo', { type: 'raster', tiles: ['https://tile.opentopomap.org/{z}/{x}/{y}.png'], tileSize: 256 });
         map.addLayer({ id: 'layer-topo', type: 'raster', source: 'bg-topo', layout: { visibility: 'none' } }, firstSymbolId);
 
-        // Capas Operacionales (URLs corregidas para evitar 400 Bad Request)
-        map.addSource('subregiones-source', { type: 'geojson', data: subregionesUrl + '/query?where=1%3D1&outFields=*&outSR=4326&f=geojson' });
-        map.addSource('municipios-source', { type: 'geojson', data: municipiosUrl + '/query?where=1%3D1&outFields=*&outSR=4326&f=geojson' });
+        // Capas Operacionales (Aumentamos el limite y corregimos el formato)
+        map.addSource('subregiones-source', { type: 'geojson', data: subregionesUrl + '/query?where=1%3D1&outFields=*&outSR=4326&f=geojson&resultRecordCount=500' });
+        map.addSource('municipios-source', { type: 'geojson', data: municipiosUrl + '/query?where=1%3D1&outFields=*&outSR=4326&f=geojson&resultRecordCount=500' });
 
         map.addLayer({
             id: 'layer-municipios',
@@ -1131,14 +1132,20 @@
             // Configurar S3 / HTTPFS / Spatial
             const conn = await dbInstance.connect();
             
-            // Forzar instalación y carga ANTES de configurar
+            // Forzar instalación y carga desde repositorio oficial WASM
             await conn.query(`
                 SET autoinstall_known_extensions=1;
                 SET autoload_known_extensions=1;
             `);
             
-            await conn.query(`INSTALL httpfs; LOAD httpfs;`);
-            await conn.query(`INSTALL spatial; LOAD spatial;`);
+            try {
+                await conn.query(`INSTALL httpfs; LOAD httpfs;`);
+                await conn.query(`INSTALL spatial; LOAD spatial;`);
+            } catch (err) {
+                console.warn("⚠️ Reintentando carga de extensiones...");
+                // Fallback: algunas versiones de DuckDB-WASM requieren cargarlas explícitamente así
+                await conn.query(`LOAD httpfs; LOAD spatial;`);
+            }
 
             // Ahora sí configuramos S3
             await conn.query(`
@@ -1150,7 +1157,7 @@
             `);
             await conn.close();
             
-            console.log("🚀 Motor DuckDB-WASM listo con soporte S3 y Espacial.");
+            console.log("🚀 Motor DuckDB-WASM listo (S3 + Spatial).");
             return true;
         } catch (e) {
             console.error("Error al iniciar DuckDB:", e);

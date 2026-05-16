@@ -1,5 +1,6 @@
 {
   "diccionario_geovisor": [
+    { "id": "TITULO_SIGAGRO", "categoria": "Interfaz", "explicacion": "<b>SIGAGRO Geovisor:</b> Plataforma analítica avanzada para la simulación de riesgo agropecuario y toma de decisiones financieras." },
     { "id": "R_TERRENO", "categoria": "Capa Catastro", "explicacion": "<b>Predios Formales:</b> Límites de fincas, parcelas y lotes con soporte jurídico y registral completo." },
     { "id": "R_TERRENO_INFORMAL", "categoria": "Capa Catastro", "explicacion": "<b>Informalidad de la Tierra:</b> Ocupaciones o posesiones que no tienen título formalizado pero existen físicamente." },
     { "id": "R_CONSTRUCCION", "categoria": "Capa Catastro", "explicacion": "<b>Huellas de Edificación:</b> Plantas de casas, bodegas y establos dentro de predios formales." },

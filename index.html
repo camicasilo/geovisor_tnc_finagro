@@ -148,9 +148,30 @@
         .accordion-icon { margin-left: auto; transition: transform 0.3s; color: #888; font-size: 0.8rem; }
         .layer-group.active .accordion-icon { transform: rotate(180deg); }
         
-        .layer-group-content { display: none; padding: 0 12px 12px 12px; }
+        .layer-group-content { 
+            display: none; 
+            padding: 0 12px 12px 12px; 
+            max-height: 250px; 
+            overflow-y: auto; 
+        }
         .layer-group.active .layer-group-content { display: block; }
         
+        /* Buscador de capas */
+        .layer-search {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            outline: none;
+            background: rgba(255,255,255,0.7);
+        }
+        .layer-search:focus {
+            border-color: #2c5f2d;
+            background: #fff;
+        }
+
         .layer-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 0.9rem; background: rgba(255,255,255,0.5); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.05); transition: background 0.2s; }
         .layer-item:hover { background: rgba(255,255,255,0.8); }
         .layer-item:last-child { margin-bottom: 0; }
@@ -278,13 +299,14 @@
     <h2><i class="fas fa-layer-group"></i> Capas del Mapa</h2>
     <div class="subtitle">Gestión de datos espaciales</div>
 
-    <!-- Acordeón: Capas Base -->
-    <div class="layer-group accordion active">
+    <!-- Acordeón: Capas Base (Sin active para iniciar retraído) -->
+    <div class="layer-group accordion">
         <div class="layer-group-title">
             <i class="fas fa-map main-icon"></i> Capas Base
             <i class="fas fa-chevron-down accordion-icon"></i>
         </div>
         <div class="layer-group-content">
+            <input type="text" class="layer-search" placeholder="Buscar capa base...">
             <label class="radio-container">Positron (Claro / Defecto)
                 <input type="radio" name="baselayer" value="positron" checked>
                 <span class="checkmark"></span>
@@ -304,13 +326,14 @@
         </div>
     </div>
 
-    <!-- Acordeón: Capas de Trabajo -->
-    <div class="layer-group accordion active">
+    <!-- Acordeón: Capas de Trabajo (Sin active para iniciar retraído) -->
+    <div class="layer-group accordion">
         <div class="layer-group-title">
             <i class="fas fa-border-all main-icon"></i> Capas de Trabajo
             <i class="fas fa-chevron-down accordion-icon"></i>
         </div>
         <div class="layer-group-content" id="working-layers">
+            <input type="text" class="layer-search" placeholder="Buscar capa de trabajo...">
             <div class="layer-item">
                 <span>Subregiones / Provincias</span>
                 <label class="switch"><input type="checkbox" id="layer-provincias" checked><span class="slider"></span></label>
@@ -322,13 +345,14 @@
         </div>
     </div>
     
-    <!-- Acordeón: Modelos de Riesgo -->
-    <div class="layer-group accordion active">
+    <!-- Acordeón: Modelos de Riesgo (Sin active para iniciar retraído) -->
+    <div class="layer-group accordion">
         <div class="layer-group-title">
             <i class="fas fa-fire-alt main-icon"></i> Modelos de Riesgo
             <i class="fas fa-chevron-down accordion-icon"></i>
         </div>
         <div class="layer-group-content">
+            <input type="text" class="layer-search" placeholder="Buscar modelo de riesgo...">
             <div class="layer-item">
                 <span>Riesgo Climático (Heatmap)</span>
                 <label class="switch"><input type="checkbox" id="layer-riesgo"><span class="slider"></span></label>
@@ -340,8 +364,8 @@
         </div>
     </div>
     
-    <!-- Carga de Datos Locales -->
-    <div class="layer-group accordion active">
+    <!-- Carga de Datos Locales (Sin active para iniciar retraído) -->
+    <div class="layer-group accordion">
         <div class="layer-group-title">
             <i class="fas fa-file-upload main-icon"></i> Cargar Capas Locales
             <i class="fas fa-chevron-down accordion-icon"></i>
@@ -415,6 +439,24 @@
     document.querySelectorAll('.layer-group-title').forEach(title => {
         title.addEventListener('click', function() {
             this.parentElement.classList.toggle('active');
+        });
+    });
+
+    // --- Buscador en cada Acordeón ---
+    document.querySelectorAll('.layer-search').forEach(input => {
+        input.addEventListener('input', function() {
+            const filter = this.value.toLowerCase();
+            const container = this.parentElement;
+            // Buscar items de tipo radio o switches
+            const items = container.querySelectorAll('.layer-item, .radio-container');
+            items.forEach(item => {
+                const text = item.textContent || item.innerText;
+                if (text.toLowerCase().indexOf(filter) > -1) {
+                    item.style.display = "";
+                } else {
+                    item.style.display = "none";
+                }
+            });
         });
     });
 

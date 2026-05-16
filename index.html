@@ -311,9 +311,9 @@
 
 <!-- Barra de Herramientas Flotante -->
 <div class="toolbar" id="toolbar-panel">
-    <div class="toolbar-btn active" id="tool-hand" title="Modo Paneo" onmouseover="updateConsole('HERRAMIENTA_MANO')" onmouseout="resetConsole()"><i class="fas fa-hand-paper"></i></div>
-    <div class="toolbar-btn" id="tool-select" title="Seleccionar Entidad" onmouseover="updateConsole('HERRAMIENTA_SELECCION')" onmouseout="resetConsole()"><i class="fas fa-mouse-pointer"></i></div>
-    <div class="toolbar-btn" id="tool-labels" title="Supresión de Etiquetas" onmouseover="updateConsole('SUPRESION_ETIQUETAS')" onmouseout="resetConsole()"><i class="fas fa-eye-slash"></i></div>
+    <div class="toolbar-btn active" id="tool-hand" title="Modo Paneo" onmouseenter="updateConsole('HERRAMIENTA_MANO')" onmouseleave="resetConsole()"><i class="fas fa-hand-paper"></i></div>
+    <div class="toolbar-btn" id="tool-select" title="Seleccionar Entidad" onmouseenter="updateConsole('HERRAMIENTA_SELECCION')" onmouseleave="resetConsole()"><i class="fas fa-mouse-pointer"></i></div>
+    <div class="toolbar-btn" id="tool-labels" title="Supresión de Etiquetas" onmouseenter="updateConsole('SUPRESION_ETIQUETAS')" onmouseleave="resetConsole()"><i class="fas fa-eye-slash"></i></div>
 </div>
 
 
@@ -322,7 +322,7 @@
     <h1><i class="fas fa-seedling"></i> SIGAGRO</h1>
     <div class="subtitle">Simulador de Escenarios · TNC / FINAGRO</div>
 
-    <div class="control-group" onmouseover="updateConsole('PRODUCTOR')">
+    <div class="control-group" onmouseenter="updateConsole('PRODUCTOR')">
         <label><i class="fas fa-tractor"></i> Tipo de productor</label>
         <select id="productorType">
             <option value="pequeno_bajos">Pequeño de ingresos bajos</option>
@@ -332,32 +332,32 @@
         </select>
     </div>
 
-    <div class="control-group" onmouseover="updateConsole('ESCENARIO_DESC')">
+    <div class="control-group" onmouseenter="updateConsole('ESCENARIO_DESC')">
         <label><i class="fas fa-cloud-sun-rain"></i> Escenario climático</label>
         <select id="escenario">
-            <option value="normal" onmouseover="updateConsole('NORMAL_CLIMA')">🌿 0. Normal climática (1981-2010)</option>
-            <option value="nino_extremo" onmouseover="updateConsole('NINO_EXTREMO')">☀️ Escenario 1: El Niño Extremo (Sequía/Estrés)</option>
-            <option value="nina_activo" onmouseover="updateConsole('NINA_ACTIVO')">🌧️ Escenario 2: La Niña Activo (Inundaciones)</option>
-            <option value="deepmind_cast" onmouseover="updateConsole('DEEPMIND_CAST')">🧠 Escenario 3: Google DeepMindCast (IA Forecast)</option>
-            <option value="riesgo_sanitario" onmouseover="updateConsole('RIESGO_SANITARIO')">📉 Escenario 4: Riesgo Sanitario (Plagas/Clima)</option>
-            <option value="finagro_saamm" onmouseover="updateConsole('SAAMM')">🏦 Escenario 5: Financiero FINAGRO (SAAMM)</option>
+            <option value="normal" onmouseenter="updateConsole('NORMAL_CLIMA')">🌿 0. Normal climática (1981-2010)</option>
+            <option value="nino_extremo" onmouseenter="updateConsole('NINO_EXTREMO')">☀️ Escenario 1: El Niño Extremo (Sequía/Estrés)</option>
+            <option value="nina_activo" onmouseenter="updateConsole('NINA_ACTIVO')">🌧️ Escenario 2: La Niña Activo (Inundaciones)</option>
+            <option value="deepmind_cast" onmouseenter="updateConsole('DEEPMIND_CAST')">🧠 Escenario 3: Google DeepMindCast (IA Forecast)</option>
+            <option value="riesgo_sanitario" onmouseenter="updateConsole('RIESGO_SANITARIO')">📉 Escenario 4: Riesgo Sanitario (Plagas/Clima)</option>
+            <option value="finagro_saamm" onmouseenter="updateConsole('SAAMM')">🏦 Escenario 5: Financiero FINAGRO (SAAMM)</option>
         </select>
     </div>
 
 
     <div class="control-group" style="border-bottom: none; margin-bottom: 0;">
         <label><i class="fas fa-sliders-h"></i> Variables Económicas</label>
-        <div class="metric" onmouseover="updateConsole('TASA_INTERES')">
+        <div class="metric" onmouseenter="updateConsole('TASA_INTERES')">
             <span>Tasa de interés (%)</span>
             <input type="range" id="tasaInteres" min="0" max="100" step="1" value="12">
             <span id="tasaValor" style="width: 45px; text-align: right; display: inline-block; font-weight: 600;">12%</span>
         </div>
-        <div class="metric" onmouseover="updateConsole('PRECIO_PRODUCTO')">
+        <div class="metric" onmouseenter="updateConsole('PRECIO_PRODUCTO')">
             <span>Precio producto (%)</span>
             <input type="range" id="precioFactor" min="0" max="100" step="1" value="100">
             <span id="precioValor" style="width: 45px; text-align: right; display: inline-block; font-weight: 600;">100%</span>
         </div>
-        <button class="btn-primary" id="simularBtn" onmouseover="updateConsole('SIMULAR_BTN')"><i class="fas fa-bolt"></i> Actualizar Modelo</button>
+        <button class="btn-primary" id="simularBtn" onmouseenter="updateConsole('SIMULAR_BTN')"><i class="fas fa-bolt"></i> Actualizar Modelo</button>
 
     </div>
 </div>
@@ -375,19 +375,19 @@
         </div>
         <div class="layer-group-content">
             <input type="text" class="layer-search" placeholder="Buscar capa base...">
-            <label class="radio-container" onmouseover="updateConsole('BASE_POSITRON')" onmouseout="resetConsole()">Positron (Claro / Defecto)
+            <label class="radio-container" onmouseenter="updateConsole('BASE_POSITRON')" onmouseleave="resetConsole()">Positron (Claro / Defecto)
                 <input type="radio" name="baselayer" value="positron" checked>
                 <span class="checkmark"></span>
             </label>
-            <label class="radio-container" onmouseover="updateConsole('BASE_DARK')" onmouseout="resetConsole()">CartoDB Dark Matter
+            <label class="radio-container" onmouseenter="updateConsole('BASE_DARK')" onmouseleave="resetConsole()">CartoDB Dark Matter
                 <input type="radio" name="baselayer" value="dark">
                 <span class="checkmark"></span>
             </label>
-            <label class="radio-container" onmouseover="updateConsole('BASE_OSM')" onmouseout="resetConsole()">OpenStreetMap Clásico
+            <label class="radio-container" onmouseenter="updateConsole('BASE_OSM')" onmouseleave="resetConsole()">OpenStreetMap Clásico
                 <input type="radio" name="baselayer" value="osm">
                 <span class="checkmark"></span>
             </label>
-            <label class="radio-container" onmouseover="updateConsole('BASE_TOPO')" onmouseout="resetConsole()">OpenTopoMap (Topográfico)
+            <label class="radio-container" onmouseenter="updateConsole('BASE_TOPO')" onmouseleave="resetConsole()">OpenTopoMap (Topográfico)
                 <input type="radio" name="baselayer" value="topo">
                 <span class="checkmark"></span>
             </label>
@@ -411,35 +411,35 @@
                     <i class="fas fa-folder-open"></i> Catastro Nacional (IGAC)
                 </div>
                 <div class="dataset-content">
-                    <div class="layer-item nested" onmouseover="updateConsole('R_TERRENO')" onmouseout="resetConsole()">
+                    <div class="layer-item nested" onmouseenter="updateConsole('R_TERRENO')" onmouseleave="resetConsole()">
                         <span>R_TERRENO</span>
                         <label class="switch"><input type="checkbox" id="layer-r-terreno"><span class="slider"></span></label>
                     </div>
-                    <div class="layer-item nested" onmouseover="updateConsole('R_TERRENO_INFORMAL')" onmouseout="resetConsole()">
+                    <div class="layer-item nested" onmouseenter="updateConsole('R_TERRENO_INFORMAL')" onmouseleave="resetConsole()">
                         <span>R_TERRENO_INFORMAL</span>
                         <label class="switch"><input type="checkbox" id="layer-r-terreno-informal"><span class="slider"></span></label>
                     </div>
-                    <div class="layer-item nested" onmouseover="updateConsole('R_CONSTRUCCION')" onmouseout="resetConsole()">
+                    <div class="layer-item nested" onmouseenter="updateConsole('R_CONSTRUCCION')" onmouseleave="resetConsole()">
                         <span>R_CONSTRUCCION</span>
                         <label class="switch"><input type="checkbox" id="layer-r-construccion"><span class="slider"></span></label>
                     </div>
-                    <div class="layer-item nested" onmouseover="updateConsole('R_CONSTRUCCION_INFORMAL')" onmouseout="resetConsole()">
+                    <div class="layer-item nested" onmouseenter="updateConsole('R_CONSTRUCCION_INFORMAL')" onmouseleave="resetConsole()">
                         <span>R_CONSTRUCCION_INFORMAL</span>
                         <label class="switch"><input type="checkbox" id="layer-r-construccion-informal"><span class="slider"></span></label>
                     </div>
-                    <div class="layer-item nested" onmouseover="updateConsole('R_VEREDA')" onmouseout="resetConsole()">
+                    <div class="layer-item nested" onmouseenter="updateConsole('R_VEREDA')" onmouseleave="resetConsole()">
                         <span>R_VEREDA</span>
                         <label class="switch"><input type="checkbox" id="layer-r-vereda"><span class="slider"></span></label>
                     </div>
-                    <div class="layer-item nested" onmouseover="updateConsole('R_SECTOR')" onmouseout="resetConsole()">
+                    <div class="layer-item nested" onmouseenter="updateConsole('R_SECTOR')" onmouseleave="resetConsole()">
                         <span>R_SECTOR</span>
                         <label class="switch"><input type="checkbox" id="layer-r-sector"><span class="slider"></span></label>
                     </div>
-                    <div class="layer-item nested" onmouseover="updateConsole('R_NOMENCLATURA_DOMICILIARIA')" onmouseout="resetConsole()">
+                    <div class="layer-item nested" onmouseenter="updateConsole('R_NOMENCLATURA_DOMICILIARIA')" onmouseleave="resetConsole()">
                         <span>R_NOMENCLATURA_DOMICILIARIA</span>
                         <label class="switch"><input type="checkbox" id="layer-r-nom-dom"><span class="slider"></span></label>
                     </div>
-                    <div class="layer-item nested" onmouseover="updateConsole('R_NOMENCLATURA_VIAL')" onmouseout="resetConsole()">
+                    <div class="layer-item nested" onmouseenter="updateConsole('R_NOMENCLATURA_VIAL')" onmouseleave="resetConsole()">
                         <span>R_NOMENCLATURA_VIAL</span>
                         <label class="switch"><input type="checkbox" id="layer-r-nom-vial"><span class="slider"></span></label>
                     </div>
@@ -453,11 +453,11 @@
                     <i class="fas fa-folder"></i> Divipola Administrativa
                 </div>
                 <div class="dataset-content">
-                    <div class="layer-item nested" onmouseover="updateConsole('MUNICIPIOS')" onmouseout="resetConsole()">
+                    <div class="layer-item nested" onmouseenter="updateConsole('MUNICIPIOS')" onmouseleave="resetConsole()">
                         <span>Límites Municipales (DANE)</span>
                         <label class="switch"><input type="checkbox" id="layer-municipios" checked><span class="slider"></span></label>
                     </div>
-                    <div class="layer-item nested" onmouseover="updateConsole('PROVINCIAS')" onmouseout="resetConsole()">
+                    <div class="layer-item nested" onmouseenter="updateConsole('PROVINCIAS')" onmouseleave="resetConsole()">
                         <span>Subregiones / Provincias</span>
                         <label class="switch"><input type="checkbox" id="layer-provincias" checked><span class="slider"></span></label>
                     </div>
@@ -469,18 +469,18 @@
     </div>
 
     
-    <div class="layer-group accordion" onmouseover="updateConsole('MODELO_RIESGO')">
+    <div class="layer-group accordion" onmouseenter="updateConsole('MODELO_RIESGO')">
         <div class="layer-group-title">
             <i class="fas fa-fire-alt main-icon"></i> Modelos de Riesgo
             <i class="fas fa-chevron-down accordion-icon"></i>
         </div>
         <div class="layer-group-content">
             <input type="text" class="layer-search" placeholder="Buscar modelo de riesgo...">
-            <div class="layer-item" onmouseover="updateConsole('RIESGO_CLIMA')" onmouseout="resetConsole()">
+            <div class="layer-item" onmouseenter="updateConsole('RIESGO_CLIMA')" onmouseleave="resetConsole()">
                 <span>Riesgo Climático (Heatmap)</span>
                 <label class="switch"><input type="checkbox" id="layer-riesgo"><span class="slider"></span></label>
             </div>
-            <div class="layer-item" onmouseover="updateConsole('ZONAS_INUNDABLES')" onmouseout="resetConsole()">
+            <div class="layer-item" onmouseenter="updateConsole('ZONAS_INUNDABLES')" onmouseleave="resetConsole()">
                 <span>Zonas Inundables</span>
                 <label class="switch"><input type="checkbox" id="layer-inundacion"><span class="slider"></span></label>
             </div>
@@ -488,7 +488,7 @@
     </div>
     
     <!-- Carga de Datos Locales (Sin active para iniciar retraído) -->
-    <div class="layer-group accordion" onmouseover="updateConsole('CARGAR_LOCAL')">
+    <div class="layer-group accordion" onmouseenter="updateConsole('CARGAR_LOCAL')">
 
         <div class="layer-group-title">
             <i class="fas fa-file-upload main-icon"></i> Cargar Capas Locales
@@ -939,17 +939,35 @@
     
     // Cargar datos de ayuda desde JSON
     fetch('Ayuda.json')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error("No se pudo cargar el JSON");
+            return response.json();
+        })
         .then(data => {
             if (data.diccionario_geovisor) {
-                // Convertir el Array de Diccionarios a un Map en memoria (Búsqueda O(1))
                 data.diccionario_geovisor.forEach(item => {
                     helpDataMap.set(item.id, item.explicacion);
                 });
                 console.log("Diccionario de ayuda cargado:", helpDataMap.size, "elementos.");
             }
         })
-        .catch(err => console.error("Error cargando Ayuda.json:", err));
+        .catch(err => {
+            console.warn("⚠️ Error cargando Ayuda.json (Posible bloqueo por ejecutar localmente file://). Usando fallback en memoria.", err);
+            // Fallback en memoria por si el usuario abre el archivo sin servidor local
+            const fallbackData = [
+                { "id": "R_TERRENO", "explicacion": "<b>Predios Formales:</b> Límites de fincas, parcelas y lotes con soporte jurídico y registral completo." },
+                { "id": "PRODUCTOR", "explicacion": "<b>Tipo de Productor:</b> Define el perfil socioeconómico. Ajusta la vulnerabilidad y la capacidad de resiliencia en el modelo." },
+                { "id": "TASA_INTERES", "explicacion": "<b>Tasa de Interés:</b> Costo financiero del crédito. Un aumento reduce el margen neto de utilidad del productor." },
+                { "id": "PRECIO_PRODUCTO", "explicacion": "<b>Precio Producto:</b> Factor de mercado. Simula caídas de precios que pueden llevar a la insolvencia técnica." },
+                { "id": "NORMAL_CLIMA", "explicacion": "<b>🌿 Normal Climática:</b> Estado base del territorio según promedios históricos del IDEAM (1981-2010)." },
+                { "id": "BASE_POSITRON", "explicacion": "<b>Capa Positron:</b> Mapa base claro y minimalista. Maximiza el contraste de las capas de riesgo." },
+                { "id": "HERRAMIENTA_MANO", "explicacion": "<b>Modo Paneo:</b> Herramienta para navegar y desplazarse libremente por el mapa." },
+                { "id": "SIMULAR_BTN", "explicacion": "<b>Actualizar Modelo:</b> Ejecuta el motor de cálculo 'What-If' recalculando el riesgo para todo el país." },
+                { "id": "WELCOME", "explicacion": "Pasa el mouse sobre cualquier elemento (capas, botones o selectores) para ver sus detalles técnicos aquí." }
+            ];
+            fallbackData.forEach(item => helpDataMap.set(item.id, item.explicacion));
+        });
+
 
     function updateConsole(id) {
         const output = document.getElementById('console-output');
@@ -971,8 +989,8 @@
     const linkHover = (elemId, helpId) => {
         const el = document.getElementById(elemId);
         if(el) {
-            el.addEventListener('mouseover', () => updateConsole(helpId));
-            el.addEventListener('mouseout', resetConsole);
+            el.addEventListener('mouseenter', () => updateConsole(helpId));
+            el.addEventListener('mouseleave', resetConsole);
         }
     };
 
@@ -980,26 +998,26 @@
     
     const escSelect = document.getElementById('escenario');
     if(escSelect) {
-        escSelect.addEventListener('mouseover', () => {
+        escSelect.addEventListener('mouseenter', () => {
             const val = escSelect.value.toUpperCase();
             updateConsole(val);
         });
-        escSelect.addEventListener('mouseout', resetConsole);
+        escSelect.addEventListener('mouseleave', resetConsole);
     }
 
     document.querySelectorAll('.metric').forEach((el, index) => {
         const id = index === 0 ? 'TASA_INTERES' : 'PRECIO_PRODUCTO';
-        el.addEventListener('mouseover', () => updateConsole(id));
-        el.addEventListener('mouseout', resetConsole);
+        el.addEventListener('mouseenter', () => updateConsole(id));
+        el.addEventListener('mouseleave', resetConsole);
     });
     
     const simBtn = document.getElementById('simularBtn');
     if(simBtn) {
-        simBtn.addEventListener('mouseover', () => updateConsole('SIMULAR_BTN'));
-        simBtn.addEventListener('mouseout', resetConsole);
+        simBtn.addEventListener('mouseenter', () => updateConsole('SIMULAR_BTN'));
+        simBtn.addEventListener('mouseleave', resetConsole);
     }
     
-    // Vincular mouseout general a los paneles para limpiar la consola
+    // Vincular mouseleave general a los paneles para limpiar la consola
     document.getElementById('left-panel').addEventListener('mouseleave', resetConsole);
     document.getElementById('right-panel').addEventListener('mouseleave', resetConsole);
     document.getElementById('toolbar-panel').addEventListener('mouseleave', resetConsole);

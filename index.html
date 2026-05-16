@@ -1136,6 +1136,7 @@
             await conn.query(`
                 SET autoinstall_known_extensions=1;
                 SET autoload_known_extensions=1;
+                SET custom_extension_repository='https://extensions.duckdb.org';
             `);
             
             try {

@@ -399,7 +399,7 @@
 
 
     <div class="control-group" style="border-bottom: none; margin-bottom: 0;">
-        <label><i class="fas fa-sliders-h"></i> Variables Económicas</label>
+        <label onmouseenter="updateConsole('TITULO_VARIABLES')" onmouseleave="resetConsole()"><i class="fas fa-sliders-h"></i> Variables Económicas</label>
         <div class="metric" onmouseenter="updateConsole('TASA_INTERES')">
             <span>Tasa de interés (%)</span>
             <input type="range" id="tasaInteres" min="0" max="100" step="1" value="12">
@@ -417,12 +417,12 @@
 
 <!-- Panel Derecho: Gestor de Capas -->
 <div class="glass-panel right-sidebar" id="right-panel">
-    <h2><i class="fas fa-layer-group"></i> Capas del Mapa</h2>
+    <h2 onmouseenter="updateConsole('TITULO_CAPAS')" onmouseleave="resetConsole()"><i class="fas fa-layer-group"></i> Capas del Mapa</h2>
     <div class="subtitle">Gestión de datos espaciales</div>
 
     <!-- Acordeón: Capas Base (Sin active para iniciar retraído) -->
     <div class="layer-group accordion">
-        <div class="layer-group-title">
+        <div class="layer-group-title" onmouseenter="updateConsole('CAPAS_BASE')" onmouseleave="resetConsole()">
             <i class="fas fa-map main-icon"></i> Capas Base
             <i class="fas fa-chevron-down accordion-icon"></i>
         </div>
@@ -450,7 +450,7 @@
 
     <!-- Acordeón: Capas de Trabajo (Estructura de Árbol) -->
     <div class="layer-group accordion">
-        <div class="layer-group-title">
+        <div class="layer-group-title" onmouseenter="updateConsole('CAPAS_TRABAJO')" onmouseleave="resetConsole()">
             <i class="fas fa-project-diagram main-icon"></i> Capas de Trabajo
             <i class="fas fa-chevron-down accordion-icon"></i>
         </div>
@@ -567,7 +567,7 @@
 
 <!-- Micro-dashboard (Popup inferior) -->
 <div class="glass-panel micro-dashboard" id="entity-dashboard">
-    <div class="md-header">
+    <div class="md-header" onmouseenter="updateConsole('TITULO_DASHBOARD')" onmouseleave="resetConsole()">
         <div class="md-title"><i class="fas fa-map-marker-alt" style="color:#d32f2f;"></i> <span id="md-entity-name">Selecciona un municipio...</span></div>
         <div class="md-close" id="md-close"><i class="fas fa-times"></i></div>
     </div>

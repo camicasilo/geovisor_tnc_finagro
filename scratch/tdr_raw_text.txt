@@ -1,0 +1,618 @@
+ 
+Página 1 de 14 
+ 
+Términos de Referencia 
+Consultoría 
+1. Resumen de la convocatoria 
+ 
+Día de publicación 4 de mayo de 2026 
+Objetivo Contratar un(a) consultor(a) especializado(a) en modelación 
+espacial para cuantificar el riesgo agropecuario, y diseñar, 
+desarrollar, validar e implementar un prototipo funcional que 
+estime el riesgo financiero a partir de resultados de riesgo de 
+los componentes climático, sanitario y de mercado usando la 
+metodología de matriz de riesgo. 
+ 
+El modelo debe ser dinámico, que permita obtener resultados 
+con diferentes escenarios y para diferentes tipos de productor 
+(pequeño productor de ingresos bajos, pequeño productor, 
+mediano productor y gran productor), a partir de información 
+disponible, además, las estimaciones de riesgo deben incluir 
+indicadores de amenaza y vulnerabilidad para los 
+componentes mencionados. 
+ 
+Las estimaciones se realizarán en zonas aptas y/o frontera 
+agrícola y debe presentar análisis crediticio agropecuario 
+siguiendo lineamientos del Fondo para el Financiamiento 
+Agropecuario (FINAGRO),  en el marco de la ruta de 
+reverdecimiento y del proyecto Paisajes Futuros. 
+ 
+Los resultados permitirán mejorar la  toma de decisiones 
+crediticias para el sector agropecuario en FINAGRO, pues 
+incluiría análisis mejorados, más informados y alineados con 
+la resiliencia climática. 
+Punto de contacto y de 
+envío de propuesta 
+Ivis Ucros Guerrero 
+E-mail: ivis.ucros@tnc.org 
+Dependencia de TNC en la 
+que se va a radicar 
+Estrategia de Agricultura y Ganadería Regenerativa, América 
+Latina 
+Esta dependencia es el único punto de contacto autorizado. 
+Fecha límite para 
+recepción de propuesta 
+técnica y económica 
+ 
+15 de mayo de 2026 
+Tipo de contrato  Contrato de servicios, monto fijo 
+TNC seleccionará la mejor propuesta con base en los criterios de evaluación establecidos en 
+los términos de Referencia. 
+ 
+1. Antecedentes 
+El sector agropecuario colombiano enfrenta importantes desafíos asociados al cambio 
+climático, la degradación de ecosistemas estratégicos y la necesidad de avanzar hacia  
+Página 2 de 14 
+ 
+sistemas productivos  rentables, más sostenibles y resilientes. En este contexto, los 
+instrumentos financieros agropecuarios desempeñan un papel clave para orientar las 
+decisiones de inversión en el territorio y facilitar la transición hacia prácticas productivas 
+que contribuyan simultáneamente a la productividad, la adaptación al cambio climático 
+y la conservación de la biodiversidad. 
+En particular, el crédito agropecuario constituye uno de los principales mecanismos de 
+política pública para promover el desarrollo rural y apoyar la transformación de los 
+sistemas productivos. Sin embargo, existe una creciente necesidad de fortalecer esto s 
+instrumentos financieros mediante la incorporación de criterios ambientales, climáticos, 
+de mercado y territoriales que permitan orientar de manera más efectiva los recursos 
+hacia modelos productivos rentables y sostenibles. 
+En este marco, FINAGRO, en articulación con diversas entidades públicas  de orden 
+nacional, organismos de cooperación internacional y aliados técnicos, ha venido 
+avanzando en una agenda orientada al fortalecimiento de sus instrumentos financieros, 
+incluyendo la integración progresiva de consideraciones ambientales y de riesgo 
+climático, sanitario y de mercado  en el diseño y operación de las líneas de crédito 
+agropecuario. Esta agenda se conecta con iniciativas como BIOFIN (Biodiversity Finance 
+Initiative) del Programa de las Naci ones Unidas para el Desarrollo (PNUD), que busca 
+identificar oportunidades para alinear los flujos financieros públicos y privados con los 
+objetivos de conservación de la biodiversidad y uso sostenible del capital natural. 
+De manera complementaria, desde el proyecto Paisajes Futuros, implementado por The 
+Nature Conservancy (TNC), se ha venido apoyando la generación de insumos técnicos 
+que contribuyan a fortalecer la integración de variables productivas, ambientales y 
+climáticas en los instrumentos financieros del sector agropecuario. Entre estos insumos 
+se encuentran análisis de riesgo al cambio climático para diferentes cadenas 
+productivas, así como ejercicios de identificación y caracterización de prácticas 
+productivas sostenibles y su relación con la gestión del riesgo agropecuario. 
+En este contexto, se ha identificado la oportunidad de avanzar en el fortalecimiento y 
+reverdecimiento de las líneas de crédito agropecuario, mediante la generación de 
+información técnica y económica, y traducir estos elementos en parámetros que puedan 
+ser incorporados en el diseño y ajuste de instrumentos de financiamiento agropecuario. 
+Este esfuerzo busca contribuir a que los instrumentos financieros del sector faciliten la 
+transición hacia sistemas productivos más resilientes, alineados con los objetivos  de 
+desarrollo sostenible, la adaptación al cambio climático y la conservación de la 
+biodiversidad en los territorios rurales. 
+El programa “Implementación y financiamiento de la Adaptación Basada en Ecosistemas 
+(AbE) por parte del sector agroalimentario para reducir el riesgo climático y los impactos 
+ambientales en América Latina” (más conocido como “Paisajes Futuros”), es liderado por 
+The Nature Conservancy (TNC) en alianza con los socios implementadores del consorcio 
+UFZ y Nestlé y por los socios locales CIPAV, FONDAGUA, FONAG, Fundación Gran Chaco 
+y ProYungas y es financiado por el Ministerio Federal Alemán de Asuntos Económicos y 
+Acción Climática (BMWK) y la Iniciativa Climática Internacional (IKI). El programa se 
+implementa en 5 países: Colombia, Argentina, Ecuador, Paraguay y Perú. El proyecto 
+inició oficialmente el 1 de junio de 2022 y finalizará el 31 de mayo de 2028.   
+Página 3 de 14 
+ 
+El programa tiene como objetivo que productores de diversos sectores agrícolas inicien 
+la transición hacia prácticas regenerativas y de AbE, que mejoren su productividad y 
+aumenten su resiliencia climática. Entendemos por Agricultura y ganadería regenerativa 
+(R2A), el enfoque de gestión de los sistemas agroalimentarios que integra los 
+conocimientos científicos y locales para conservar y restaurar activamente los 
+ecosistemas y la biodiversidad en las zonas de producción y sus alrededores, para 
+reducir las hu ellas, aumentar la resiliencia y la productividad, mejorando al mismo 
+tiempo la inclusión social, la salud humana y los medios de vida. Por lo tanto, aunque la 
+R2A implica un cambio hacia una perspectiva sistémica que tenga en cuenta la salud 
+del medio amb iente y el bienestar de las personas a largo plazo, reconocemos la 
+necesidad de hablar una transición a esta.   
+En Colombia se centra en las cadenas productivas de ganadería bovina, palma de aceite 
+y caña de azúcar. Busca los siguientes resultados:  
+Output 1: Se desarrollará un Centro Regional de Transformación del Sistema con cinco 
+Centros Nacionales (la Plataforma) como un motor colaborativo para el cambio, 
+involucrando a gobiernos, empresas, investigadores, sociedad civil y productores en 
+asociaciones novedosas en torno a la visión colectiva de escalar EbA R2A. El Centro 
+Regional (Hub) crea herramientas, políticas y modelos comerciales con aportes de las 
+partes nacionales interesadas y los canaliza hacia los Centros Nacionales. Reúne 
+financiación regional, sector privado, investigaciones y otros actores para promover la 
+EbA R2A. Cada Centro Nacional se adapta al contexto local, pruebas políticas, 
+mecanismos financieros y aplica los enfoques EbA R2A en colaboración con 
+productores, programas gubername ntales y el sector privado. A través del sistema 
+integral MEL (Monitoreo, Evaluación y Aprendizaje) del proyecto, los aprendizajes, los 
+desafíos y los obstáculos se retroalimentarán al Centro Regional para fortalecer y refinar 
+las intervenciones y garantizar que la escala se produzca a nivel de sistemas.  
+Output 2: Para garantizar el impacto a nivel de paisaje, el proyecto se centrará en el 
+desarrollo y el intercambio de conocimientos al proporcionar análisis interdisciplinarios 
+de la situación y planes de acción de género personalizados para cada país, al crear vías 
+para la transformación del sistema y al desarrollar las capacidades de las partes 
+interesadas.   
+Output 3: Se informarán la identificación y mejora de los modelos comerciales que se 
+basen en los beneficios de AbE R2A (por ejemplo, fomentar el espíritu empresarial y la 
+innovación de la industria) para crear vías hacia una rápida adopción por parte de l os 
+productores (incluidas mujeres, pueblos indígenas), empresas y gobiernos y empoderar 
+a mujeres y pueblos indígenas a través del desarrollo de diversos productos elaborados 
+con recursos naturales (tintes, fibras, miel, lana, plantas medicinales, frutas p ara la 
+alimentación familiar).  
+Output 4: Las políticas y las finanzas públicas están codiseñadas para entornos propicios 
+que capturan las contribuciones de carbono, adaptación y mitigación de AbE R2A a las 
+NDC, dirigen las economías agrícolas a AbE R2A y desvían los flujos de financiaci ón 
+gubernamentales nuevos y actuales hacia el desarrollo de AbE R2A.  
+Output 5: Financiamiento Privado: aumenta la disponibilidad de crédito privado, 
+inversiones y presupuestos operativos para canalizar a instituciones y productores de 
+AbE R2A para la expansión económica de AbE R2A.  
+Página 4 de 14 
+ 
+En un escenario de cambio climático, el sector agropecuario enfrenta una creciente 
+exposición a riesgos climáticos, como sequías, inundaciones, variabilidad en las 
+precipitaciones y eventos extremos, que afectan de manera diferenciada a los 
+productores según el tipo de sistema productivo, la ubicación territorial y las prácticas 
+de manejo implementadas. Sin embargo, estos factores de diferenciación no siempre se 
+reflejan de manera explícita en los modelos tradicionales de análisis de riesgo crediticio, 
+que tienden a tratar el riesgo climático de forma agregada o indirecta. 
+En Colombia, FINAGRO desempeña un rol clave en la canalización de recursos 
+financieros hacia el sector agropecuario y, en ese marco, ha venido avanzando en una 
+ruta de reverdecimiento orientada a incorporar consideraciones ambientales y 
+climáticas en sus procesos de análisis y toma de decisiones. Un desafío central de este 
+proceso es contar con herramientas técnicas que permitan identificar, cuantificar y 
+comparar el nivel de riesgo crediticio asociado a distintos sistemas productivos y 
+prácticas agrícolas, reconociendo que aquellas prácticas que fortalecen la resiliencia 
+climática pueden contribuir a reducir pérdidas y mejorar el desempeño crediticio en el 
+mediano y largo plazo. 
+En este contexto, surge la necesidad de desarrollar un enfoque analítico que traduzca 
+la información climática, productiva y territorial en parámetros cuantificables de riesgo, 
+aplicables al análisis de riesgo crediticio agropecuario.  
+La presente consultoría se enmarca en los outputs 4 y 5 del programa Paisajes Futuros 
+y tiene como propósito sentar las bases técnicas y metodológicas para que FINAGRO 
+pueda incorporar progresivamente esta diferenciación en sus procesos de análisis de 
+riesgo, fortaleciendo así la alineación entre la gestión del riesgo crediticio, la resiliencia 
+climática del sector agropecuario y los objetivos de sostenibilidad y financiamiento 
+verde del país. 
+ 
+2. Objeto 
+Contratar un(a) consultor(a) especializado(a) en modelación cuantitativa de riesgo 
+usando la metodología de matriz de riesgo para diseñar, desarrollar y validar un prototipo 
+funcional de modelo de riesgo agro pecuario, que permita incorporar de manera 
+progresiva variables climáticas,  sanitarias, de mercado,  productivas y territoriales  por 
+tipo de productor en el análisis de riesgo crediticio agropecuario, en el marco de la ruta 
+de reverdecimiento y del proyecto Paisajes Futuros. 
+ 
+3. Objetivos específicos 
+1. Desarrollar un marco metodológico para la incorporación del riesgo climático, 
+sanitario y de mercado para la evaluación del riesgo crediticio agropecuario, 
+articulado con los riesgos financieros, que permita diferenciar el nivel de riesgo 
+según el tipo de actividad agropecuaria y tipo de productor, usando la matriz de 
+riesgo agropecuario como marco analítico. Todo el modelo debe ser espacial 
+estimado en zonas aptas. 
+2. Definir y cuantificar parámetros e indicadores de riesgo agroclimático que 
+permitan estimar la incidencia de la variabilidad y el cambio climático en el 
+comportamiento crediticio del sector agropecuario. Así mismo, indicadores para  
+Página 5 de 14 
+ 
+los componentes de mercado, sanitario y financiero, principalmente para el 
+componente de amenaza. 
+3. Establecer una base técnica reproducible para la gestión e integración de datos 
+climáticos, productivos, territoriales y financieros que soporten el análisis 
+diferenciado de riesgo crediticio agropecuario. 
+4. Diseñar, validar e implementar un prototipo funcional que permita aplicar y 
+explorar los parámetros de riesgo agroclimático en un entorno de prueba, 
+evaluando su viabilidad técnica e institucional.  Este prototipo debe permitir 
+analizar y comparar escenarios de riesgo y pérdidas esperadas bajo distintos 
+sistemas productivos y niveles de adopción de prácticas resilientes. 
+5. Fortalecer las capacidades institucionales de FINAGRO mediante la generación 
+de lineamientos técnicos y la transferencia de conocimiento que faciliten la 
+adopción progresiva del enfoque de riesgo climático y resiliencia productiva en 
+sus procesos de análisis. 
+ 
+4. Actividades 
+1. Entender y sistematizar la evaluación del riesgo realizada por FINAGRO y la banca 
+de primer piso en Colombia. Revisar y sistematizar los insumos existentes sobre 
+riesgo climático (incluyendo resultados de análisis previamente desarrollados 
+por TNC y otros estudios relevantes). 
+2. Identificar y priorizar variables climáticas, sanitarias, productivas, territoriales y de 
+mercado que puedan incidir en el riesgo crediticio agropecuario , incluyendo 
+variables asociadas al tipo de sistema productivo. 
+3. Diseñar una propuesta metodológica para traducir dichas variables en 
+parámetros aplicables al análisis de riesgo de crédito (por ejemplo: ajustes en 
+probabilidad de incumplimiento, severidad de pérdida, exposición sectorial), 
+permitiendo diferenciar niveles de riesgo y pérdidas esperadas según sistemas 
+productivos y prácticas implementadas. 
+4. Construir indicadores cuantitativos que permitan estimar la incidencia del riesgo 
+climático en el comportamiento crediticio del sector agropecuario, así como 
+indicadores proxy de resiliencia productiva asociados a prácticas y arreglos 
+productivos. 
+ 
+5. Cuantificar el riesgo productivo para sistemas transitorios, permanentes y 
+pecuarios, es decir, los componentes de clima y sanitario, usando la matriz de 
+riesgo agropecuario de FINAGRO. 
+6. Para un cultivo transitorio, dos permanentes y un sistema pecuario, priorizados 
+por TNC y FINAGRO estimar riesgos de mercados y financieros para consolidar 
+riesgo de crédito (usando los 4 componentes de riesgo), para los cuatro 
+componentes de riesgo se deb e usar la matriz de riesgo. Las estimaciones se 
+realizan en zonas aptas, por tipo de productor. 
+7. Desarrollar pruebas piloto con información disponible para validar la 
+aplicabilidad de los parámetros diseñados para cultivos priorizados. Cuando sea 
+posible, comparar escenarios según prácticas productivas. Mínimo debe incluir 
+los siguientes escenarios desde el punto de vista climático: 1) Normal climática,  
+Página 6 de 14 
+ 
+2) El Niño Típico, 3) La Niña Típica, 4) Predicciones climáticas, 5) tres escenarios 
+de cambio climático definidos por TNC y FINAGRO. 
+8. Elaborar lineamientos técnicos para la incorporación progresiva del riesgo 
+climático la diferenciación por sistemas productivos y prácticas dentro de la 
+evaluación de riesgo agropecuario de Finagro. 
+9. Realizar sesiones de transferencia técnica al equipo de la Dirección de Riesgos 
+Agropecuarios y TNC. 
+ 
+5. Entregables 
+Entregable 1. Diseño conceptual del modelo de riesgo agroclimático y sanitario por tipo 
+de productor, usando información de normal climática, predicciones climática s, 
+escenarios de variabilidad y cambio climático y su articulación con los riesgos de 
+mercado y financiero (definidos por FINAGRO) usando la metodología de matriz de 
+riesgo agropecuario.  Plazo: Mes 1 
+Contenido mínimo:  Marco conceptual del modelo de riesgo agropecuario/ climático, 
+sanitarios, mercados y financiero . Identificación de variables climáticas, productivas, 
+territoriales y de precios (Ubicación, disponibilidad, resoluciones, temporalidad entre 
+otros de la información para estimar el riesgo y sus parámetros, integración a futuro con 
+información satelital  para realizar monitoreo de riesgo productivo ).  Definición de 
+supuestos, escalas espaciales y temporales.  Arquitectura lógica del sistema (dat os–
+modelo–salidas), Para ser implementado en la matriz de riesgo agropecuario 
+Producto 1:  Documento de diseño del modelo de riesgo agroclimático , sanitario, 
+mercado y financiero definidos por FINAGRO usando el concepto de matriz de riesgo 
+agropecuario por tipo de productor en zonas aptas y/o frontera agrícola que permita 
+estimar el riesgo crediticio 
+Entregable 2. Arquitectura de datos y procesos extracción, transformación y carga de 
+información (ETL). Plazo: Mes 2 
+Contenido mínimo:  Diseño de la arquitectura de datos (fuentes, ingestión, 
+almacenamiento, Pesos de la información y posibles tiempos de procesamiento).  
+Definición y desarrollo de procesos ETL automatizados.  Integración de datos climáticos, 
+geoespaciales y productivos.  Lineamientos de calidad, interoperabilidad y buenas 
+prácticas MinTIC. 
+Producto 2:  Documento técnico + scripts ETL versionados." 
+Entregable 3. Prototipo funcional del modelo de riesgo.  Plazo: Mes 3.5 
+Contenido mínimo:  Implementación inicial de algoritmos de análisis y/o simulación de 
+riesgo. Uso de técnicas de machine learning supervisado y/o no supervisado (cuando 
+aplique). Parametrización básica del riesgo agropecuario/climático, sanitario, mercado 
+y financiero. Validación preliminar del funcionamiento del modelo y Simulación del 
+riesgo y cada uno de los parámetros para su estimación y análisis de riesgo de crédito. 
+Producto 3: Prototipo funcional del modelo  espacial usando el concepto de matriz de 
+riesgo agroclimático (código + documentación)."  
+Página 7 de 14 
+ 
+Entregable 4. Desarrollo y pruebas de la aplicación de soporte.  Plazo: Mes 4 
+Contenido mínimo:  Desarrollo de componentes de software (backend y/o frontend 
+según aplique). Integración del modelo de riesgo con la aplicación.  Pruebas funcionales 
+y técnicas del sistema. Ajustes derivados de pruebas internas con FINAGRO, Evaluando 
+la integración futura de los resultados a SAAM (Sistema de Alertas Ambientales y 
+Monitoreo de Finagro) e interoperabilidad con otros sistemas. 
+Producto 4:  Aplicación funcional en entorno de prueba + informe de pruebas." 
+Entregable 5. Modelo ajustado y documentación técnica.  Plazo: Mes 5 
+Contenido mínimo:  Ajustes finales del modelo de riesgo según resultados de pruebas.  
+Documentación técnica del código, algoritmos y parámetros. Guía de operación y 
+mantenimiento del sistema. Versionamiento completo del código y repositorio 
+organizado. 
+Producto 5:  Modelo ajustado + documentación técnica y de usuario." 
+Entregable 6. Informe final y transferencia técnica. Plazo: Mes 6 
+Contenido mínimo: Síntesis del modelo desarrollado y su aplicabilidad institucional.  
+Recomendaciones para escalamiento, mejoras futuras y sostenibilidad.  Sesión de 
+transferencia técnica al equipo de FINAGRO.  Entrega final de código, bases de datos y 
+documentación. 
+Producto 6:  Informe final + repositorio completo + acta de transferencia." 
+6. Cronograma de entregables y pagos 
+Los pagos se efectuarán contra la entrega de productos recibidos a plena satisfacción 
+de TNC. Como comprobante de cada pago, se deberá entregar la factura oficial 
+correspondiente por cada uno de los productos, que deberá ser autorizada al nivel 
+impositivo correspondiente. Los pagos se realizarán según el siguiente cronograma: 
+ 
+Productos Fecha de 
+entrega 
+% Pago 
+Producto 1 . Documento de diseño del modelo de 
+riesgo agroclimático y sanitario articulados con los 
+riesgos de mercado y financiero definidos por Finagro 
+usando el concepto de matriz de riesgo agropecuario. 
+31 de julio de 
+2026 
+10% 
+Producto 2:  Documento técnico + scripts ETL 
+versionados." 
+31 de agosto de 
+2026 
+0% 
+Producto 3:  Prototipo funcional del modelo  espacial 
+usando el concepto de matriz de riesgo agroclimático 
+(código + documentación)." 
+15 de octubre de 
+2026 
+25% 
+Producto 4:  Aplicación funcional en entorno de 
+prueba + informe de pruebas , describiendo para 
+cada técnica o metodología las fases y etapas 
+31 de octubre de 
+2026 
+30%  
+Página 8 de 14 
+ 
+Productos Fecha de 
+entrega 
+% Pago 
+necesarias para su implementación. Debe precisarse las 
+ventajas y desventajas de cada metodología. 
+El producto incluye una sesión de presentación al 
+equipo TNC, soportada en un documento de Power 
+Point. 
+Producto 5: Modelo ajustado + documentación 
+técnica y de usuario." 
+30 de 
+noviembre de 
+2026 
+0% 
+Producto 6: Informe final + repositorio completo + 
+acta de transferencia." 
+31 de diciembre 
+de 2026 
+35% 
+ 
+7. Duración del contrato 
+Se estima que la consultoría tenga una duración de seis (6) meses, iniciando en el mes 
+de junio de 2026. 
+8. Perfil: 
+Formación Académica:  
+• Profesional en Economía, Ingeniería Industrial, Ingeniería de Sistemas, 
+Estadística, Matemáticas, Actuaría, Agronomía, Ingeniería Agrícola o áreas afines. 
+• Deseable posgrado en finanzas cuantitativas, análisis de riesgo, econometría, 
+sector agropecuario, ciencia de datos o áreas relacionadas. 
+Experiencia General:  
+• Mínimo 5 años de experiencia en modelación cuantitativa aplicada a análisis de 
+riesgo financiero, riesgo climático, crediticio o riesgo sectorial. 
+• Experiencia en construcción de indicadores y parametrización de modelos de 
+riesgo para el sector agropecuario.  
+• Experiencia en análisis de datos climáticos, sanitarios, económicos o financieros 
+para el sector agropecuario. 
+Experiencia Específica: 
+• Construcción de parámetros para evaluación de riesgo crediticio.  
+• Análisis estadístico y econométrico aplicado a riesgo. 
+• Integración de variables externas (climáticas, sanitarias, productivas, territoriales) 
+en modelos financieros. 
+• Programación en Python o R para análisis cuantitativo. 
+• Manejo de bases de datos estructuradas. 
+Deseable: 
+• Experiencia en análisis de riesgo agropecuario. 
+• Conocimiento de riesgo climático o análisis de variabilidad climática. 
+• Familiaridad con marcos de gestión de riesgo ambiental y social (SARAS).  
+Página 9 de 14 
+ 
+• Conocimiento lineamientos de FINAGRO en torno a tipos de productores, líneas 
+de crédito, tipos de cartera y destinos de crédito, principalmente. Además, 
+conocimiento en incentivos de FINAGRO. 
+ 
+9.  Presentación de propuestas 
+Las personas  naturales y/o jurídicas  interesadas en postularse para esta consultoría 
+deben enviar un documento PDF que consolide los siguientes documentos (ver anexo):  
+i) Carta de motivación justificando la experiencia del proponente, firmada  
+ii) Propuesta técnica y económica para el desarrollo de todos los productos. 
+iii) Currículum Vitae de la(s) persona(s) participante(s) en la ejecución de la 
+propuesta. 
+Se considerarán sólo las propuestas completas enviadas electrónicamente a: 
+ivis.ucros@tnc.org hasta el 15 de mayo de 2026. 
+ 
+10. Criterios de calificación 
+Las propuestas serán evaluadas según los siguientes criterios:  
+ 
+Criterios de calificación Puntaje 
+100% 
+Formación y conocimiento relevante.  
+Nivel y pertinencia de la formación académica del(a) consultor(a) en 
+áreas directamente relacionadas con el objeto de la consultoría, así 
+como su conocimiento conceptual en análisis de riesgo, finanzas, 
+modelación cuantitativa, riesgo climático y sostenibilidad. Familiaridad 
+con enfoques de resiliencia climática, adaptación basada en 
+Ecosistemas (AbE) y gestión de riesgo ambiental y social. 
+ 
+30% 
+Experiencia:  
+Experiencia comprobada en modelación cuantitativa de riesgo, en 
+particular riesgo crediticio y/o financiero, incluyendo la integración de 
+variables climáticas, productivas y territoriales. Experiencia en diseño 
+de marcos metodológicos, construcción de indi cadores, desarrollo y 
+validación de modelos o prototipos funcionales, manejo de datos 
+complejos y trabajo en contextos institucionales del sector 
+público/financiero. Experiencia en programación. 
+25% 
+Calidad de la propuesta técnica: 
+Calidad, claridad y coherencia de la propuesta técnica presentada, 
+incluyendo la comprensión del problema, el enfoque metodológico 
+propuesto, la alineación con los objetivos, actividades y entregables 
+de los TDR, el realismo de la aproximación técnica y la solidez del plan 
+de trabajo. Se valorará la capacidad de traducir un ejercicio técnico 
+complejo en insumos aplicables al contexto institucional de FINAGRO. 
+30% 
+Propuesta económica.  
+Razonabilidad y coherencia de la propuesta económica en relación 
+con el alcance, duración, complejidad técnica y nivel de 
+especialización requerido para la consultoría. Consistencia entre el 
+15%  
+Página 10 de 14 
+ 
+Criterios de calificación Puntaje 
+100% 
+presupuesto presentado y los entregables propuestos, así como su 
+competitividad y eficiencia en el uso de recursos. 
+ 
+ 
+11. Valor de la consultoría y gastos asociados 
+La convocatoria cuenta con un presupuesto estimado de $ 85.000.000 pesos 
+colombianos. 
+La propuesta económica debe considerar el desarrollo y entrega de todos los 
+productos, incluyendo impuestos, seguridad social, y gastos de viaje (de ser 
+necesarios). Todos los gastos, incluidos viajes relacionados al desarrollo y la entrega 
+de productos, s eguridad social, impuestos, y demás deberán estar incluidos en la 
+propuesta económica. TNC no hará reembolsos ni reconocerá pagos adicionales. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+Página 11 de 14 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ANEXO 1: CARTA DE PRESENTACIÓN 
+ 
+(Ciudad y fecha) 
+Por este medio someto a su consideración la aplicación adjunta en respuesta a los 
+TDRS xxxxxxxx  con fecha xxxx de 202X, por un total de xxxxxxxxx moneda 
+corriente. 
+ 
+Firma autorizada:  
+Nombre: Nombre 
+Nit.  
+Contacto técnico:  
+Email:  
+ 
+Dirección: Dirección: 
+Sitio web (si aplica):  
+Teléfono:  
+Correo Electrónico:  
+Sello: (si aplica) 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+Página 12 de 14 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ANEXO 2 – PROPUESTA TÉCNICA  
+ 
+ 
+I.  INFORMACIÓN GENERAL DEL SOLICITANTE 
+ 
+1.   Nombre legal de la organización y siglas (si aplica) / nombre de la persona natural:  
+ 
+ 
+2.   Domicilio legal de la organización / persona natural: 
+ 
+ 
+3.   Teléfono: 
+ 
+4.   Correo Electrónico 
+ 
+5.   Sitio web: 
+ 
+II. DOCUMENTO DE LA APLICACIÓN 
+ 
+1.  Resumen y Antecedentes 
+ 
+ 
+2.  Aplicación técnica 
+ 
+   
+Página 13 de 14 
+ 
+ 
+III. Cronograma 
+Plazo de ejecución:  
+ 
+Plan de trabajo 
+No. Actividad Productos Responsable Recursos 
+requeridos 
+Plazo de 
+ejecución de la 
+donación 
+Y1 
+Q1 Q2 Q3 Q4          
+         
+         
+         
+          
+Página 14 de 14 
+ 
+ 
+IV. Resumen de costos de la propuesta 
+ 
+Categoría Valor 
+1. SALARIOS  
+ 
+2. PRESTACIONES SOCIALES  
+ 
+3. CONSULTORES  
+ 
+4. SERVICIOS ADICIONALES A SER 
+CONTRATADOS  
+ 
+5.  TRANSPORTES Y VIÁTICOS 
+ 
+6 GASTOS DE VIAJE (per diem, tiquetes 
+aéreos, alojamiento ) 
+ 
+7. MATERIALES Y SUMINISTROS  
+ 
+8. COSTOS ADMINISTRATIVOS  
+ 
+Total  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

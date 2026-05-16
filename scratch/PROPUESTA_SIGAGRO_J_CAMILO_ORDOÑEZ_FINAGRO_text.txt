@@ -1,0 +1,834 @@
+5 DE MAYO DE 2026 
+ 
+  
+PROPUESTA 
+GEOVISOR 
+PREDICTIVO DE 
+RIESGO 
+AGROPECUARIO PARA 
+FINAGRO 
+Diseño, desarrollo e implementación de un 
+prototipo funcional de geovisor para la 
+estimación del riesgo agropecuario (climático, 
+sanitario, de mercado y financiero) mediante 
+modelación espacial y machine learning, en el 
+marco de la ruta de reverdecimiento de 
+FINAGRO y el proyecto Paisajes Futuros de TNC 
+ 
+ING. JUAN CAMILO ORDOÑEZ BETANCOURTH 
+SIGAGRO – SOLUCIONES GEOESPACIALES INTELIGENTES PARA EL AGRO 
+ 
+  JUAN CAMILO ORDOÑEZ BETANCOURTH - 1032405173-2 
+DIRECCIÓN: DG 94 BIS # 56 – 73 Piso 2 - Bogotá – TEL: 350 6671715 
+gerencia@agrohoney.com - camicasilo@gmail.com
+ 
+ 
+I. CARTA DE PRESENTACIÓN  
+ 
+Imaginen por un momento que FINAGRO pudiera predecir el riesgo crediticio de cada uno de 
+sus productores antes de que ocurra un fenómeno climático. Imaginen un geovisor que no 
+solo muestre mapas, sino que simule el impacto de El Niño, La Niña o el cambio climático 
+sobre la cartera , y que entregue alertas tempranas con la Pérdida Esperada por municipio, 
+cadena productiva y tipo de productor. Ese no es un sueño futurista: es el prototipo que he 
+desplegado y que hoy pongo a su disposición. 
+Soy Juan Camilo Ordoñez Betancourth , Ingeniero Agrícola de la Universidad Nacional de 
+Colombia, con maestría en Ciencia de Datos y Big Data (en curso) y más de 7 años de 
+experiencia en modelación cuantitativa, riesgo crediticio agropecuario y sistemas de 
+información geográfica. He trabajado en el Banco Agrario evaluando riesgo bajo normativa 
+FINAGRO, en el IDEAM desarrollando dashboards hidrometeorológicos con inteligencia 
+artificial, y en el IGAC automatizando el control de calidad de capas de suelos. Conozco la 
+matriz de riesgo de FINAGRO desde su aplicación práctica y sé exactamente lo que le falta 
+a SAAM para ser predictivo. 
+IDENTIFICANDO PUNTOS DE DOLOR Y NUESTRA SOLUCIÓN 
+Ustedes necesitan un modelo dinámico que integre clima, sanidad, mercado y finanzas, que 
+diferencie por tipo de productor y que funcione en zonas aptas. El problema es que las 
+herramientas actuales son reactivas, dependen de licencias costosas (ESRI) y no logran 
+desagregar el riesgo por cadena productiva a nivel de predio. Además, la incertidumbre sobre 
+los viajes de campo y la clasificación de riesgo ARL frena a muchos consultores. 
+Mi propuesta elimina cada uno de esos puntos de dolor: 
+Predictivo, no solo descriptivo: implemento un modelo híbrido que combina el pronóstico 
+climático del modelo más avanzado de predicción climática a la fecha el de Google 
+DeepMind (GraphCast/GenCast) con algoritmos de machine learning (XGBoost, Random 
+Forest) para calcular la Probabilidad de Incumplimiento (PD) y la Pérdida Esperada (Expected 
+Loss) bajo 5 escenarios climáticos (normal, El Niño, La Niña, predicción operacional, 
+cambio climático – SSP1/2/5). 
+https://deepmind.google/blog/graphcast-ai-model-for-faster-and-more-accurate-global-
+weather-forecasting/ 
+100% open source y soberanía tecnológica:  el geovisor está construido con Python, R, 
+DuckDB, React y Deck.GL. No hay vendor lock -in con ESRI. Pero si FINAGRO quiere 
+integrarlo a ArcGIS, entrego un módulo adicional que publica los resultados como 
+servicios REST nativos. Ustedes eligen.  
+ 
+  JUAN CAMILO ORDOÑEZ BETANCOURTH - 1032405173-2 
+DIRECCIÓN: DG 94 BIS # 56 – 73 Piso 2 - Bogotá – TEL: 350 6671715 
+gerencia@agrohoney.com - camicasilo@gmail.com
+ 
+ 
+ 
+Desagregación por cadena productiva y tipo de productor:  usando inferencia espacial y 
+zonificación de la UPRA, transformamos los datos agregados a nivel municipal en información 
+a nivel de predio. El geovisor permite filtrar por ganadería, palma, caña, arroz, café, cacao, y 
+por productor pequeño, mediano o grande. 
+He desplegado un MVP funcional del geovisor en mi servidor profesional. Pueden verlo hoy 
+mismo en: 
+https://geovisortnc.agrohoney.com 
+El código fuente completo está en GitHub: 
+https://github.com/camicasilo/geovisor_tnc_finagro 
+En 6 meses entregaré un geovisor en tres versiones (Alpha, Beta, Estable) acompañado de 
+toda la documentación técnica, manuales de usuario, scripts ETL y un acta de transferencia 
+con sesiones de capacitación. El valor total de mi propuesta es $84.900.000 COP. 
+No les pido que confíen en mi palabra. Les pido que den clic en el enlace del geovisor , que 
+revisen el repositorio y que me concedan una reunión de 30 minutos para demostrarles en vivo 
+cómo el modelo híbrido simula el impacto de un fenómeno de El Niño sobre la cartera de 
+FINAGRO. Si no quedan convencidos, no habré perdido su tiempo. 
+Estoy listo para empezar en junio de 2026. La decisión está en sus manos: seguir 
+monitoreando el riesgo después de que ocurra, o anticiparse y ganar resiliencia. 
+ 
+ 
+ 
+ 
+ 
+JUAN CAMILO ORDOÑEZ BETANCOURTH 
+Ingeniero Agrícola – Especialista en Ciencia de Datos y SIG 
+C.C. 1.032.405.173 de Bogotá D.C. 
+Teléfono de Contacto: 350 6671715 --312 4814773 
+Correo Electrónico: gerencia@agrohoney.com / camicasilo@gmail.com 
+
+ 
+  JUAN CAMILO ORDOÑEZ BETANCOURTH - 1032405173-2 
+DIRECCIÓN: DG 94 BIS # 56 – 73 Piso 2 - Bogotá – TEL: 350 6671715 
+gerencia@agrohoney.com - camicasilo@gmail.com
+ 
+ 
+Bogotá D.C., 15 de mayo de 2026 
+ 
+Señores 
+The Nature Conservancy (TNC) 
+Estrategia de Agricultura y Ganadería Regenerativa, América Latina 
+Attn. Ivis Ucros Guerrero 
+Referencia: Propuesta para la Consultoría en Modelación Espacial de Riesgo 
+Agropecuario – Proyecto Paisajes Futuros 
+ 
+Respetados señores, 
+Por este medio someto a su consideración la aplicación adjunta en respuesta a los Términos 
+de Referencia para la Consultoría en Modelación Espacial de Riesgo Agropecuario – 
+Proyecto Paisajes Futuros, con fecha 4 de mayo de 2026, por un total de OCHENTA Y 
+CUATRO MILLONES NOVECIENTOS CINCUENTA MIL PESOS COLOMBIANOS ($84.950.000 
+COP) moneda corriente. 
+Firma autorizada  
+ 
+ 
+ 
+ 
+ 
+ 
+Nombre Juan Camilo Ordoñez Betancourth 
+Dirección: DG 94 BIS # 56 – 73 Piso 2, Bogotá D.C. 
+Teléfono: 3506671715 - 3124814773 
+Correo Eléctronico: gerencia@agrohoney.com 
+camicasilo@gmail.com 
+Sello: No Aplica 
+ 
+Atentamente, 
+  
+
+ 
+  JUAN CAMILO ORDOÑEZ BETANCOURTH - 1032405173-2 
+DIRECCIÓN: DG 94 BIS # 56 – 73 Piso 2 - Bogotá – TEL: 350 6671715 
+gerencia@agrohoney.com - camicasilo@gmail.com
+ 
+ 
+II. INFORMACIÓN GENERAL  
+Campo Información 
+1. Nombre legal de la 
+organización y siglas (si aplica) / 
+nombre de la persona natural: 
+JUAN CAMILO ORDOÑEZ BETANCOURTH 
+2. Domicilio legal de la 
+organización / persona natural: Bogotá D.C., Colombia 
+3. Teléfono: +57 312 4814773 / +57 350 6671715 
+4. Correo Electrónico: gerencia@agrohoney.com camicasilo@gmail.com 
+5. Sitio web: Geovisor MVP: https://geovisortnc.agrohoney.com 
+ 
+Repositorio GitHub: 
+https://github.com/camicasilo/geovisor_tnc_finagro 
+ 
+III. DOCUMENTO DE LA APLICACIÓN  
+1. Resumen y Antecedentes 
+1.1. Contexto del proyecto Paisajes Futuros y la ruta de reverdecimiento de FINAGRO 
+Colombia enfrenta una tensión crítica entre la producción agropecuaria y la conservación de 
+sus ecosistemas. El sector agrícola es vital para la economía nacional, pero también es 
+responsable de una parte significativa de la pérdida de hábitat y del consum o de recursos 
+hídricos. En este contexto de cambio climático y degradación ambiental, surgen dos iniciativas 
+complementarias que enmarcan la presente consultoría: el proyecto Paisajes Futuros , 
+liderado por The Nature Conservancy (TNC), y la ruta de reverdecimiento de FINAGRO. 
+Paisajes Futuros  es un programa de seis años (2022 -2028) financiado por la Iniciativa 
+Climática Internacional (IKI) del Gobierno alemán, ejecutada por el Ministerio Federal de 
+Economía y Acción por el Clima (BMWK). El consorcio está integrado por TNC, el Centro 
+Helmholtz de Investigación del Medioambiente (UFZ) y Nestlé, con aliados implementadores 
+locales como CIPAV, FONDAGUA, FONAG, ProYungas y la Fundación Gran Chaco. El proyecto 
+tiene como objetivo transformar 3 millones de hectáreas  de sistemas agrícol as 
+convencionales en paisajes regenerativos a través de la implementación de prácticas y 
+medidas de Adaptación basada en Ecosistemas (AbE) . En Colombia, Paisajes Futuros se 
+centra en las cadenas productivas de ganadería bovina, palma de aceite y caña de azúcar. 
+ 
+  JUAN CAMILO ORDOÑEZ BETANCOURTH - 1032405173-2 
+DIRECCIÓN: DG 94 BIS # 56 – 73 Piso 2 - Bogotá – TEL: 350 6671715 
+gerencia@agrohoney.com - camicasilo@gmail.com
+ 
+ 
+En paralelo, FINAGRO (Fondo para el Financiamiento del Sector Agropecuario) ha 
+venido avanzando en una ruta de reverdecimiento  de sus líneas de crédito. Esta 
+iniciativa, desarrollada junto con el Programa de las Naciones Unidas para el Desarrollo 
+(PNUD) a través de su iniciativa BIOFIN, busca incorporar criterios ambientales y climáticos 
+en el análisis y la toma de decisiones crediticias, alineándose con la Meta 18 del Marco Global 
+de Biodiversidad de Kunming -Montreal (identificar y reformar incentivos perj udiciales para 
+la biodiversidad para 2025). FINAGRO se ha propuesto que todos los créditos que se 
+coloquen al 2026 vinculen criterios ambientales. 
+La presente consultoría se enmarca en los outputs 4 y 5  de Paisajes Futuros: finanzas 
+públicas y privadas. El Output 4 se enfoca en el codiseño de políticas y finanzas públicas que 
+capturen las contribuciones de carbono, adaptación y mitigación de la Agricultura y 
+Ganadería Regenerativa (R2A) frente a las Contribuciones Determinadas a Nivel Nacional 
+(NDC). El Output 5 busca aumentar la disponibilidad de crédito privado, inversiones y 
+presupuestos operativos para canalizar recursos hacia instituciones y prod uctores que 
+adopten prácticas regenerativas. 
+1.2. Objeto de la consultoría (modelación espacial, matriz de riesgo, prototipo funcional) 
+El objeto de esta consultoría es contratar un especialista en modelación cuantitativa de riesgo 
+usando la metodología de matriz de riesgo agropecuario de FINAGRO  para diseñar, 
+desarrollar y validar un prototipo funcional  que permita incorporar de manera progresiva 
+variables climáticas, sanitarias, de mercado, productivas y territoriales por tipo de productor 
+en el análisis de riesgo crediticio agropecuario. El modelo debe ser dinámico, espacial, 
+estimado en zonas aptas y/ o frontera agrícola, y debe permitir  obtener resultados con 
+diferentes escenarios climáticos para diferentes tipos de productor (pequeño de ingresos 
+bajos, pequeño, mediano, grande). Las estimaciones de riesgo deben incluir indicadores de 
+amenaza y vulnerabilidad para los cuatro componentes de riesgo. 
+1.3. Oferente: perfil del consultor (Ingeniero Agrícola, especialista en ciencia de datos y 
+SIG) 
+El consultor responsable de la ejecución total de esta propuesta es Juan Camilo Ordoñez 
+Betancourth, profesional que reúne la combinación estratégica de conocimientos 
+agronómicos, modelación cuantitativa y tecnologías de información geoespacial. 
+• Formación académica: Ingeniero Agrícola de la Universidad Nacional de Colombia 
+(Tarjeta profesional COPNIA No. 25268-396479 vigente); Maestría en Ciencia de Datos 
+y Big Data (en curso); Técnico Laboral en Gestión de Proyectos; múltiples 
+certificaciones en Python, Data Science, SIG avanzado y GeoIA. 
+• Experiencia general (más de 7 años): Profesional Operativo de Controles de Inversión 
+en el Banco Agrario de Colombia  evaluando riesgo crediticio bajo normativa 
+FINAGRO; líder temático en geomática en el IGAC automatizando control de calidad 
+cartográfica; analista de datos en el IDEAM desarrollando dashboards 
+hidrometeorológicos con IA; consultor ambiental en caracterización de suelos y EIA 
+para proyectos de petróleo, gas e infraestructura en La Guajira, Casanare, Córdoba, 
+Sucre y Cundinamarca, con trabajo d irecto con comunidades indígenas (Wayúu, 
+Sáliba, Achagua). 
+ 
+  JUAN CAMILO ORDOÑEZ BETANCOURTH - 1032405173-2 
+DIRECCIÓN: DG 94 BIS # 56 – 73 Piso 2 - Bogotá – TEL: 350 6671715 
+gerencia@agrohoney.com - camicasilo@gmail.com
+ 
+ 
+• Experiencia específica relevante : Construcción de parámetros para 
+evaluación de riesgo crediticio; análisis estadístico y econométrico aplicado 
+a riesgo; integración de variables externas (climáticas, sanitarias, productivas, 
+territoriales) en modelos financieros; programación en Python y R; manejo de bases de 
+datos estructuradas (DuckDB, SQLite, PostgreSQL, geodatabases empresariales). 
+• Valor diferencial : Bilingüe (inglés C1), con visión de arquitectura open source y un 
+MVP funcional del geovisor ya desplegado. 
+El oferente actúa en calidad de Persona Natural , ejecutará directamente todas las 
+actividades sin subcontratación, y certifica que cumple a cabalidad con todos los requisitos 
+de formación, experiencia y capacidad financiera exigidos en los Términos de Referencia. 
+1.4. Valor diferencial: enfoque predictivo (modelo híbrido + ML) y tecnologías open 
+source 
+La principal limitación de los sistemas de monitoreo tradicionales, incluido el SAAM actual de 
+FINAGRO, es su naturaleza reactiva: describen el riesgo después de que los eventos han 
+ocurrido, pero no predicen la Probabilidad de Incumplimiento (PD) antes de que la sequía o 
+la inundación afecten la cosecha. Esta propuesta cierra esa brecha mediante un modelo 
+híbrido de machine learning  apoyado en una arquitectura tecnológica 100% open source , 
+cuyos componentes clave son: 
+• Modelos climáticos de vanguardia de Google DeepMind : GraphCast (determinista, 
+10 días, superior en 90% de métricas), GenCast (probabilístico, 15 días, superior en 
+97.2% de métricas) y NeuralGCM (híbrido para escenarios de cambio climático SSP). 
+Disponibles vía GitHub (código abierto) o Google Cloud/BigQuery. 
+• Ecosistema open source : Python (Polars, GeoPandas), motor DuckDB+GeoParquet 
+(procesamiento en memoria, cero costos de infraestructura), frontend 
+React+Deck.GL+MapLibre (renderizado por GPU), control de versiones con 
+Git/GitHub, y opción de integración nativa con ArcGIS Enterprise mediante ArcPy. 
+• Modelo híbrido de riesgo crediticio: Capa 1 (pronóstico climático), Capa 2 (XGBoost 
+para PD) que integra variables climáticas, sanitarias, de mercado y del productor, y 
+Capa 3 (Pérdida Esperada = PD × LGD × EAD). Casos regionales de éxito en Perú, Brasil 
+y Argentina avalan este enfoque. 
+1.5. Enlace al MVP funcional del geovisor 
+Como evidencia del avance técnico y del compromiso con la ejecución oportuna, el 
+consultor ha desarrollado y desplegado un Producto Mínimo Viable (MVP) del Geovisor de 
+Riesgo Agropecuario: 
+• Geovisor MVP: https://geovisortnc.agrohoney.com 
+• Repositorio público: https://github.com/camicasilo/geovisor_tnc_finagro 
+El MVP incluye visualización de capa base catastral del IGAC, selector de tipo de productor, 
+integración de datos climáticos históricos para una zona piloto y un motor básico de riesgo. 
+Todo el código es 100% open source, auditabled y extensible por FINAGRO. 
+ 
+  JUAN CAMILO ORDOÑEZ BETANCOURTH - 1032405173-2 
+DIRECCIÓN: DG 94 BIS # 56 – 73 Piso 2 - Bogotá – TEL: 350 6671715 
+gerencia@agrohoney.com - camicasilo@gmail.com
+ 
+ 
+ 
+2. Aplicación Técnica 
+2.1. Marco Metodológico General 
+2.1.1. La matriz de riesgo agropecuario de FINAGRO (Resolución CNCA 10 de 2025) 
+La Resolución 10 de 2025 de la Comisión Nacional de Crédito Agropecuario (CNCA) establece 
+en su Artículo 10 la creación de una Matriz de Riesgos Agropecuarios Mínimos y define los 
+lineamientos generales para su implementación por parte de FINAGRO y las entidades 
+financieras vigiladas. La matriz es una herramienta orientadora, flexible y de adopción 
+progresiva que constituye un referente técnico para la evaluación de so licitudes de crédito y 
+el seguimiento de la cartera agropecuaria. La presente propuesta im plementa esta matriz a 
+través de un modelo cuantitativo y automático de cuatro componentes. 
+2.1.2. Componentes del riesgo: climático, sanitario, de mercado y financiero 
+• Riesgo climático:  Probabilidad de que eventos hidrometeorológicos adversos 
+(sequías, inundaciones, heladas) afecten la productividad. Se alimenta de datos 
+IDEAM y pronósticos GraphCast/GenCast, y produce un índice de amenaza climática. 
+• Riesgo sanitario:  Probabilidad de plagas, enfermedades o problemas 
+fitosanitarios/epidemiológicos. Se alimenta de ICA y Agrosavia, y produce una 
+probabilidad de incidencia sanitaria. 
+• Riesgo de mercado:  Probabilidad de no poder colocar la producción a precios 
+rentables. Se alimenta de DANE -AGRONET y precios internacionales, y produce un 
+índice de riesgo de mercado. 
+• Riesgo financiero: Capacidad de pago y suficiencia de garantías. El modelo XGBoost 
+consolida los tres componentes anteriores más variables del productor y del crédito 
+para calcular la Probabilidad de Incumplimiento (PD) y la Pérdida Esperada (EL = PD 
+× LGD × EAD). 
+2.1.3. Tipos de productor (pequeño de ingresos bajos, pequeño, mediano, grande) 
+Tipo de productor Activos totales 
+(SMMLV) 
+Área máxima 
+(UAF) 
+Ponderador de 
+riesgo 
+Pequeño ingresos 
+bajos ≤ 150 ≤ 5 1.5× base 
+Pequeño ≤ 300 ≤ 10 1.0× base 
+Mediano ≤ 5.000 ≤ 50 0.7× base 
+Grande > 5.000 > 50 0.5× base 
+ 
+  JUAN CAMILO ORDOÑEZ BETANCOURTH - 1032405173-2 
+DIRECCIÓN: DG 94 BIS # 56 – 73 Piso 2 - Bogotá – TEL: 350 6671715 
+gerencia@agrohoney.com - camicasilo@gmail.com
+ 
+ 
+El geovisor segmenta resultados y calibra dinámicamente el modelo según estas 
+categorías. 
+ 
+2.1.4. Zonas aptas y frontera agrícola (IGAC, UPRA) 
+• Zonas aptas (UPRA): Capas de zonificación de aptitud para cada cultivo (ganadería, 
+palma, caña, arroz, café, cacao, yuca). Si un predio está fuera de su zona apta, el 
+modelo eleva automáticamente la PD. 
+• Frontera agrícola (IGAC):  Delimitación de 43 millones de hectáreas (37.8% del 
+territorio). El geovisor valida la ubicación de predios, emite alertas si están fuera de la 
+frontera y detecta cambios de uso del suelo mediante imágenes satelitales. 
+2.1.5. Alineación con los outputs 4 y 5 de Paisajes Futuros 
+• Output 4 (Finanzas públicas):  El geovisor proporciona a FINAGRO una herramienta 
+objetiva para incorporar criterios ambientales en el crédito de fomento, diferenciar 
+tasas según adopción de prácticas regenerativas y evaluar el impacto de la ruta de 
+reverdecimiento sobre la cartera. 
+• Output 5 (Financiamiento privado):  Reduce asimetrías de información mediante 
+scores predictivos estandarizados disponibles vía API para la banca de primer piso, 
+facilitando la inversión privada en proyectos regenerativos de bajo riesgo calificado. 
+2.2. Arquitectura de la Solución: Geovisor de Riesgo Agropecuario 
+2.2.1. Visión general: un geovisor que integra todos los entregables 
+El geovisor es el producto central que unifica los seis entregables de los TdR. Evoluciona desde 
+una maqueta (Producto 1) hasta un prototipo funcional (Producto 3), luego a una versión 
+completa con simulador de escenarios (Producto 4) y finalmente estable (Producto 5), 
+acompañado de documentación y transferencia (Producto 6). 
+2.2.2. Capa 1 – Insumos: conexión a SAAM y fuentes externas 
+El geovisor se conecta a la geodatabase empresarial de SAAM (ArcGIS REST API) para extraer 
+capas de predios, créditos, garantías, suelos (IGAC), clima histórico (IDEAM), precios (DANE-
+AGRONET) y zonificación (UPRA). También consume pronósticos de Google We ather API y 
+datos sanitarios del ICA. 
+2.2.3. Capa 2 – Motor de IA híbrido (R + Python) 
+• Python (Polars, GeoPandas, XGBoost):  Procesamiento ETL, entrenamiento del 
+modelo de riesgo crediticio, cálculo de PD y EL. 
+• R (sf, terra, spdep, rsoi, tidymodels):  Manipulación espacial, clasificación ENSO, 
+econometría espacial (autocorrelación, clusters de riesgo), validación de modelos. 
+ 
+  JUAN CAMILO ORDOÑEZ BETANCOURTH - 1032405173-2 
+DIRECCIÓN: DG 94 BIS # 56 – 73 Piso 2 - Bogotá – TEL: 350 6671715 
+gerencia@agrohoney.com - camicasilo@gmail.com
+ 
+ 
+2.2.4. Capa 3 – Geovisor interactivo y dashboard 
+• Frontend: React + TypeScript + Deck.GL + MapLibre GL JS (aceleración por GPU). 
+• Dashboard: Panel de control con selectores de productor, cadena, escenario 
+climático, filtros geográficos y simulador “What-If”; mapa interactivo con capas de PD 
+y EL; paneles de métricas agregadas (PD promedio, exposición sectorial, 
+concentración de riesgo). 
+2.2.5. Tecnologías 100% open source y opción de integración con ArcGIS Enterprise 
+• Open source estándar: Python, R, DuckDB, GeoParquet, React, Deck.GL, MapLibre, 
+Docker, Nginx, Git. 
+• Módulo opcional para ArcGIS Enterprise:  Scripts en ArcPy que publican los 
+resultados del motor de IA como servicios REST nativos dentro de la infraestructura 
+existente de FINAGRO, garantizando compatibilidad y escalabilidad sin vendor lock-in. 
+2.3. Fuentes de Datos y Política Pública 
+2.3.1. Datos espaciales y catastrales (IGAC, DANE DIVIPOLA) 
+Se integrarán capas de suelos, uso del suelo, límites político-administrativos (vereda, 
+municipio, departamento) y cartografía catastral del IGAC, junto con la división 
+político-administrativa oficial del DANE (DIVIPOLA). Estas capas constituyen la base 
+geoespacial para la ubicación de predios, la regionalización del riesgo y la generación 
+de indicadores por unidad territorial. 
+2.3.2. Datos climáticos (IDEAM, NOAA, Google Weather API) 
+Se emplearán series históricas diarias y mensuales de precipitación, temperatura y 
+humedad del IDEAM; índices ENSO (ONI) vía NOAA (paquete rsoi); pronósticos 
+deterministas (GraphCast) y probabilísticos (GenCast) de Google Weather API; y 
+escenarios de cambio climático (SSP1 -2.6, SSP2 -4.5, SSP5 -8.5) desde el IDEAM o 
+BigQuery. Todo ello alimentará los 5 escenarios climáticos requeridos. 
+2.3.3. Datos sanitarios (ICA, Agrosavia) 
+Se incorporarán alertas fitosanitarias y epidemiológicas del ICA, así como modelos 
+fenológicos de correlación clima -plaga desarrollados por Agrosavia. Estos datos 
+permitirán estimar la probabilidad de incidencia de plagas y enfermedades por cadena 
+productiva y región. 
+2.3.4. Datos productivos y de mercado (DANE-AGRONET, FINAGRO) 
+Se utilizarán series de precios mayoristas (por central de abastos), rendimientos 
+históricos, producción, costos de insumos (DANE -AGRONET) y precios 
+ 
+  JUAN CAMILO ORDOÑEZ BETANCOURTH - 1032405173-2 
+DIRECCIÓN: DG 94 BIS # 56 – 73 Piso 2 - Bogotá – TEL: 350 6671715 
+gerencia@agrohoney.com - camicasilo@gmail.com
+ 
+ 
+internacionales de referencia (Bolsa de Chicago, ICE, BMD). Con ellos se 
+calcularán índices de volatilidad, márgenes brutos esperados y riesgo de 
+mercado. 
+2.3.5. Datos crediticios internos (SAAM – geodatabase empresarial) 
+Previa autorización de FINAGRO y respetando la confidencialidad, se accederá a datos 
+agregados y anonimizados de desembolsos, saldos, tasas de interés, garantías y 
+comportamiento de pago (mora e incumplimiento) contenidos en la geodatabase 
+empresarial de SAAM. Estos datos son la base para el entrenamiento y validación del 
+modelo XGBoost de Probabilidad de Incumplimiento (PD). 
+2.3.6. Marcos normativos 
+El desarrollo se alinea con las Resoluciones CNCA 10 de 2025  (matriz de riesgos 
+agropecuarios) y 17 de 2025 (PAGRA 2026), la Ley 1931 de 2018  (cambio climático) y 
+el CONPES 3700 (Estrategia institucional para la articulación de políticas y acciones 
+en materia de cambio climático). También se consideran las directrices de la ruta de 
+reverdecimiento de FINAGRO y los outputs 4 y 5 del proyecto Paisajes Futuros. 
+2.4. Modelo Híbrido de Predicción de Riesgo Crediticio 
+El núcleo del geovisor es un modelo híbrido de machine learning diseñado para 
+predecir el riesgo crediticio del sector agropecuario. A diferencia de los enfoques 
+tradicionales que solo describen eventos pasados, este modelo anticipa la 
+probabilidad de incumplimiento (PD) de un crédito, integrando pronósticos 
+climáticos de vanguardia con datos productivos, sanitarios, de mercado y 
+financieros. 
+2.4.1. Fundamentos científicos: modelos físicos + machine learning 
+El enfoque híbrido combina un modelo base de pronóstico climático con un modelo 
+de machine learning. Esta arquitectura aprovecha lo mejor de ambos mundos: la 
+base física garantiza la consistencia con las leyes de la naturaleza y aporta 
+conocimiento científico, mientras que el modelo de ML aprende de los datos 
+históricos para corregir sesgos, capturar relaciones complejas y mejorar la precisión 
+en condiciones extremas. 
+Esta metodología está respaldada por desarrollos de vanguardia y casos de éxito en 
+el sector agropecuario: 
+• NeuralCrop: Es un modelo híbrido global para la predicción de rendimientos 
+de cultivos, que combina un modelo de cultivo basado en procesos físicos 
+(GGCM) con técnicas de machine learning. Sus resultados demuestran que 
+ 
+  JUAN CAMILO ORDOÑEZ BETANCOURTH - 1032405173-2 
+DIRECCIÓN: DG 94 BIS # 56 – 73 Piso 2 - Bogotá – TEL: 350 6671715 
+gerencia@agrohoney.com - camicasilo@gmail.com
+ 
+ 
+esta integración ofrece proyecciones más fiables, especialmente en 
+escenarios de cambio climático y eventos climáticos extremos. 
+• PINN (Physics-Informed Neural Networks): Aplicado a la predicción de 
+rendimientos de cultivos a múltiples escalas, ha demostrado alcanzar una 
+precisión superior al 94%. Su arquitectura utiliza una función de pérdida 
+mejorada que incorpora principios físicos, como la respuesta del cultivo a la 
+escasez de agua, lo que resulta en una predicción más robusta y extrapolable. 
+• Google's NeuralGCM: A diferencia de GraphCast (pronóstico a corto plazo), 
+NeuralGCM es un modelo climático híbrido diseñado para predicciones 
+estacionales y estudios climáticos a largo plazo. Es el modelo indicado para 
+los escenarios de cambio climático a 2030-2050 (SSP1-2.6, SSP2-4.5, SSP5-
+8.5). 
+• Estudios en Colombia y la Región: Investigaciones recientes en el sector 
+agroindustrial colombiano han aplicado y evaluado modelos avanzados de 
+machine learning (XGBoost y clustering) para predecir el riesgo de 
+incumplimiento en la cartera de créditos respaldados por FINAGRO. 
+Paralelamente, se están desarrollando modelos de predicción de riesgo 
+financiero para empresas agrícolas utilizando inteligencia artificial, adaptados 
+para operar en entornos inciertos y apoyar la toma de decisiones sostenibles. 
+Estos trabajos proporcionan una validación contextual y una base sólida para 
+la aplicación de estas metodologías en esta consultoría. 
+2.4.2. Modelo climático de vanguardia (GraphCast / GenCast / NeuralGCM de 
+Google DeepMind) 
+El motor del pronóstico climático integra tres modelos desarrollados por Google 
+DeepMind, cada uno seleccionado por su fortaleza específica y por ser de código 
+abierto, lo que garantiza la soberanía tecnológica. 
+• GraphCast: Modelo determinista de alta resolución que predice cientos de 
+variables atmosféricas a 10 días con una precisión que supera al sistema líder 
+mundial en el 90% de las métricas, con un costo computacional mínimo 
+(minutos en una sola TPU). 
+• GenCast: Modelo probabilístico de conjunto (ensemble) que genera 50 
+trayectorias posibles a 15 días y ha demostrado ser superior al sistema ENS de 
+ECMWF en el 97.2% de las métricas evaluadas. Su capacidad para cuantificar 
+la incertidumbre es crucial para la gestión del riesgo crediticio. 
+• NeuralGCM: Modelo híbrido para simulaciones climáticas a largo plazo, que 
+reduce el error medio en un 40% y captura con mayor fidelidad la intensidad 
+de los episodios extremos. Es la base para los escenarios de cambio 
+climático. 
+Integración y Adaptación Regional: El código y los pesos pre-entrenados de estos 
+modelos son públicos en GitHub. La estrategia de integración es la siguiente: 
+ 
+  JUAN CAMILO ORDOÑEZ BETANCOURTH - 1032405173-2 
+DIRECCIÓN: DG 94 BIS # 56 – 73 Piso 2 - Bogotá – TEL: 350 6671715 
+gerencia@agrohoney.com - camicasilo@gmail.com
+ 
+ 
+• Fine-Tuning con Datos del IDEAM: Los modelos pre-entrenados 
+globalmente serán ajustados (fine-tuning) con las series históricas del 
+IDEAM (precipitación, temperatura, humedad) en Google Cloud. Este proceso 
+adapta los modelos a las condiciones climáticas específicas de Colombia (ej. 
+el Pacífico colombiano, la región Andina) para mejorar significativamente la 
+precisión local. 
+2.4.3. Modelo de riesgo crediticio: XGBoost 
+Para estimar la Probabilidad de Incumplimiento (PD), se ha seleccionado el 
+algoritmo XGBoost. Su capacidad para manejar relaciones no lineales, datos 
+faltantes y conjuntos de datos complejos y desbalanceados lo convierten en la 
+opción ideal para la industria financiera. 
+• Entrenamiento con Datos Históricos de FINAGRO: El modelo se entrenará 
+con una base de datos construida a partir de créditos otorgados por FINAGRO. 
+Esta base emparejará cada crédito con el perfil del productor y, lo más 
+importante, con los valores rezagados de las variables climáticas, sanitarias y 
+de mercado que imperaban en el momento del desembolso y durante la vida 
+del crédito. El objetivo es predecir la variable objetivo: incumplimiento (1 si el 
+crédito cayó en mora superior a 90 días, 0 en caso contrario). 
+• Variables Predictoras Clave: Se utilizarán las siguientes variables, que serán 
+consolidadas y puestas a disposición del modelo por la capa 1 del sistema: 
+o Índice de Amenaza Climática (sequía/inundación/helada, por 
+predio/vereda). 
+o Probabilidad de Incidencia Sanitaria (plagas/enfermedades por 
+cadena productiva). 
+o Índice de Riesgo de Mercado (volatilidad de precios, margen bruto 
+esperado). 
+o Variables del Productor: Tipo de productor, ubicación (vereda), 
+historial crediticio. 
+o Variables del Crédito: Monto, plazo, tasa de interés, tipo de garantía. 
+o Variables Externas Adicionales: TRM, inflación del grupo alimentos. 
+• Cálculo de la Probabilidad de Incumplimiento (PD): La salida final del 
+modelo XGBoost para cada unidad productiva es un valor continuo entre 0 y 1, 
+que representa la PD mensual. Este es el insumo central para el cálculo de la 
+Pérdida Esperada y para la visualización en el dashboard. 
+2.4.4. Modelo de Pérdida Esperada (Expected Loss = PD × LGD × EAD) 
+Siguiendo la práctica estándar de la banca y el marco de Basilea, la Pérdida Esperada 
+(EL) se calcula agregando el riesgo de cada exposición crediticia: 
+EL = PD × LGD × EAD 
+ 
+  JUAN CAMILO ORDOÑEZ BETANCOURTH - 1032405173-2 
+DIRECCIÓN: DG 94 BIS # 56 – 73 Piso 2 - Bogotá – TEL: 350 6671715 
+gerencia@agrohoney.com - camicasilo@gmail.com
+ 
+ 
+• PD (Probabilidad de Incumplimiento): Proviene directamente del 
+modelo XGBoost (subsección 2.4.3). 
+• LGD (Pérdida en caso de incumplimiento): Se estima según el tipo y la 
+calidad de la garantía asociada al crédito, siguiendo los parámetros estándar 
+establecidos por FINAGRO. 
+• EAD (Exposición en el momento del incumplimiento): Corresponde al saldo 
+de capital del crédito en la fecha de evaluación. 
+El modelo entregará la EL en valor monetario ($) y como un porcentaje del crédito 
+(EL%) , lo que permite agregar el riesgo a nivel de cartera y comparar la exposición 
+entre diferentes regiones, cadenas productivas o tipos de productor. 
+2.4.5. Paquete de R para análisis espacial y econometría 
+El lenguaje R se utilizará para los siguientes análisis geoestadísticos y de 
+econometría espacial, que corren en paralelo al modelo XGBoost y cuyos resultados 
+retroalimentan el dashboard: 
+• sf y terra: Serán las librerías fundamentales para la manipulación de datos 
+vectoriales (predios, municipios) y raster (capas climáticas, mapas de riesgo) 
+a lo largo de todo el pipeline. 
+• spdep (Spatial Dependence): Se empleará para cuantificar y modelar la 
+autocorrelación espacial. Con funciones como moran.test se calculará el 
+Índice de Moran para determinar si los eventos de incumplimiento se agrupan 
+geográficamente. La detección de clusters de alto riesgo (Hotspots) se 
+realizará mediante el estadístico local localmoran, proporcionando alertas 
+tempranas a los analistas de FINAGRO. 
+• rsoi: Se utilizará para la descarga automática y actualizada del Oceanic Niño 
+Index (ONI), y así clasificar los períodos como El Niño, La Niña o Neutral. Esta 
+clasificación se usará como una variable exógena en los modelos de riesgo. 
+• caret / tidymodels: Estas librerías se usarán en la fase de entrenamiento y 
+validación del modelo para realizar una búsqueda sistemática de 
+hiperparámetros para XGBoost y evaluar el rendimiento del modelo mediante 
+validación cruzada (k-fold) con métricas robustas para datos 
+desbalanceados (AUC-ROC, F1-score). 
+2.4.6. Implementación de los 5 escenarios climáticos requeridos 
+Los TdR exigen la simulación de cinco escenarios climáticos. A continuación, se 
+detalla la fuente de datos y el método para cada uno, asegurando la trazabilidad y el 
+rigor científico: 
+ 
+  JUAN CAMILO ORDOÑEZ BETANCOURTH - 1032405173-2 
+DIRECCIÓN: DG 94 BIS # 56 – 73 Piso 2 - Bogotá – TEL: 350 6671715 
+gerencia@agrohoney.com - camicasilo@gmail.com
+ 
+ 
+• Escenario 1 – Normal Climática (Línea Base 1981-2010): Se 
+construirá a partir de las normales climáticas oficiales del IDEAM y de 
+los promedios históricos de la NOAA. 
+• Escenario 2 – El Niño Típico: Se definirá usando el índice ONI (≥ +0.5°C) 
+descargado con rsoi. El modelo híbrido se ejecutará alimentando el modelo 
+climático con las anomalías de temperatura de la superficie del mar (TSM) 
+características de un año El Niño fuerte (ej. 2015-2016). 
+• Escenario 3 – La Niña Típica: Similar al anterior, pero con el ONI ≤ -0.5°C, 
+usando las anomalías de TSM de un año La Niña fuerte (ej. 2010-2011). 
+• Escenario 4 – Predicción Operacional (GraphCast, 6 meses): El geovisor se 
+integrará vía API a los pronósticos operacionales de GraphCast y GenCast, 
+actualizados diariamente. Esto permitirá a FINAGRO tener una visión 
+prospectiva del riesgo para el próximo semestre. 
+• Escenario 5 – Cambio Climático (SSP1-2.6, SSP2-4.5, SSP5-8.5): Se 
+utilizarán los modelos del proyecto CMIP6, que son el estándar global para 
+este tipo de proyecciones. Se emplearán los modelos que cuentan con 
+información para Sudamérica y Colombia. Dado que los modelos CMIP6 
+tienen una resolución gruesa (~100-200 km), se aplicarán técnicas de 
+downscaling estadístico para llevarlos a la resolución de los planes de 
+ordenamiento territorial (vereda/municipio). Para las proyecciones 
+hidrológicas, se emplearán modelos como el InVEST, que ha sido aplicado 
+exitosamente para proyectar la oferta hídrica en cuencas colombianas bajo 
+los escenarios SSP. 
+2.5. Integración con SAAM (Sistema de Alertas Ambientales y Monitoreo) 
+2.5.1. Diagnóstico del SAAM actual (geodatabase ArcGIS, capas temáticas) 
+SAAM está construido sobre ArcGIS Enterprise y contiene capas oficiales de IGAC, IDEAM, 
+DANE y cartera interna. Su arquitectura es robusta pero reactiva y con datos agregados a 
+nivel municipal. 
+2.5.2. Datos que SAAM ya provee (IGAC, IDEAM, DANE, cartera) 
+El geovisor se conectará a la geodatabase mediante API REST para extraer estas capas sin 
+interrumpir la operación actual. 
+2.5.3. Limitaciones: agregación municipal, insuficiente desagregación por cadena 
+productiva 
+No se puede determinar directamente el nivel de riesgo de una finca específica ni comparar 
+cadenas productivas a nivel de predio. El geovisor resuelve esto mediante modelos de ML 
+que desagregan la información. 
+2.5.4. Estrategia de integración (API REST, ArcGIS Enterprise) 
+Se implementará un conector en Python que lee servicios REST de SAAM, procesa los datos 
+en el motor de IA y escribe los resultados como nuevas capas temáticas en el mismo ArcGIS 
+Enterprise. 
+ 
+  JUAN CAMILO ORDOÑEZ BETANCOURTH - 1032405173-2 
+DIRECCIÓN: DG 94 BIS # 56 – 73 Piso 2 - Bogotá – TEL: 350 6671715 
+gerencia@agrohoney.com - camicasilo@gmail.com
+ 
+ 
+2.5.5. Flujo de datos: desde SAAM → motor de IA → nuevas capas de riesgo → de 
+vuelta a SAAM 
+Los analistas de FINAGRO podrán visualizar en sus visores habituales las capas de PD y EL 
+generadas por el modelo predictivo. 
+2.5.6. Doble vía de implementación: open source (geovisor independiente) y módulo 
+ArcGIS (servicios REST) 
+FINAGRO puede optar por usar el geovisor web open source (sin costos de licencia) o integrar 
+nativamente los resultados a su infraestructura ArcGIS existente. El consultor entrega ambas 
+opciones. 
+2.5.7. Interoperabilidad con el futuro SAAM 2.0 y la nube de Google Cloud 
+La arquitectura es modular y basada en estándares abiertos (GeoJSON, GeoParquet, REST), 
+por lo que puede migrarse fácilmente a versiones futuras de SAAM o desplegarse en Google 
+Cloud. 
+2.6. El Geovisor Dashboard: Visualización y Desagregación de Resultados 
+2.6.1. Estructura del dashboard 
+• Mapa interactivo (Deck.GL + MapLibre): Capas de catastro IGAC, zonificación 
+UPRA, mapas de calor de PD (por predio/vereda/municipio), mapas de Pérdida 
+Esperada (EL), alertas espaciales (clusters de alto riesgo detectados con spdep). 
+• Panel de control (sidebar): Selector de tipo de productor (4 categorías); selector de 
+cadena productiva (ganadería, palma, caña, arroz, café, cacao); selector de 
+escenario climático (5 principales + 3 vías SSP); filtros geográficos (departamento, 
+municipio, vereda); simulador "What-If" (deslizadores para tasa de interés, precio del 
+producto, TRM). 
+• Panel de métricas agregadas: PD promedio por región/cadena; exposición sectorial 
+(saldo de cartera por producto); concentración de riesgo (curva Lorenz, índice de Gini 
+espacial); comparación de escenarios (gráfico de barras dinámico). 
+2.6.2. Interpretación de resultados para cinco perfiles de usuario 
+• Analista de riesgo crediticio: Mapas de PD y EL, alertas de clusters de alto riesgo, 
+simulador What-If. 
+• Agrónomo / técnico de campo: Alertas sanitarias tempranas, mapas de amenaza 
+climática por cultivo. 
+• Especialista SIG: Capas de downscaling de escenarios climáticos, exportación de 
+datos en GeoPackage/Shapefile. 
+• Economista: Proyecciones de precios, márgenes de rentabilidad, correlación TRM-
+precio. 
+• Alto decisor (gerencia de FINAGRO): Dashboard ejecutivo de Pérdida Esperada 
+agregada por departamento, evolución de la cartera bajo escenarios de cambio 
+climático. 
+ 
+  JUAN CAMILO ORDOÑEZ BETANCOURTH - 1032405173-2 
+DIRECCIÓN: DG 94 BIS # 56 – 73 Piso 2 - Bogotá – TEL: 350 6671715 
+gerencia@agrohoney.com - camicasilo@gmail.com
+ 
+ 
+2.6.3. Generación de reportes (PDF / Excel) desde el dashboard 
+El geovisor permite descargar reportes estandarizados (mapas fijos, tablas de 
+PD/EL, resumen de escenarios) y tablas dinámicas para análisis externo. 
+2.7. Plan de Implementación por Fases (6 meses) 
+• Fase 1 (Mes 1): Diseño conceptual y maqueta del geovisor. Entregable 1. 
+• Fase 2 (Mes 2): Construcción de pipelines ETL y motor DuckDB. Entregable 2. 
+• Fase 3 (Meses 3-3.5): Prototipo funcional (Alpha) con ML básico. Entregable 3. 
+• Fase 4 (Meses 4-4.5): Geovisor Beta con simulador de escenarios e integración 
+SAAM. Entregable 4. 
+• Fase 5 (Mes 5): Ajustes finales y documentación. Entregable 5. 
+• Fase 6 (Mes 6): Transferencia técnica, informe final y cierre. Entregable 6. 
+2.8. Entregables Detallados (por hito de pago) 
+• Producto 1 (10%): Documento de diseño conceptual + maqueta del geovisor. Fecha: 
+31/07/2026. 
+• Producto 2 (0%): Scripts ETL versionados + documentación de arquitectura. Fecha: 
+31/08/2026. 
+• Producto 3 (25%): Geovisor Alpha + código + documentación. Fecha: 15/10/2026. 
+• Producto 4 (30%): Geovisor Beta + simulador de escenarios + integración SAAM + 
+informe de pruebas. Fecha: 31/10/2026. 
+• Producto 5 (0%): Geovisor estable + manuales técnico y de usuario. Fecha: 
+30/11/2026. 
+• Producto 6 (35%): Informe final + repositorio completo + acta de transferencia. 
+Fecha: 31/12/2026. 
+2.9. Metodología de Desarrollo y Aseguramiento de Calidad 
+• Estándares de código: PEP8 para Python, tidyverse style para R. 
+• Control de versiones: Git y GitHub (repositorio público 
+camicasilo/geovisor_tnc_finagro). 
+• Documentación: Quarto / RMarkdown para notebooks técnicos; MkDocs para el 
+manual de usuario. 
+• Pruebas unitarias e integración continua: GitHub Actions para ejecutar pruebas de 
+pipelines ETL y validación de modelos. 
+• Validación de modelos: Backtesting con datos históricos de cartera y validación 
+cruzada (k-fold) para XGBoost; pruebas de significación estadística para clusters 
+espaciales. 
+3. Plan de Trabajo (Cronograma) 
+3.1. Diagrama de Gantt con 6 meses (julio a diciembre 2026) 
+ 
+  JUAN CAMILO ORDOÑEZ BETANCOURTH - 1032405173-2 
+DIRECCIÓN: DG 94 BIS # 56 – 73 Piso 2 - Bogotá – TEL: 350 6671715 
+gerencia@agrohoney.com - camicasilo@gmail.com
+ 
+ 
+Actividad Jul Ago Sep Oct Nov Dic 
+Fase 1: Diseño conceptual y maqueta X      
+Fase 2: Pipelines ETL y DuckDB  X     
+Fase 3: Geovisor Alpha   X    
+Fase 4: Geovisor Beta + SAAM    X   
+Fase 5: Ajustes y documentación     X  
+Fase 6: Transferencia y cierre      X 
+3.2. Tabla de hitos, actividades y responsables 
+Hito Fecha Actividades clave Responsable 
+Inicio del contrato 01/06/2026 Acta de inicio Consultor + TNC 
+Entrega Producto 
+1 31/07/2026 Documento de diseño y maqueta Consultor 
+Entrega Producto 
+2 31/08/2026 Scripts ETL y documentación Consultor 
+Entrega Producto 
+3 15/10/2026 Geovisor Alpha Consultor 
+Entrega Producto 
+4 31/10/2026 Geovisor Beta + integración SAAM Consultor 
+Entrega Producto 
+5 30/11/2026 Geovisor estable + manuales Consultor 
+Entrega Producto 
+6 31/12/2026 Informe final + acta de 
+transferencia 
+Consultor + 
+TNC/FINAGRO 
+3.3. Asignación de porcentajes de pago por producto 
+ 
+  JUAN CAMILO ORDOÑEZ BETANCOURTH - 1032405173-2 
+DIRECCIÓN: DG 94 BIS # 56 – 73 Piso 2 - Bogotá – TEL: 350 6671715 
+gerencia@agrohoney.com - camicasilo@gmail.com
+ 
+ 
+Producto % Pago Fecha 
+Producto 1 10% 31/07/2026 
+Producto 2 0% 31/08/2026 
+Producto 3 25% 15/10/2026 
+Producto 4 30% 31/10/2026 
+Producto 5 0% 30/11/2026 
+Producto 6 35% 31/12/2026 
+4. Propuesta Económica 
+4.1. Resumen de costos (honorarios, viáticos, etc.) 
+Categoría Valor (COP) 
+1. HONORARIOS PROFESIONALES $84.950.000 
+2. PRESTACIONES SOCIALES $0 (No aplica, persona natural) 
+3. CONSULTORES $0 (Ejecución directa) 
+4. SERVICIOS ADICIONALES A SER 
+CONTRATADOS $0 
+5. TRANSPORTES Y VIÁTICOS $0 (Se liquidan por separado con soportes) 
+6. GASTOS DE VIAJE (per diem, tiquetes aéreos, 
+alojamiento) 
+$0 (Se liquidan con soportes reales, previa 
+autorización) 
+7. MATERIALES Y SUMINISTROS $0 (Incluidos en honorarios) 
+8. COSTOS ADMINISTRATIVOS $0 
+TOTAL $84.950.000 
+4.2. Notas aclaratorias 
+• IVA: El proponente es No responsable de IVA (Responsabilidad 49 del RUT). El valor 
+cotizado no incluye este impuesto. 
+ 
+  JUAN CAMILO ORDOÑEZ BETANCOURTH - 1032405173-2 
+DIRECCIÓN: DG 94 BIS # 56 – 73 Piso 2 - Bogotá – TEL: 350 6671715 
+gerencia@agrohoney.com - camicasilo@gmail.com
+ 
+ 
+• ARL Riesgo V: Según la Ley 1562 de 2012, el pago del 100% del aporte a la 
+ARL para actividades clasificadas en Riesgo V es obligación del contratante 
+(TNC). Este costo no está incluido en los honorarios. 
+• Gastos de viaje: No están incluidos en el valor fijo. Se liquidarán con base en costos 
+reales (tiquetes, hospedaje, alimentación), previa autorización de TNC, y se pagarán 
+contra presentación de soportes (facturas). 
+• Seguridad social: Los aportes a pensión y salud serán asumidos directamente por el 
+consultor a través de la PILA. 
+• Retención en la fuente: TNC, en su calidad de agente retenedor, aplicará la 
+retención correspondiente según la normativa vigente (10% o 11% según la condición 
+de declarante de renta del consultor). 
+4.3. Valor total ofrecido 
+OCHENTA Y CUATRO MILLONES NOVECIENTOS CINCUENTA MIL PESOS COLOMBIANOS 
+($84.950.000 COP) 
+5. Anexos 
+5.1. Currículum vitae del consultor (HV completa) 
+Se adjunta la hoja de vida completa del consultor Juan Camilo Ordoñez Betancourth, que 
+incluye: 
+• Formación académica (Ingeniero Agrícola, Maestría en Ciencia de Datos y Big Data en 
+curso, Técnico Laboral en Gestión de Proyectos, múltiples diplomados y 
+certificaciones). 
+• Experiencia laboral detallada (más de 7 años) en el Banco Agrario de Colombia, IGAC, 
+IDEAM, Suelos y Riego Consultoría S.A.S., ALTTEC S.A.S., Unión Temporal 
+Almacenamiento 2021, entre otros. 
+• Certificaciones profesionales: Tarjeta profesional de Ingeniero Agrícola (COPNIA No. 
+25268-396479), curso de Análisis y Visualización de Datos, Diplomado en Python, 
+certificación en GeoIA, entre otras. 
+• Dominio de idiomas: Inglés C1 (TOEFL iBT). 
+• Publicaciones y ponencias (si aplica). 
+5.2. Soportes 
+Se anexan los siguientes documentos de soporte que acreditan la información presentada en 
+la propuesta: 
+• Registro Único Tributario (RUT) – Persona natural, No responsable de IVA 
+(Responsabilidad 49). 
+• Cédula de ciudadanía del consultor. 
+• Tarjeta profesional de Ingeniero Agrícola (COPNIA). 
+• Certificados de estudios superiores (diploma de pregrado, certificado de maestría en 
+curso). 
+ 
+  JUAN CAMILO ORDOÑEZ BETANCOURTH - 1032405173-2 
+DIRECCIÓN: DG 94 BIS # 56 – 73 Piso 2 - Bogotá – TEL: 350 6671715 
+gerencia@agrohoney.com - camicasilo@gmail.com
+ 
+ 
+• Certificaciones laborales de las entidades donde ha prestado sus servicios 
+(IGAC, IDEAM, Banco Agrario, Suelos y Riego, ALTTEC, Unión Temporal 
+Almacenamiento 2021, etc.). 
+• Estados financieros 2023 y 2024 certificados por contador público. 
+• Enlaces al repositorio público GitHub 
+(https://github.com/camicasilo/geovisor_tnc_finagro) y al MVP funcional del geovisor 
+(https://geovisortnc.agrohoney.com). 
+  
+ 
+  JUAN CAMILO ORDOÑEZ BETANCOURTH - 1032405173-2 
+DIRECCIÓN: DG 94 BIS # 56 – 73 Piso 2 - Bogotá – TEL: 350 6671715 
+gerencia@agrohoney.com - camicasilo@gmail.com
+ 
+ 
+IV . FIRMA 
+En constancia de que la información contenida en esta propuesta es veraz y de que el 
+consultor se compromete a ejecutar la totalidad de las actividades, entregables y productos 
+en los términos y plazos establecidos, se firma el presente documento en la ciudad de 
+Bogotá D.C., a los 15 días del mes de mayo de 2026. 
+Firma: _________________________ 
+Nombre: JUAN CAMILO ORDOÑEZ BETANCOURTH 
+Cédula: 1.032.405.173 de Bogotá D.C. 
+Teléfono: 312 4814773 – 350 6671715 
+Correo electrónico: camicasilo@gmail.com 
+ 
+Fin del documento 
+ 
+ 
+

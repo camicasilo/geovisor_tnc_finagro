@@ -375,8 +375,8 @@
         <div class="subtitle">Simulador de Escenarios · TNC / FINAGRO</div>
     </div>
 
-    <div class="control-group" onmouseenter="updateConsole('PRODUCTOR')">
-        <label><i class="fas fa-tractor"></i> Tipo de productor</label>
+    <div class="control-group">
+        <label onmouseenter="updateConsole('PRODUCTOR')" onmouseleave="resetConsole()"><i class="fas fa-tractor"></i> Tipo de productor</label>
         <select id="productorType">
             <option value="pequeno_bajos">Pequeño de ingresos bajos</option>
             <option value="pequeno" selected>Pequeño productor</option>
@@ -385,8 +385,8 @@
         </select>
     </div>
 
-    <div class="control-group" onmouseenter="updateConsole('ESCENARIO_DESC')">
-        <label><i class="fas fa-cloud-sun-rain"></i> Escenario climático</label>
+    <div class="control-group">
+        <label onmouseenter="updateConsole('ESCENARIO_DESC')" onmouseleave="resetConsole()"><i class="fas fa-cloud-sun-rain"></i> Escenario climático</label>
         <select id="escenario">
             <option value="normal">🌿 0. Normal climática (1981-2010)</option>
             <option value="nino_extremo">☀️ Escenario 1: El Niño Extremo (Sequía/Estrés)</option>
@@ -522,8 +522,8 @@
     </div>
 
     
-    <div class="layer-group accordion" onmouseenter="updateConsole('MODELO_RIESGO')">
-        <div class="layer-group-title">
+    <div class="layer-group accordion">
+        <div class="layer-group-title" onmouseenter="updateConsole('MODELO_RIESGO')" onmouseleave="resetConsole()">
             <i class="fas fa-fire-alt main-icon"></i> Modelos de Riesgo
             <i class="fas fa-chevron-down accordion-icon"></i>
         </div>

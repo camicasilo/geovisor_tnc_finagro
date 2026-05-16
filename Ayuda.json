@@ -1,8 +1,8 @@
 {
   "diccionario_geovisor": [
     { "id": "TITULO_SIGAGRO", "categoria": "Interfaz", "explicacion": "<b>SIGAGRO Geovisor:</b> Plataforma analítica avanzada para la simulación de riesgo agropecuario y toma de decisiones financieras." },
-    { "id": "TITULO_CAPAS", "categoria": "Interfaz", "explicacion": "<b>Capas del Mapa:</b> Gestor central de información geográfica. Permite activar mapas base, infraestructura del IGAC y modelos de riesgo." },
-    { "id": "TITULO_VARIABLES", "categoria": "Interfaz", "explicacion": "<b>Variables Económicas:</b> Panel de control para ajustar parámetros financieros (Tasas y Precios) y simular su impacto en el riesgo." },
+    { "id": "TITULO_CAPAS", "categoria": "Interfaz", "explicacion": "<b>Panel de Gestión de Capas:</b> Permite configurar la visualización del mapa, activando datos base, infraestructura del IGAC y capas analíticas de riesgo." },
+    { "id": "TITULO_VARIABLES", "categoria": "Interfaz", "explicacion": "<b>Simulación Económica:</b> Permite ajustar variables financieras como tasas y precios para observar cómo impactan la cartera de FINAGRO en tiempo real." },
     { "id": "TITULO_DASHBOARD", "categoria": "Interfaz", "explicacion": "<b>Tablero de Detalle:</b> Visualiza estadísticas específicas de la entidad seleccionada, incluyendo Pérdida Esperada y Probabilidad de Incumplimiento." },
     { "id": "R_TERRENO", "categoria": "Capa Catastro", "explicacion": "<b>Predios Formales:</b> Límites de fincas, parcelas y lotes con soporte jurídico y registral completo." },
     { "id": "R_TERRENO_INFORMAL", "categoria": "Capa Catastro", "explicacion": "<b>Informalidad de la Tierra:</b> Ocupaciones o posesiones que no tienen título formalizado pero existen físicamente." },
@@ -15,16 +15,16 @@
     { "id": "MUNICIPIOS", "categoria": "Capa Divipola", "explicacion": "<b>Municipios:</b> Límites políticos de la Divipola (DANE). Base para el reporte de estadísticas de FINAGRO." },
     { "id": "PROVINCIAS", "categoria": "Capa Divipola", "explicacion": "<b>Provincias/Subregiones:</b> Agrupaciones regionales que comparten características económicas y agroecológicas." },
     
-    { "id": "PRODUCTOR", "categoria": "Control Simulador", "explicacion": "<b>Tipo de Productor:</b> Define el perfil socioeconómico. Ajusta la vulnerabilidad y la capacidad de resiliencia en el modelo." },
+    { "id": "PRODUCTOR", "categoria": "Control Simulador", "explicacion": "<b>Tipo de Productor:</b> Clasifica al productor según activos y área. Permite al modelo ajustar la vulnerabilidad y la probabilidad de incumplimiento basada en la resiliencia de cada perfil." },
     { "id": "PEQUENO_BAJOS", "categoria": "Tipo Productor", "explicacion": "<b>Ingresos Bajos:</b> Productores con alta dependencia del ciclo climático y activos limitados." },
     { "id": "PEQUENO", "categoria": "Tipo Productor", "explicacion": "<b>Pequeño Productor:</b> Escala familiar con acceso moderado a crédito de fomento y asistencia técnica." },
     { "id": "MEDIANO", "categoria": "Tipo Productor", "explicacion": "<b>Mediano Productor:</b> Capacidad técnica intermedia, mayor diversificación y solvencia financiera." },
     { "id": "GRANDE", "categoria": "Tipo Productor", "explicacion": "<b>Gran Productor:</b> Escala industrial, alta tecnificación y gran capacidad de mitigación de riesgos." },
     
-    { "id": "TASA_INTERES", "categoria": "Control Económico", "explicacion": "<b>Tasa de Interés:</b> Costo financiero del crédito. Un aumento reduce el margen neto de utilidad del productor." },
-    { "id": "PRECIO_PRODUCTO", "categoria": "Control Económico", "explicacion": "<b>Precio Producto:</b> Factor de mercado. Simula caídas de precios que pueden llevar a la insolvencia técnica." },
+    { "id": "TASA_INTERES", "categoria": "Control Económico", "explicacion": "<b>Control de Tasa de Interés:</b> Ajusta el costo del capital. Sirve para simular cómo un aumento en las tasas reduce la utilidad neta y eleva el riesgo de mora del productor." },
+    { "id": "PRECIO_PRODUCTO", "categoria": "Control Económico", "explicacion": "<b>Control de Precio:</b> Simula variaciones en el valor de venta. Sirve para observar la vulnerabilidad de la cartera ante caídas de precios o crisis de mercado." },
     
-    { "id": "ESCENARIO_DESC", "categoria": "Sección", "explicacion": "<b>Selector de Escenario:</b> Permite alternar entre diferentes condiciones climáticas y financieras para observar su impacto." },
+    { "id": "ESCENARIO_DESC", "categoria": "Sección", "explicacion": "<b>Escenario Climático:</b> Define las condiciones ambientales (Niño, Niña, Normal) que afectan el territorio para simular su impacto en la productividad y el riesgo crediticio." },
     { "id": "NORMAL_CLIMA", "categoria": "Escenario", "explicacion": "<b>🌿 Normal Climática:</b> Estado base del territorio según promedios históricos del IDEAM (1981-2010)." },
     { "id": "NINO_EXTREMO", "categoria": "Escenario", "explicacion": "<b>☀️ El Niño Extremo:</b> Estrés hídrico severo, sequías prolongadas y riesgo de incendios forestales." },
     { "id": "NINA_ACTIVO", "categoria": "Escenario", "explicacion": "<b>🌧️ La Niña Activa:</b> Exceso de lluvias, inundaciones, saturación de suelos y daños en infraestructura vial." },
@@ -43,7 +43,7 @@
     { "id": "CARGAR_LOCAL", "categoria": "Sección", "explicacion": "<b>Carga de Capas:</b> Permite integrar tus propios datos (.parquet, .geojson) para análisis cruzado con el catastro." },
     { "id": "CAPAS_BASE", "categoria": "Sección", "explicacion": "<b>Sección Capas Base:</b> Define el contexto visual y geográfico sobre el cual se montan los datos." },
     { "id": "CAPAS_TRABAJO", "categoria": "Sección", "explicacion": "<b>Sección Capas de Trabajo:</b> Contiene la infraestructura de datos oficial del proyecto (Catastro e IGAC)." },
-    { "id": "MODELO_RIESGO", "categoria": "Sección", "explicacion": "<b>Sección Modelos de Riesgo:</b> Capas inteligentes generadas por algoritmos de análisis geoespacial." },
+    { "id": "MODELO_RIESGO", "categoria": "Sección", "explicacion": "<b>Modelos de Riesgo:</b> Algoritmos avanzados que procesan datos de clima, sanidad y mercado para generar mapas de amenaza específicos para el sector agropecuario." },
     
     { "id": "HERRAMIENTA_MANO", "categoria": "Herramienta", "explicacion": "<b>Modo Paneo:</b> Herramienta para navegar y desplazarse libremente por el mapa sin activar consultas." },
     { "id": "HERRAMIENTA_SELECCION", "categoria": "Herramienta", "explicacion": "<b>Modo Selección:</b> Al activarse, permite hacer clic en el mapa para abrir el tablero detallado de cada entidad." },

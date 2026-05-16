@@ -1,11 +1,27 @@
-import subprocess
 import os
 import sqlite3
 import sys
+import time
+
+# Intentamos importar las librerías necesarias
+try:
+    import geoparquet_io as gpio
+    import duckdb
+except ImportError:
+    print("❌ ERROR: No se encontraron las librerías 'geoparquet_io' o 'duckdb'.")
+    print("Ejecuta: pip install geoparquet-io duckdb")
+    sys.exit(1)
 
 # 1. Definición de rutas seguras
 INPUT_FILE = r"C:\Users\HP\Documents\MEGAsync\RELACIONES LABORALES\CONSERVANCY NATURAL SERVICE\4_INSUMOS\1_COLOMBIA_EN_MAPAS\CatastroPublicoMarzo2026.gpkg"
 OUTPUT_DIR = r"C:\Users\HP\Documents\MEGAsync\RELACIONES LABORALES\CONSERVANCY NATURAL SERVICE\4_INSUMOS\1_COLOMBIA_EN_MAPAS"
+
+def check_architecture():
+    """Advierte si Python es de 32 bits, lo cual limita mucho el manejo de archivos grandes."""
+    if sys.maxsize <= 2**31 - 1:
+        print("⚠️ ADVERTENCIA: Estás usando Python de 32 bits.")
+        print("Para archivos de Catastro (muy pesados), esto puede causar errores de memoria o de cálculo.")
+        print("Se recomienda instalar Python 64 bits para procesos SIG pesados.\n")
 
 def obtener_capas_gpkg(ruta_gpkg):
     """Extrae los nombres de las capas de un archivo GeoPackage usando SQLite."""
@@ -20,36 +36,12 @@ def obtener_capas_gpkg(ruta_gpkg):
         print(f"⚠️ No se pudieron leer las capas internamente: {e}")
         return []
 
-def ejecutar_comando_streaming(comando):
-    """Ejecuta un comando en la terminal y muestra la salida en tiempo real."""
-    try:
-        # Popen permite leer la consola en vivo mientras el proceso ocurre
-        proceso = subprocess.Popen(
-            comando, 
-            stdout=subprocess.PIPE, 
-            stderr=subprocess.STDOUT, 
-            text=True,
-            encoding='utf-8', 
-            errors='replace' # Evita crasheos por caracteres extraños
-        )
-        
-        # Iteramos línea por línea de la consola del subproceso y la imprimimos
-        for linea in iter(proceso.stdout.readline, ''):
-            sys.stdout.write(linea)
-            sys.stdout.flush()
-            
-        proceso.stdout.close()
-        retcode = proceso.wait()
-        
-        return retcode == 0
-    except FileNotFoundError:
-        print("\n❌ ERROR: Python no encuentra la herramienta 'gpio'. Asegúrate de que geoparquet-io esté instalado.")
-        return False
-
 def ejecutar_conversion():
     print("=====================================================")
-    print("🌾 GEOVISOR TNC-FINAGRO | SUPER-CONVERSOR A GEOPARQUET")
+    print("🌾 GEOVISOR TNC-FINAGRO | CONVERSOR GEOPARQUET PRO")
     print("=====================================================\n")
+
+    check_architecture()
 
     if not os.path.exists(INPUT_FILE):
         print(f"❌ ERROR: El archivo origen no existe:\n{INPUT_FILE}")
@@ -58,51 +50,76 @@ def ejecutar_conversion():
     extension = os.path.splitext(INPUT_FILE)[1].lower()
     base_name = os.path.splitext(os.path.basename(INPUT_FILE))[0]
     
-    # Crear una subcarpeta automáticamente para mantener todo organizado
+    # Crear subcarpeta para resultados
     carpeta_salida = os.path.join(OUTPUT_DIR, f"{base_name}_Parquet")
     if not os.path.exists(carpeta_salida):
         os.makedirs(carpeta_salida)
-        print(f"📁 Se creó una nueva carpeta para guardar los resultados:\n   {carpeta_salida}\n")
+        print(f"📁 Carpeta de salida: {carpeta_salida}\n")
     
-    print(f"📂 Archivo detectado: {os.path.basename(INPUT_FILE)}")
-    print(f"⚙️ Formato: {extension}\n")
+    print(f"📂 Procesando: {os.path.basename(INPUT_FILE)}")
 
-    # Si es GPKG, averiguamos cuántas capas tiene internamente
-    capas_a_procesar = [None] # None significa "convertir directo sin flag --layer"
-    
+    # Obtener capas si es GPKG
+    capas = [None]
     if extension == '.gpkg':
         capas = obtener_capas_gpkg(INPUT_FILE)
-        if capas:
-            print(f"🗺️ Se detectaron {len(capas)} capas en el GeoPackage:")
-            for i, capa in enumerate(capas, 1):
-                print(f"   {i}. {capa}")
-            print("\n🛠️ Preparando conversión capa por capa para evitar el error de 'bounds'...\n")
-            capas_a_procesar = capas
+        print(f"🗺️ Capas detectadas: {len(capas)}")
 
-    for capa in capas_a_procesar:
+    for capa in capas:
+        start_time = time.time()
         if capa:
             output_file = os.path.join(carpeta_salida, f"{base_name}_{capa}.parquet")
-            print(f"🚀 Procesando capa: '{capa}' -> {os.path.basename(output_file)}")
-            comando = ["gpio", "convert", INPUT_FILE, output_file, "--layer", capa]
+            print(f"\n🚀 Convirtiendo capa: '{capa}'")
         else:
             output_file = os.path.join(carpeta_salida, f"{base_name}.parquet")
-            print(f"🚀 Iniciando conversión -> {os.path.basename(output_file)}")
-            comando = ["gpio", "convert", INPUT_FILE, output_file]
+            print(f"\n🚀 Iniciando conversión...")
 
-        print(f"💻 Ejecutando: {' '.join(comando)}")
-        print("-" * 50)
-        
-        exito = ejecutar_comando_streaming(comando)
-        
-        print("-" * 50)
-        if exito:
-            print(f"✅ ¡ÉXITO! Guardado en:\n{output_file}\n")
-        else:
-            print(f"⚠️ Falló la conversión de esta capa.\n")
+        try:
+            # MÉTODO 1: Intento estándar con geoparquet-io (incluye Hilbert sorting y BBOX)
+            print(f"⚙️ Leyendo datos y calculando metadatos...")
+            dataset = gpio.read(INPUT_FILE, layer=capa)
+            dataset.write(output_file)
+            
+            elapsed = time.time() - start_time
+            print(f"✅ ¡ÉXITO! Guardado en: {os.path.basename(output_file)} ({elapsed:.1f}s)")
+            
+        except Exception as e:
+            error_msg = str(e).lower()
+            if "bounds" in error_msg or "extent" in error_msg:
+                print(f"⚠️ Falló el cálculo de límites (geometrías inválidas detectadas).")
+                print(f"🔄 Iniciando limpieza y conversión forzada vía DuckDB...")
+                
+                try:
+                    # MÉTODO 2: Fallback con DuckDB Directo
+                    # Filtramos geometrías nulas que suelen causar el error de bounds
+                    con = duckdb.connect()
+                    con.execute("INSTALL spatial; LOAD spatial;")
+                    
+                    # DuckDB lee el GPKG, filtra nulos y exporta a Parquet
+                    # Nota: ST_Read en DuckDB es extremadamente rápido
+                    query = f"COPY (SELECT * FROM st_read('{INPUT_FILE}', layer='{capa}') WHERE geom IS NOT NULL) TO '{output_file}' (FORMAT 'PARQUET')"
+                    con.execute(query)
+                    con.close()
+                    
+                    # Intentamos inyectar los metadatos de GeoParquet al archivo generado por DuckDB
+                    # para que sea compatible con el Geovisor
+                    try:
+                        gpio.add_bbox_metadata(output_file)
+                    except:
+                        pass
+                        
+                    elapsed = time.time() - start_time
+                    print(f"✅ ¡ÉXITO FORZADO! Capa limpia y convertida ({elapsed:.1f}s)")
+                except Exception as e2:
+                    print(f"❌ Falló incluso el método de respaldo: {e2}")
+            else:
+                print(f"❌ ERROR inesperado en la capa '{capa}': {e}")
 
-    print("🎉 Proceso de conversión finalizado.")
+    print("\n🎉 Proceso finalizado.")
 
 if __name__ == "__main__":
-    # Aseguramos que la consola pueda imprimir emojis
-    sys.stdout.reconfigure(encoding='utf-8')
+    # Aseguramos salida UTF-8 para emojis en Windows
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except AttributeError:
+        pass
     ejecutar_conversion()

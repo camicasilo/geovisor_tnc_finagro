@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geovisor Predictivo - TNC FINAGRO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src='https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js'></script>
+    <link href='https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css' rel='stylesheet' />
+    <style> body { margin: 0; padding: 0; } #map { position: absolute; top: 0; bottom: 0; width: 100%; z-index: 1; } </style>
+</head>
+<body class="bg-gray-900 text-white font-sans h-screen flex flex-col relative">
+    
+    <div id="map"></div>
+
+    <div class="z-10 absolute top-0 left-0 w-full p-6 bg-gradient-to-b from-gray-900/90 to-transparent pointer-events-none">
+        <h1 class="text-3xl font-bold text-green-400 drop-shadow-md">Geovisor de Riesgo Agropecuario</h1>
+        <p class="text-xl mt-2 text-gray-200">The Nature Conservancy - FINAGRO | Proyecto Paisajes Futuros</p>
+    </div>
+
+    <div class="z-10 absolute bottom-10 left-10 p-6 bg-gray-900/90 backdrop-blur-md rounded-xl border border-gray-700 shadow-2xl max-w-md">
+        <div class="flex items-center mb-4">
+            <div class="w-3 h-3 bg-green-500 rounded-full animate-ping mr-3"></div>
+            <h2 class="text-lg font-semibold">Estado del MVP: Inicializando Arquitectura</h2>
+        </div>
+        <p class="text-sm text-gray-300 mb-4">Desplegando instancias... Conectando con bases de datos (SAAM, IGAC, IDEAM) y precargando modelos de simulación climática (GraphCast/GenCast).</p>
+        
+        <div class="w-full bg-gray-800 rounded-full h-2 mb-2">
+            <div class="bg-green-500 h-2 rounded-full" style="width: 15%"></div>
+        </div>
+        <p class="text-xs text-right text-gray-400">Versión Alpha 0.1 - Despliegue en curso</p>
+    </div>
+
+    <script>
+        var map = new maplibregl.Map({
+            container: 'map',
+            style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json', // Mapa base oscuro y elegante
+            center: [-74.08175, 4.60971], // Centrado en Colombia
+            zoom: 5.5
+        });
+    </script>
+</body>
+</html>

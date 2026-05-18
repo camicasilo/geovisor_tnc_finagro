@@ -18,3 +18,4 @@ DataSets_Parquet/
 # Ignorar secretos y configuraciones locales
 .env
 config_local.json
+dokploy_project.json

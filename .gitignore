@@ -1,0 +1,20 @@
+# Ignorar el subrepositorio QParquet (ya que tiene su propio control en GitHub)
+QParquet/
+
+# Ignorar archivos de respaldo y temporales
+*.bak
+index.html.bak
+scratch/
+
+# Ignorar datos pesados
+*.gpkg
+*.parquet
+*.zip
+*.tar.gz
+*.xlsx
+*.csv
+DataSets_Parquet/
+
+# Ignorar secretos y configuraciones locales
+.env
+config_local.json

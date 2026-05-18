@@ -344,6 +344,96 @@
         .layer-item.nested::before { content: ''; position: absolute; top: 14px; left: -10px; width: 8px; border-top: 1px solid rgba(44, 95, 45, 0.15); }
         .layer-item.nested span { font-size: 0.75rem; color: #444; }
 
+        /* Premium Green Range Sliders for Economic Variables */
+        .metric input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: rgba(44, 95, 45, 0.15);
+            border-radius: 3px;
+            outline: none;
+            transition: background 0.3s;
+        }
+        .metric input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #2c5f2d;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            transition: transform 0.1s ease, background 0.2s;
+        }
+        .metric input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: #1e3a1f;
+        }
+        .metric input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border: none;
+            border-radius: 50%;
+            background: #2c5f2d;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            transition: transform 0.1s ease, background 0.2s;
+        }
+        .metric input[type="range"]::-moz-range-thumb:hover {
+            transform: scale(1.2);
+            background: #1e3a1f;
+        }
+
+        /* Checkbox Redondo Verde Auténtico */
+        .round-chk-container {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+        .round-chk-container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0; width: 0;
+        }
+        .round-checkmark {
+            height: 16px;
+            width: 16px;
+            background-color: #fff;
+            border: 2px solid rgba(44, 95, 45, 0.4);
+            border-radius: 50%;
+            position: relative;
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+        .round-chk-container:hover input ~ .round-checkmark {
+            border-color: #2c5f2d;
+            box-shadow: 0 0 4px rgba(44, 95, 45, 0.2);
+        }
+        .round-chk-container input:checked ~ .round-checkmark {
+            background-color: #2c5f2d;
+            border-color: #2c5f2d;
+        }
+        .round-checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+        .round-chk-container input:checked ~ .round-checkmark:after {
+            display: block;
+        }
+        .round-chk-container .round-checkmark:after {
+            left: 4px;
+            top: 1px;
+            width: 4px;
+            height: 7px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
         /* Modal de Configuración Columnar Avanzada */
         .modal-overlay {
             position: fixed;
@@ -421,15 +511,35 @@
         .layer-item-wrapper:hover .layer-actions-container {
             display: flex;
         }
-        .layer-action-btn {
-            background: none; border: none; cursor: pointer; padding: 4px 6px;
-            font-size: 0.8rem; border-radius: 4px; transition: all 0.15s ease;
+
+        /* Soporte para que los items precargados también revelen acciones en hover */
+        .layer-item-actions {
+            display: none;
+            gap: 4px;
+            align-items: center;
+            margin-left: 8px;
+        }
+        .layer-item:hover .layer-item-actions,
+        .layer-item.nested:hover .layer-item-actions {
+            display: inline-flex !important;
+        }
+
+        .layer-item-actions .layer-action-btn,
+        .layer-actions-container .layer-action-btn {
+            background: none; border: none; cursor: pointer; padding: 2px 4px;
+            font-size: 0.75rem; border-radius: 4px; transition: all 0.15s ease;
             display: flex; align-items: center; justify-content: center;
         }
-        .layer-action-btn.config-btn { color: #2c3e50; }
-        .layer-action-btn.config-btn:hover { background: rgba(0,0,0,0.05); color: #1abc9c; }
-        .layer-action-btn.delete-btn { color: #e74c3c; }
-        .layer-action-btn.delete-btn:hover { background: rgba(231, 76, 60, 0.1); }
+        .layer-item-actions .config-btn,
+        .layer-actions-container .config-btn { color: #2c5f2d; }
+        .layer-item-actions .config-btn:hover,
+        .layer-actions-container .config-btn:hover { background: rgba(44, 95, 45, 0.08); color: #1e3a1f; }
+
+        .layer-item-actions .delete-btn,
+        .layer-actions-container .delete-btn { color: #e74c3c; }
+        .layer-item-actions .delete-btn:hover,
+        .layer-actions-container .delete-btn:hover { background: rgba(231, 76, 60, 0.1); }
+        .layer-item-actions .delete-btn:disabled { color: #ccc !important; cursor: not-allowed !important; background: none !important; }
 
         /* Barra Global de Lotes Flotante */
         .batch-crud-bar {
@@ -531,34 +641,93 @@
     <!-- Acordeón: Capas Base (Sin active para iniciar retraído) -->
     <div class="layer-group accordion">
         <div class="layer-group-title" onmouseenter="updateConsole('CAPAS_BASE')" onmouseleave="resetConsole()">
+            <label class="round-chk-container" style="margin-right: 8px;" onclick="event.stopPropagation();" title="Seleccionar todo">
+                <input type="checkbox" class="section-select-all" data-section="base">
+                <span class="round-checkmark"></span>
+            </label>
             <i class="fas fa-map main-icon"></i> Capas Base
             <i class="fas fa-chevron-down accordion-icon"></i>
         </div>
         <div class="layer-group-content">
             <input type="text" class="layer-search" placeholder="Buscar capa base...">
-            <label class="radio-container" onmouseenter="updateConsole('BASE_POSITRON')" onmouseleave="resetConsole()">Positron (Claro / Defecto)
-                <input type="radio" name="baselayer" value="positron" checked>
-                <span class="checkmark"></span>
-            </label>
-            <label class="radio-container" onmouseenter="updateConsole('BASE_DARK')" onmouseleave="resetConsole()">CartoDB Dark Matter
-                <input type="radio" name="baselayer" value="dark">
-                <span class="checkmark"></span>
-            </label>
-            <label class="radio-container" onmouseenter="updateConsole('BASE_OSM')" onmouseleave="resetConsole()">OpenStreetMap Clásico
-                <input type="radio" name="baselayer" value="osm">
-                <span class="checkmark"></span>
-            </label>
-            <label class="radio-container" onmouseenter="updateConsole('BASE_TOPO')" onmouseleave="resetConsole()">OpenTopoMap (Topográfico)
-                <input type="radio" name="baselayer" value="topo">
-                <span class="checkmark"></span>
-            </label>
-        </div>
+            
+            <div class="layer-item" onmouseenter="updateConsole('BASE_POSITRON')" onmouseleave="resetConsole()">
+                <div style="display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;">
+                    <label class="round-chk-container" onclick="event.stopPropagation();">
+                        <input type="checkbox" class="layer-batch-select" data-section="base" data-layer-id="base-positron">
+                        <span class="round-checkmark"></span>
+                    </label>
+                    <span class="layer-title-text" style="font-size: 0.75rem; font-weight: 600; color: #333;">Positron (Claro / Defecto)</span>
+                    <div class="layer-item-actions">
+                        <button class="layer-action-btn config-btn" onclick="openBaseLayerConfig('base-positron'); event.stopPropagation();" title="Configurar Capa"><i class="fas fa-cog"></i></button>
+                        <button class="layer-action-btn delete-btn" title="Eliminar Capa" disabled><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+                <label class="radio-container" style="padding-left: 0; margin-bottom: 0; display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px;">
+                    <input type="radio" name="baselayer" value="positron" checked style="cursor: pointer;">
+                    <span class="checkmark" style="position: relative; top: 0; left: 0; display: block;"></span>
+                </label>
+            </div>
 
-    </div>
+            <div class="layer-item" onmouseenter="updateConsole('BASE_DARK')" onmouseleave="resetConsole()">
+                <div style="display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;">
+                    <label class="round-chk-container" onclick="event.stopPropagation();">
+                        <input type="checkbox" class="layer-batch-select" data-section="base" data-layer-id="base-dark">
+                        <span class="round-checkmark"></span>
+                    </label>
+                    <span class="layer-title-text" style="font-size: 0.75rem; font-weight: 600; color: #333;">CartoDB Dark Matter</span>
+                    <div class="layer-item-actions">
+                        <button class="layer-action-btn config-btn" onclick="openBaseLayerConfig('base-dark'); event.stopPropagation();" title="Configurar Capa"><i class="fas fa-cog"></i></button>
+                        <button class="layer-action-btn delete-btn" title="Eliminar Capa" disabled><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+                <label class="radio-container" style="padding-left: 0; margin-bottom: 0; display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px;">
+                    <input type="radio" name="baselayer" value="dark" style="cursor: pointer;">
+                    <span class="checkmark" style="position: relative; top: 0; left: 0; display: block;"></span>
+                </label>
+            </div>
 
+            <div class="layer-item" onmouseenter="updateConsole('BASE_OSM')" onmouseleave="resetConsole()">
+                <div style="display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;">
+                    <label class="round-chk-container" onclick="event.stopPropagation();">
+                        <input type="checkbox" class="layer-batch-select" data-section="base" data-layer-id="base-osm">
+                        <span class="round-checkmark"></span>
+                    </label>
+                    <span class="layer-title-text" style="font-size: 0.75rem; font-weight: 600; color: #333;">OpenStreetMap Clásico</span>
+                    <div class="layer-item-actions">
+                        <button class="layer-action-btn config-btn" onclick="openBaseLayerConfig('base-osm'); event.stopPropagation();" title="Configurar Capa"><i class="fas fa-cog"></i></button>
+                        <button class="layer-action-btn delete-btn" title="Eliminar Capa" disabled><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+                <label class="radio-container" style="padding-left: 0; margin-bottom: 0; display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px;">
+                    <input type="radio" name="baselayer" value="osm" style="cursor: pointer;">
+                    <span class="checkmark" style="position: relative; top: 0; left: 0; display: block;"></span>
+                </label>
+            </div>
+
+            <div class="layer-item" onmouseenter="updateConsole('BASE_TOPO')" onmouseleave="resetConsole()">
+                <div style="display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;">
+                    <label class="round-chk-container" onclick="event.stopPropagation();">
+                        <input type="checkbox" class="layer-batch-select" data-section="base" data-layer-id="base-topo">
+                        <span class="round-checkmark"></span>
+                    </label>
+                    <span class="layer-title-text" style="font-size: 0.75rem; font-weight: 600; color: #333;">OpenTopoMap (Topográfico)</span>
+                    <div class="layer-item-actions">
+                        <button class="layer-action-btn config-btn" onclick="openBaseLayerConfig('base-topo'); event.stopPropagation();" title="Configurar Capa"><i class="fas fa-cog"></i></button>
+                        <button class="layer-action-btn delete-btn" title="Eliminar Capa" disabled><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+                <label class="radio-container" style="padding-left: 0; margin-bottom: 0; display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px;">
+                    <input type="radio" name="baselayer" value="topo" style="cursor: pointer;">
+                    <span class="checkmark" style="position: relative; top: 0; left: 0; display: block;"></span>
+                </label>
     <!-- Acordeón: Capas de Trabajo (Estructura de Árbol) -->
     <div class="layer-group accordion">
         <div class="layer-group-title" onmouseenter="updateConsole('CAPAS_TRABAJO')" onmouseleave="resetConsole()">
+            <label class="round-chk-container" style="margin-right: 8px;" onclick="event.stopPropagation();" title="Seleccionar todo">
+                <input type="checkbox" class="section-select-all" data-section="trabajo">
+                <span class="round-checkmark"></span>
+            </label>
             <i class="fas fa-project-diagram main-icon"></i> Capas de Trabajo
             <i class="fas fa-chevron-down accordion-icon"></i>
         </div>
@@ -573,55 +742,185 @@
                 </div>
                 <div class="dataset-content">
                     <div class="layer-item nested" onmouseenter="updateConsole('R_CONSTRUCCION')" onmouseleave="resetConsole()">
-                        <span>R_CONSTRUCCION</span>
+                        <div style="display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;">
+                            <label class="round-chk-container" onclick="event.stopPropagation();">
+                                <input type="checkbox" class="layer-batch-select" data-section="trabajo" data-layer-id="layer-r-construccion">
+                                <span class="round-checkmark"></span>
+                            </label>
+                            <span class="layer-title-text" style="font-size: 0.75rem; font-weight: 600; color: #333;">R_CONSTRUCCION</span>
+                            <div class="layer-item-actions">
+                                <button class="layer-action-btn config-btn" onclick="openLayerConfig('layer-r-construccion'); event.stopPropagation();" title="Configurar Capa"><i class="fas fa-cog"></i></button>
+                                <button class="layer-action-btn delete-btn" title="Eliminar Capa" disabled><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
                         <label class="switch"><input type="checkbox" id="layer-r-construccion"><span class="slider"></span></label>
                     </div>
                     <div class="layer-item nested" onmouseenter="updateConsole('R_NOMENCLATURA_DOMICILIARIA')" onmouseleave="resetConsole()">
-                        <span>R_NOMENCLATURA_DOMICILIARIA</span>
+                        <div style="display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;">
+                            <label class="round-chk-container" onclick="event.stopPropagation();">
+                                <input type="checkbox" class="layer-batch-select" data-section="trabajo" data-layer-id="layer-r-nom-dom">
+                                <span class="round-checkmark"></span>
+                            </label>
+                            <span class="layer-title-text" style="font-size: 0.75rem; font-weight: 600; color: #333;">R_NOMENCLATURA_DOMICILIARIA</span>
+                            <div class="layer-item-actions">
+                                <button class="layer-action-btn config-btn" onclick="openLayerConfig('layer-r-nom-dom'); event.stopPropagation();" title="Configurar Capa"><i class="fas fa-cog"></i></button>
+                                <button class="layer-action-btn delete-btn" title="Eliminar Capa" disabled><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
                         <label class="switch"><input type="checkbox" id="layer-r-nom-dom"><span class="slider"></span></label>
                     </div>
                     <div class="layer-item nested" onmouseenter="updateConsole('R_NOMENCLATURA_VIAL')" onmouseleave="resetConsole()">
-                        <span>R_NOMENCLATURA_VIAL</span>
+                        <div style="display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;">
+                            <label class="round-chk-container" onclick="event.stopPropagation();">
+                                <input type="checkbox" class="layer-batch-select" data-section="trabajo" data-layer-id="layer-r-nom-vial">
+                                <span class="round-checkmark"></span>
+                            </label>
+                            <span class="layer-title-text" style="font-size: 0.75rem; font-weight: 600; color: #333;">R_NOMENCLATURA_VIAL</span>
+                            <div class="layer-item-actions">
+                                <button class="layer-action-btn config-btn" onclick="openLayerConfig('layer-r-nom-vial'); event.stopPropagation();" title="Configurar Capa"><i class="fas fa-cog"></i></button>
+                                <button class="layer-action-btn delete-btn" title="Eliminar Capa" disabled><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
                         <label class="switch"><input type="checkbox" id="layer-r-nom-vial"><span class="slider"></span></label>
                     </div>
                     <div class="layer-item nested" onmouseenter="updateConsole('R_SECTOR')" onmouseleave="resetConsole()">
-                        <span>R_SECTOR</span>
+                        <div style="display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;">
+                            <label class="round-chk-container" onclick="event.stopPropagation();">
+                                <input type="checkbox" class="layer-batch-select" data-section="trabajo" data-layer-id="layer-r-sector">
+                                <span class="round-checkmark"></span>
+                            </label>
+                            <span class="layer-title-text" style="font-size: 0.75rem; font-weight: 600; color: #333;">R_SECTOR</span>
+                            <div class="layer-item-actions">
+                                <button class="layer-action-btn config-btn" onclick="openLayerConfig('layer-r-sector'); event.stopPropagation();" title="Configurar Capa"><i class="fas fa-cog"></i></button>
+                                <button class="layer-action-btn delete-btn" title="Eliminar Capa" disabled><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
                         <label class="switch"><input type="checkbox" id="layer-r-sector"><span class="slider"></span></label>
                     </div>
                     <div class="layer-item nested" onmouseenter="updateConsole('R_TERRENO')" onmouseleave="resetConsole()">
-                        <span>R_TERRENO</span>
+                        <div style="display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;">
+                            <label class="round-chk-container" onclick="event.stopPropagation();">
+                                <input type="checkbox" class="layer-batch-select" data-section="trabajo" data-layer-id="layer-r-terreno">
+                                <span class="round-checkmark"></span>
+                            </label>
+                            <span class="layer-title-text" style="font-size: 0.75rem; font-weight: 600; color: #333;">R_TERRENO</span>
+                            <div class="layer-item-actions">
+                                <button class="layer-action-btn config-btn" onclick="openLayerConfig('layer-r-terreno'); event.stopPropagation();" title="Configurar Capa"><i class="fas fa-cog"></i></button>
+                                <button class="layer-action-btn delete-btn" title="Eliminar Capa" disabled><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
                         <label class="switch"><input type="checkbox" id="layer-r-terreno"><span class="slider"></span></label>
                     </div>
                     <div class="layer-item nested" onmouseenter="updateConsole('R_VEREDA')" onmouseleave="resetConsole()">
-                        <span>R_VEREDA</span>
+                        <div style="display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;">
+                            <label class="round-chk-container" onclick="event.stopPropagation();">
+                                <input type="checkbox" class="layer-batch-select" data-section="trabajo" data-layer-id="layer-r-vereda">
+                                <span class="round-checkmark"></span>
+                            </label>
+                            <span class="layer-title-text" style="font-size: 0.75rem; font-weight: 600; color: #333;">R_VEREDA</span>
+                            <div class="layer-item-actions">
+                                <button class="layer-action-btn config-btn" onclick="openLayerConfig('layer-r-vereda'); event.stopPropagation();" title="Configurar Capa"><i class="fas fa-cog"></i></button>
+                                <button class="layer-action-btn delete-btn" title="Eliminar Capa" disabled><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
                         <label class="switch"><input type="checkbox" id="layer-r-vereda"><span class="slider"></span></label>
                     </div>
                     <div class="layer-item nested" onmouseenter="updateConsole('U_CONSTRUCCION')" onmouseleave="resetConsole()">
-                        <span>U_CONSTRUCCION</span>
+                        <div style="display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;">
+                            <label class="round-chk-container" onclick="event.stopPropagation();">
+                                <input type="checkbox" class="layer-batch-select" data-section="trabajo" data-layer-id="layer-u-construccion">
+                                <span class="round-checkmark"></span>
+                            </label>
+                            <span class="layer-title-text" style="font-size: 0.75rem; font-weight: 600; color: #333;">U_CONSTRUCCION</span>
+                            <div class="layer-item-actions">
+                                <button class="layer-action-btn config-btn" onclick="openLayerConfig('layer-u-construccion'); event.stopPropagation();" title="Configurar Capa"><i class="fas fa-cog"></i></button>
+                                <button class="layer-action-btn delete-btn" title="Eliminar Capa" disabled><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
                         <label class="switch"><input type="checkbox" id="layer-u-construccion"><span class="slider"></span></label>
                     </div>
                     <div class="layer-item nested" onmouseenter="updateConsole('U_MANZANA')" onmouseleave="resetConsole()">
-                        <span>U_MANZANA</span>
+                        <div style="display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;">
+                            <label class="round-chk-container" onclick="event.stopPropagation();">
+                                <input type="checkbox" class="layer-batch-select" data-section="trabajo" data-layer-id="layer-u-manzana">
+                                <span class="round-checkmark"></span>
+                            </label>
+                            <span class="layer-title-text" style="font-size: 0.75rem; font-weight: 600; color: #333;">U_MANZANA</span>
+                            <div class="layer-item-actions">
+                                <button class="layer-action-btn config-btn" onclick="openLayerConfig('layer-u-manzana'); event.stopPropagation();" title="Configurar Capa"><i class="fas fa-cog"></i></button>
+                                <button class="layer-action-btn delete-btn" title="Eliminar Capa" disabled><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
                         <label class="switch"><input type="checkbox" id="layer-u-manzana"><span class="slider"></span></label>
                     </div>
                     <div class="layer-item nested" onmouseenter="updateConsole('U_NOMENCLATURA_DOMICILIARIA')" onmouseleave="resetConsole()">
-                        <span>U_NOMENCLATURA_DOMICILIARIA</span>
+                        <div style="display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;">
+                            <label class="round-chk-container" onclick="event.stopPropagation();">
+                                <input type="checkbox" class="layer-batch-select" data-section="trabajo" data-layer-id="layer-u-nom-dom">
+                                <span class="round-checkmark"></span>
+                            </label>
+                            <span class="layer-title-text" style="font-size: 0.75rem; font-weight: 600; color: #333;">U_NOMENCLATURA_DOMICILIARIA</span>
+                            <div class="layer-item-actions">
+                                <button class="layer-action-btn config-btn" onclick="openLayerConfig('layer-u-nom-dom'); event.stopPropagation();" title="Configurar Capa"><i class="fas fa-cog"></i></button>
+                                <button class="layer-action-btn delete-btn" title="Eliminar Capa" disabled><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
                         <label class="switch"><input type="checkbox" id="layer-u-nom-dom"><span class="slider"></span></label>
                     </div>
                     <div class="layer-item nested" onmouseenter="updateConsole('U_NOMENCLATURA_VIAL')" onmouseleave="resetConsole()">
-                        <span>U_NOMENCLATURA_VIAL</span>
+                        <div style="display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;">
+                            <label class="round-chk-container" onclick="event.stopPropagation();">
+                                <input type="checkbox" class="layer-batch-select" data-section="trabajo" data-layer-id="layer-u-nom-vial">
+                                <span class="round-checkmark"></span>
+                            </label>
+                            <span class="layer-title-text" style="font-size: 0.75rem; font-weight: 600; color: #333;">U_NOMENCLATURA_VIAL</span>
+                            <div class="layer-item-actions">
+                                <button class="layer-action-btn config-btn" onclick="openLayerConfig('layer-u-nom-vial'); event.stopPropagation();" title="Configurar Capa"><i class="fas fa-cog"></i></button>
+                                <button class="layer-action-btn delete-btn" title="Eliminar Capa" disabled><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
                         <label class="switch"><input type="checkbox" id="layer-u-nom-vial"><span class="slider"></span></label>
                     </div>
                     <div class="layer-item nested" onmouseenter="updateConsole('U_PERIMETRO')" onmouseleave="resetConsole()">
-                        <span>U_PERIMETRO</span>
+                        <div style="display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;">
+                            <label class="round-chk-container" onclick="event.stopPropagation();">
+                                <input type="checkbox" class="layer-batch-select" data-section="trabajo" data-layer-id="layer-u-perimetro">
+                                <span class="round-checkmark"></span>
+                            </label>
+                            <span class="layer-title-text" style="font-size: 0.75rem; font-weight: 600; color: #333;">U_PERIMETRO</span>
+                            <div class="layer-item-actions">
+                                <button class="layer-action-btn config-btn" onclick="openLayerConfig('layer-u-perimetro'); event.stopPropagation();" title="Configurar Capa"><i class="fas fa-cog"></i></button>
+                                <button class="layer-action-btn delete-btn" title="Eliminar Capa" disabled><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
                         <label class="switch"><input type="checkbox" id="layer-u-perimetro"><span class="slider"></span></label>
                     </div>
                     <div class="layer-item nested" onmouseenter="updateConsole('U_SECTOR')" onmouseleave="resetConsole()">
-                        <span>U_SECTOR</span>
+                        <div style="display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;">
+                            <label class="round-chk-container" onclick="event.stopPropagation();">
+                                <input type="checkbox" class="layer-batch-select" data-section="trabajo" data-layer-id="layer-u-sector">
+                                <span class="round-checkmark"></span>
+                            </label>
+                            <span class="layer-title-text" style="font-size: 0.75rem; font-weight: 600; color: #333;">U_SECTOR</span>
+                            <div class="layer-item-actions">
+                                <button class="layer-action-btn config-btn" onclick="openLayerConfig('layer-u-sector'); event.stopPropagation();" title="Configurar Capa"><i class="fas fa-cog"></i></button>
+                                <button class="layer-action-btn delete-btn" title="Eliminar Capa" disabled><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
                         <label class="switch"><input type="checkbox" id="layer-u-sector"><span class="slider"></span></label>
                     </div>
                     <div class="layer-item nested" onmouseenter="updateConsole('U_TERRENO')" onmouseleave="resetConsole()">
-                        <span>U_TERRENO</span>
+                        <div style="display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;">
+                            <label class="round-chk-container" onclick="event.stopPropagation();">
+                                <input type="checkbox" class="layer-batch-select" data-section="trabajo" data-layer-id="layer-u-terreno">
+                                <span class="round-checkmark"></span>
+                            </label>
+                            <span class="layer-title-text" style="font-size: 0.75rem; font-weight: 600; color: #333;">U_TERRENO</span>
+                            <div class="layer-item-actions">
+                                <button class="layer-action-btn config-btn" onclick="openLayerConfig('layer-u-terreno'); event.stopPropagation();" title="Configurar Capa"><i class="fas fa-cog"></i></button>
+                                <button class="layer-action-btn delete-btn" title="Eliminar Capa" disabled><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
                         <label class="switch"><input type="checkbox" id="layer-u-terreno"><span class="slider"></span></label>
                     </div>
                 </div>
@@ -635,42 +934,88 @@
                 </div>
                 <div class="dataset-content">
                     <div class="layer-item nested" onmouseenter="updateConsole('MUNICIPIOS')" onmouseleave="resetConsole()">
-                        <span>Límites Municipales (DANE)</span>
+                        <div style="display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;">
+                            <label class="round-chk-container" onclick="event.stopPropagation();">
+                                <input type="checkbox" class="layer-batch-select" data-section="trabajo" data-layer-id="layer-municipios">
+                                <span class="round-checkmark"></span>
+                            </label>
+                            <span class="layer-title-text" style="font-size: 0.75rem; font-weight: 600; color: #333;">Límites Municipales (DANE)</span>
+                            <div class="layer-item-actions">
+                                <button class="layer-action-btn config-btn" onclick="openLayerConfig('layer-municipios'); event.stopPropagation();" title="Configurar Capa"><i class="fas fa-cog"></i></button>
+                                <button class="layer-action-btn delete-btn" title="Eliminar Capa" disabled><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
                         <label class="switch"><input type="checkbox" id="layer-municipios" checked><span class="slider"></span></label>
                     </div>
                     <div class="layer-item nested" onmouseenter="updateConsole('PROVINCIAS')" onmouseleave="resetConsole()">
-                        <span>Subregiones / Provincias</span>
+                        <div style="display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;">
+                            <label class="round-chk-container" onclick="event.stopPropagation();">
+                                <input type="checkbox" class="layer-batch-select" data-section="trabajo" data-layer-id="layer-provincias">
+                                <span class="round-checkmark"></span>
+                            </label>
+                            <span class="layer-title-text" style="font-size: 0.75rem; font-weight: 600; color: #333;">Subregiones / Provincias</span>
+                            <div class="layer-item-actions">
+                                <button class="layer-action-btn config-btn" onclick="openLayerConfig('layer-provincias'); event.stopPropagation();" title="Configurar Capa"><i class="fas fa-cog"></i></button>
+                                <button class="layer-action-btn delete-btn" title="Eliminar Capa" disabled><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
                         <label class="switch"><input type="checkbox" id="layer-provincias" checked><span class="slider"></span></label>
                     </div>
                 </div>
             </div>
-
-
         </div>
     </div>
 
     
     <div class="layer-group accordion">
         <div class="layer-group-title" onmouseenter="updateConsole('MODELO_RIESGO')" onmouseleave="resetConsole()">
+            <label class="round-chk-container" style="margin-right: 8px;" onclick="event.stopPropagation();" title="Seleccionar todo">
+                <input type="checkbox" class="section-select-all" data-section="riesgo">
+                <span class="round-checkmark"></span>
+            </label>
             <i class="fas fa-fire-alt main-icon"></i> Modelos de Riesgo
             <i class="fas fa-chevron-down accordion-icon"></i>
         </div>
         <div class="layer-group-content">
             <input type="text" class="layer-search" placeholder="Buscar modelo de riesgo...">
             <div class="layer-item" onmouseenter="updateConsole('RIESGO_CLIMA')" onmouseleave="resetConsole()">
-                <span>Riesgo Climático (Heatmap)</span>
+                <div style="display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;">
+                    <label class="round-chk-container" onclick="event.stopPropagation();">
+                        <input type="checkbox" class="layer-batch-select" data-section="riesgo" data-layer-id="layer-riesgo">
+                        <span class="round-checkmark"></span>
+                    </label>
+                    <span class="layer-title-text" style="font-size: 0.75rem; font-weight: 600; color: #333;">Riesgo Climático (Heatmap)</span>
+                    <div class="layer-item-actions">
+                        <button class="layer-action-btn config-btn" onclick="openLayerConfig('layer-riesgo'); event.stopPropagation();" title="Configurar Capa"><i class="fas fa-cog"></i></button>
+                        <button class="layer-action-btn delete-btn" title="Eliminar Capa" disabled><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
                 <label class="switch"><input type="checkbox" id="layer-riesgo"><span class="slider"></span></label>
             </div>
             <div class="layer-item" onmouseenter="updateConsole('ZONAS_INUNDABLES')" onmouseleave="resetConsole()">
-                <span>Zonas Inundables</span>
+                <div style="display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;">
+                    <label class="round-chk-container" onclick="event.stopPropagation();">
+                        <input type="checkbox" class="layer-batch-select" data-section="riesgo" data-layer-id="layer-inundacion">
+                        <span class="round-checkmark"></span>
+                    </label>
+                    <span class="layer-title-text" style="font-size: 0.75rem; font-weight: 600; color: #333;">Zonas Inundables</span>
+                    <div class="layer-item-actions">
+                        <button class="layer-action-btn config-btn" onclick="openLayerConfig('layer-inundacion'); event.stopPropagation();" title="Configurar Capa"><i class="fas fa-cog"></i></button>
+                        <button class="layer-action-btn delete-btn" title="Eliminar Capa" disabled><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
                 <label class="switch"><input type="checkbox" id="layer-inundacion"><span class="slider"></span></label>
             </div>
         </div>
     </div>
-    
+
     <!-- CRUD de Capas de Usuario S3 (Con Drag & Drop y Selección Masiva) -->
     <div class="layer-group accordion active" onmouseenter="updateConsole('CARGAR_LOCAL')" onmouseleave="resetConsole()">
         <div class="layer-group-title">
+            <label class="round-chk-container" style="margin-right: 8px;" onclick="event.stopPropagation();" title="Seleccionar todo">
+                <input type="checkbox" id="crud-select-all" class="section-select-all" data-section="usuario">
+                <span class="round-checkmark"></span>
+            </label>
             <i class="fas fa-database main-icon"></i> Capas de Usuario (S3 CRUD)
             <i class="fas fa-chevron-down accordion-icon"></i>
         </div>
@@ -693,15 +1038,6 @@
             </div>
             <div id="upload-status" style="font-size: 0.75rem; color: #2c5f2d; margin-bottom: 8px; display: none; font-weight: bold; text-align: center;">Subiendo a S3...</div>
             <div id="upload-error" style="font-size: 0.75rem; color: #d32f2f; margin-bottom: 8px; display: none; text-align: center; font-weight: 500;"></div>
-
-            <!-- Cabecera del CRUD (Acciones masivas) -->
-            <div id="crud-actions-header" style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.03); padding: 6px 10px; border-radius: 6px; margin-bottom: 8px; font-size: 0.75rem; font-weight: 600; color: #444;">
-                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; margin-bottom: 0;">
-                    <input type="checkbox" id="crud-select-all" style="cursor: pointer;">
-                    <span>Seleccionar todo</span>
-                </label>
-                <button id="btn-delete-selected" style="width: auto; padding: 4px 8px; background: #e74c3c; color: white; border: none; border-radius: 4px; font-size: 0.7rem; font-weight: 700; display: flex; align-items: center; gap: 4px; transition: all 0.2s;" title="Eliminar capas seleccionadas"><i class="fas fa-trash-alt"></i> Eliminar</button>
-            </div>
 
             <!-- Listado dinámico del CRUD -->
             <div id="user-layers-list" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;">
@@ -1329,7 +1665,7 @@
     function actualizarListaCapasUI() {
         if (loadedUserLayers.length === 0) {
             noLayersMsg.style.display = 'block';
-            selectAllCheckbox.checked = false;
+            if (selectAllCheckbox) selectAllCheckbox.checked = false;
             if(batchCrudBar) batchCrudBar.style.display = 'none';
             userLayersList.innerHTML = `
                 <div id="no-user-layers-msg" style="font-size: 0.75rem; color: #888; text-align: center; padding: 12px; font-style: italic; background: rgba(0,0,0,0.01); border-radius: 6px; border: 1px dashed rgba(0,0,0,0.05);">
@@ -1346,27 +1682,32 @@
         userLayersList.innerHTML = '';
         loadedUserLayers.forEach(layer => {
             const item = document.createElement('div');
-            item.className = 'layer-item-wrapper';
+            item.className = 'layer-item';
+            item.setAttribute('onmouseenter', `updateConsole('CAPA_USUARIO')`);
+            item.setAttribute('onmouseleave', 'resetConsole()');
             
             const isChecked = checkeds.includes(layer.id) ? 'checked' : '';
             const iconS3 = layer.subido ? '<i class="fas fa-cloud" style="color: #2980b9;" title="Almacenado físicamente en S3"></i>' : '<i class="fas fa-bolt" style="color: #f39c12;" title="En caché virtual en DuckDB-WASM"></i>';
 
             item.innerHTML = `
-                <div class="layer-left-info">
-                    <input type="checkbox" class="layer-batch-checkbox" data-id="${layer.id}" ${isChecked}>
-                    <span class="layer-title-text" title="${layer.nombre}" onclick="openLayerConfigModal(${layer.id})">${layer.nombre}</span>
+                <div style="display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;">
+                    <label class="round-chk-container" onclick="event.stopPropagation();">
+                        <input type="checkbox" class="layer-batch-checkbox layer-batch-select" data-id="${layer.id}" data-section="usuario" ${isChecked}>
+                        <span class="round-checkmark"></span>
+                    </label>
+                    <span class="layer-title-text" style="font-size: 0.75rem; font-weight: 600; color: #333;" title="${layer.nombre}">${layer.nombre}</span>
+                    <div class="layer-item-actions">
+                        <button class="layer-action-btn config-btn" onclick="openLayerConfigModal(${layer.id}); event.stopPropagation();" title="Configuración Columnar Avanzada"><i class="fas fa-cog"></i></button>
+                        <button class="layer-action-btn delete-btn" onclick="eliminarCapaIndividual(${layer.id}); event.stopPropagation();" title="Eliminar Capa"><i class="fas fa-trash-alt"></i></button>
+                    </div>
                 </div>
-                <div style="display: flex; align-items: center; gap: 8px; overflow: visible;">
-                    <span style="color: #888; font-size: 0.65rem; font-weight: 500;">${layer.size} MB</span>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <span style="color: #888; font-size: 0.65rem; font-weight: 500; white-space: nowrap;">${layer.size} MB</span>
                     ${iconS3}
                     <label class="switch" style="width: 28px; height: 16px; margin-bottom: 0;">
                         <input type="checkbox" id="visibility-${layer.id}" checked>
                         <span class="slider" style="border-radius: 10px;"></span>
                     </label>
-                    <div class="layer-actions-container">
-                        <button class="layer-action-btn config-btn" onclick="openLayerConfigModal(${layer.id})" title="Configuración Columnar Avanzada"><i class="fas fa-cog"></i></button>
-                        <button class="layer-action-btn delete-btn" onclick="eliminarCapaIndividual(${layer.id})" title="Eliminar Capa"><i class="fas fa-trash-alt"></i></button>
-                    </div>
                 </div>
             `;
             userLayersList.appendChild(item);
@@ -1379,23 +1720,13 @@
             });
         });
 
-        // Eventos a los checkboxes individuales para la selección por lote
-        userLayersList.querySelectorAll('.layer-batch-checkbox').forEach(el => {
-            el.addEventListener('change', () => {
-                const total = loadedUserLayers.length;
-                const marcados = userLayersList.querySelectorAll('.layer-batch-checkbox:checked').length;
-                selectAllCheckbox.checked = total === marcados;
-                evaluarBatchCRUDBar();
-            });
-        });
-        
         evaluarBatchCRUDBar();
     }
 
     // --- Control de Visibilidad de la Barra CRUD Global ---
     function evaluarBatchCRUDBar() {
         if(!batchCrudBar) return;
-        const marcados = userLayersList.querySelectorAll('.layer-batch-checkbox:checked').length;
+        const marcados = document.querySelectorAll('.layer-batch-select:checked').length;
         if (marcados > 0) {
             batchSelectedCount.innerText = marcados;
             batchCrudBar.style.display = 'flex';
@@ -1404,13 +1735,44 @@
         }
     }
 
-    // --- Selección Masiva ---
-    selectAllCheckbox.addEventListener('change', (e) => {
-        userLayersList.querySelectorAll('.layer-batch-checkbox').forEach(el => {
-            el.checked = e.target.checked;
+    // --- Event Listener para Checkboxes de Lote por Acordeón ---
+    document.querySelectorAll('.section-select-all').forEach(headerCheckbox => {
+        headerCheckbox.addEventListener('change', (e) => {
+            const section = e.target.dataset.section;
+            let selector = `.layer-batch-select[data-section="${section}"]`;
+            if (section === 'usuario') {
+                selector = `.layer-batch-checkbox`;
+            }
+            document.querySelectorAll(selector).forEach(el => {
+                el.checked = e.target.checked;
+            });
+            evaluarBatchCRUDBar();
         });
-        evaluarBatchCRUDBar();
     });
+
+    // --- Delegación de Evento para Actualizar el Select All del Encabezado ---
+    const panelElement = document.getElementById('right-panel');
+    if (panelElement) {
+        panelElement.addEventListener('change', (e) => {
+            if (e.target.classList.contains('layer-batch-select')) {
+                const section = e.target.dataset.section;
+                if (section) {
+                    let allSelector = `.layer-batch-select[data-section="${section}"]`;
+                    let headerSelector = `.section-select-all[data-section="${section}"]`;
+                    if (section === 'usuario') {
+                        allSelector = `.layer-batch-checkbox`;
+                    }
+                    const total = document.querySelectorAll(allSelector).length;
+                    const marcados = document.querySelectorAll(`${allSelector}:checked`).length;
+                    const headerCheckbox = document.querySelector(headerSelector);
+                    if (headerCheckbox) {
+                        headerCheckbox.checked = total > 0 && total === marcados;
+                    }
+                }
+                evaluarBatchCRUDBar();
+            }
+        });
+    }
 
     // --- Eliminación Individual ---
     async function eliminarCapaIndividual(layerId) {
@@ -1474,7 +1836,9 @@
 
         loadedUserLayers = loadedUserLayers.filter(l => !marcados.includes(l.id));
         actualizarListaCapasUI();
-        selectAllCheckbox.checked = false;
+        if (selectAllCheckbox) selectAllCheckbox.checked = false;
+        document.querySelectorAll('.section-select-all').forEach(el => el.checked = false);
+        document.querySelectorAll('.layer-batch-select').forEach(el => el.checked = false);
 
         uploadStatus.style.display = 'block';
         uploadStatus.innerHTML = `<i class="fas fa-check-circle"></i> Eliminación por lotes completada.`;

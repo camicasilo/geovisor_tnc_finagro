@@ -64,7 +64,7 @@
             top: 20px;
             right: 20px;
             width: 340px;
-            max-height: calc(100vh - 40px);
+            height: calc(100vh - 40px);
             overflow: hidden;
             padding: 0;
             display: flex;
@@ -612,38 +612,42 @@
             display: flex;
         }
 
-        /* Contenedor derecho que agrupa el switch, los MB y los botones CRUD */
+        /* Contenedor derecho: PRIMERO el switch, LUEGO los botones emergen a la IZQUIERDA del switch */
         .layer-right-controls {
             display: flex;
             align-items: center;
             position: relative;
             overflow: visible;
+            flex-direction: row-reverse; /* switch a la derecha, actions a la izquierda */
+            gap: 0;
         }
 
         .layer-item-actions {
             display: flex !important;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             width: 0;
             opacity: 0;
-            transform: translateX(-15px); /* Inicia ligeramente detrás del switch */
+            transform: translateX(18px); /* Sale desde detrás del switch hacia la izquierda */
             transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
-                        opacity 0.3s ease, 
+                        opacity 0.28s ease, 
                         transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-                        margin-left 0.3s ease;
+                        margin-right 0.3s ease;
             overflow: hidden;
             white-space: nowrap;
-            margin-left: 0;
+            margin-right: 0;
             z-index: 1;
+            pointer-events: none;
         }
 
-        /* Al pasar el mouse, emergen los botones CRUD hacia la derecha */
+        /* Al pasar el mouse, emergen los botones hacia la IZQUIERDA */
         .layer-item:hover .layer-item-actions,
         .layer-item.nested:hover .layer-item-actions {
-            width: 48px;
+            width: 52px;
             opacity: 1;
             transform: translateX(0);
-            margin-left: 8px;
+            margin-right: 6px;
+            pointer-events: all;
         }
 
         .layer-item-actions .layer-action-btn,
@@ -1244,7 +1248,11 @@
             <button class="slide-back-btn" id="slide-back-btn" title="Volver al listado de capas" style="width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center;">
                 <i class="fas fa-arrow-left"></i>
             </button>
-            <h3 id="slide-layer-title" style="flex:1;font-size:0.85rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Configuración de Capa</h3>
+            <div style="flex:1;overflow:hidden;">
+                <h3 id="slide-layer-title" style="margin:0;font-size:0.85rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#2c3e50;">Configuración de Capa</h3>
+                <div id="slide-layer-subtitle" style="font-size:0.68rem;color:#888;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
+            </div>
+        </div>
         </div>
         <div class="slide-content" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; padding-top: 4px;">
             <div id="slide-tech-details" style="font-size: 0.72rem; color: #444; background: rgba(0,0,0,0.03); padding: 12px; border-radius: 8px; margin-bottom: 12px; line-height: 1.4; border: 1px solid rgba(0,0,0,0.05); overflow-y: auto; max-height: 150px;">
@@ -2422,6 +2430,22 @@
                 </div>
             ` : '';
 
+            // Determinar el contexto de origen (sección y dataset) de la capa
+            const slideSubtitle = document.getElementById('slide-layer-subtitle');
+            if (slideSubtitle) {
+                if (layer.static) {
+                    const sectionEl = document.querySelector(`button.config-btn[onclick*="'${layerId}'"]`);
+                    let sectionName = 'Catastro Público S3';
+                    if (sectionEl) {
+                        const datasetTitle = sectionEl.closest('.dataset-content')?.previousElementSibling?.textContent?.trim();
+                        if (datasetTitle) sectionName = datasetTitle;
+                    }
+                    slideSubtitle.textContent = `🗄️ ${sectionName} • bucket: catastro`;
+                } else {
+                    slideSubtitle.textContent = `📤 Capa de Usuario • bucket: geovisor-tnc-finagro`;
+                }
+            }
+
             // Determinar CRS intentando leerlo del parquet; default Colombia MAGNA-SIRGAS
             let crsInfo = 'Detectando...';
             try {
@@ -2851,8 +2875,16 @@
             // Configurar S3 / HTTPFS / Spatial
             const conn = await dbInstance.connect();
             
-            // ── DuckDB-WASM: la única forma que funciona en browser es autoinstall=1 + INSTALL/LOAD sin URL ──
-            // El CDN oficial de extensiones WASM es gestionado internamente por DuckDB; las URLs directas no funcionan.
+            // ── DuckDB-WASM FIX CRÍTICO: establecer home_directory ANTES de INSTALL ──
+            // El WASM virtual filesystem (Emscripten) tiene /tmp disponible pero NO /home/web_user.
+            // Sin este SET, INSTALL falla con "Can't find the home directory at '/home/web_user'".
+            try {
+                await conn.query(`SET home_directory='/tmp'; SET extension_directory='/tmp/.duckdb_ext';`);
+                console.log('📂 [DuckDB] home_directory y extension_directory configurados en /tmp');
+            } catch(homeErr) {
+                console.warn('⚠️ [DuckDB] No se pudo configurar home_directory:', homeErr.message);
+            }
+
             await conn.query(`SET autoinstall_known_extensions=1; SET autoload_known_extensions=0;`);
 
             const isEH = (bundle.mainWorker && bundle.mainWorker.includes('eh')) || (bundle.mainModule && bundle.mainModule.includes('eh'));

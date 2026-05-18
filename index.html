@@ -190,11 +190,11 @@
         .metric input[type="range"] { flex: 1; margin: 0 12px; }
         
         /* Acordeones y Layers */
-        .layer-group { margin-bottom: 10px; background: rgba(0,0,0,0.02); border-radius: 8px; border: 1px solid rgba(0,0,0,0.05); overflow: hidden; }
+        .layer-group { flex-shrink: 0; margin-bottom: 10px; background: rgba(0,0,0,0.02); border-radius: 8px; border: 1px solid rgba(0,0,0,0.05); overflow: hidden; }
         .layer-group-title { font-weight: 600; font-size: 0.85rem; color: #1e466e; padding: 10px 12px; display: flex; align-items: center; cursor: pointer; transition: background 0.2s; gap: 4px; }
         .layer-group-title:hover { background: rgba(0,0,0,0.05); color: #2c5f2d; }
         .layer-group-title i.main-icon { margin-right: 6px; width: 16px; text-align: center; }
-        .accordion-icon { transition: transform 0.3s; color: #2c5f2d; font-size: 0.85rem; /* flex:1 se aplica inline en el HTML */ }
+        .accordion-icon { transition: transform 0.3s; color: #2c5f2d; font-size: 0.85rem; margin-left: auto; }
         .layer-group.active .accordion-icon { transform: rotate(180deg); }
         
         .layer-group-content { 
@@ -824,7 +824,7 @@
                 <span class="round-checkmark"></span>
             </label>
             <i class="fas fa-map main-icon"></i> Capas Base
-            <i class="fas fa-chevron-down accordion-icon" style="flex:1;"></i>
+            <i class="fas fa-chevron-down accordion-icon"></i>
             <label class="switch" style="margin-left:6px;" onclick="event.stopPropagation();" title="Encender/apagar todas las capas base">
                 <input type="checkbox" class="section-visibility-all" data-section="base">
                 <span class="slider"></span>
@@ -910,7 +910,7 @@
                 <span class="round-checkmark"></span>
             </label>
             <i class="fas fa-project-diagram main-icon"></i> Capas de Trabajo
-            <i class="fas fa-chevron-down accordion-icon" style="flex:1;"></i>
+            <i class="fas fa-chevron-down accordion-icon"></i>
             <label class="switch" style="margin-left:6px;" onclick="event.stopPropagation();" title="Encender/apagar todas las capas de trabajo">
                 <input type="checkbox" class="section-visibility-all" data-section="trabajo">
                 <span class="slider"></span>
@@ -1159,7 +1159,7 @@
                 <span class="round-checkmark"></span>
             </label>
             <i class="fas fa-fire-alt main-icon"></i> Modelos de Riesgo
-            <i class="fas fa-chevron-down accordion-icon" style="flex:1;"></i>
+            <i class="fas fa-chevron-down accordion-icon"></i>
             <label class="switch" style="margin-left:6px;" onclick="event.stopPropagation();" title="Encender/apagar todos los modelos de riesgo">
                 <input type="checkbox" class="section-visibility-all" data-section="riesgo">
                 <span class="slider"></span>
@@ -1206,7 +1206,7 @@
                 <span class="round-checkmark"></span>
             </label>
             <i class="fas fa-database main-icon"></i> Cargue de Capas
-            <i class="fas fa-chevron-down accordion-icon" style="flex:1;"></i>
+            <i class="fas fa-chevron-down accordion-icon"></i>
             <label class="switch" style="margin-left:6px;" onclick="event.stopPropagation();" id="crud-module-toggle" title="Activar/desactivar módulo de carga">
                 <input type="checkbox" id="crud-module-switch">
                 <span class="slider"></span>
@@ -1252,7 +1252,6 @@
                 <h3 id="slide-layer-title" style="margin:0;font-size:0.85rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#2c3e50;">Configuración de Capa</h3>
                 <div id="slide-layer-subtitle" style="font-size:0.68rem;color:#888;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
             </div>
-        </div>
         </div>
         <div class="slide-content" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; padding-top: 4px;">
             <div id="slide-tech-details" style="font-size: 0.72rem; color: #444; background: rgba(0,0,0,0.03); padding: 12px; border-radius: 8px; margin-bottom: 12px; line-height: 1.4; border: 1px solid rgba(0,0,0,0.05); overflow-y: auto; max-height: 150px;">
@@ -1855,7 +1854,7 @@
 
             // Evitar reinstalar si ya está cargada globalmente en window
             if (!window.spatialExtensionLoaded) {
-                console.log("⚙️ Extensión Spatial no detectada en la sesión global. Intentando instalación en caliente por CDN...");
+                console.log("⚙️ Extensión Spatial no detectada en la sesión global. Cargando de forma dinámica y segura...");
                 try {
                     const duckdb = await import('https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.28.0/+esm');
                     const JSDELIVR_BUNDLES = duckdb.getJsDelivrBundles();
@@ -1864,17 +1863,28 @@
                     const arch = isEH ? 'wasm_eh' : 'wasm_mvp';
                     const spatialUrl = `https://extensions.duckdb.org/v0.9.1/${arch}/spatial.duckdb_extension.wasm`;
                     
-                    await conn.query(`INSTALL '${spatialUrl}'; LOAD '${spatialUrl}';`);
+                    console.log(`⬇️ [Dynamic Load] Descargando extensión: spatial desde ${spatialUrl}`);
+                    const resp = await fetch(spatialUrl);
+                    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                    const arrayBuffer = await resp.arrayBuffer();
+                    const u8 = new Uint8Array(arrayBuffer);
+                    
+                    // Registrar en todas las rutas posibles del filesystem virtual
+                    const paths = [
+                        `/tmp/.duckdb/extensions/v0.9.1/${arch}/spatial.duckdb_extension`,
+                        `/tmp/.duckdb_ext/.duckdb/extensions/v0.9.1/${arch}/spatial.duckdb_extension`,
+                        `/home/web_user/.duckdb/extensions/v0.9.1/${arch}/spatial.duckdb_extension`
+                    ];
+                    
+                    for (const p of paths) {
+                        await dbInstance.registerFileBuffer(p, u8);
+                    }
+                    
+                    await conn.query(`LOAD spatial;`);
                     window.spatialExtensionLoaded = true;
                     console.log("✅ Extensión spatial recuperada de forma dinámica en dropzone.");
                 } catch(err) {
-                    console.warn("Fallo carga CDN, intentando carga nativa simple...", err.message);
-                    try {
-                        await conn.query(`LOAD spatial;`);
-                        window.spatialExtensionLoaded = true;
-                    } catch(e) {
-                        console.error("❌ Spatial inaccesible definitivo.");
-                    }
+                    console.error("❌ Spatial inaccesible definitivo:", err.message);
                 }
             }
 
@@ -2891,34 +2901,62 @@
             const arch = isEH ? 'wasm_eh' : 'wasm_mvp';
             console.log(`📦 Arquitectura DuckDB-WASM: [${arch}] — usando autoinstall interno`);
 
-            // HTTPFS: autoinstall=1 permite INSTALL/LOAD sin URL
-            let httpfsLoaded = false;
-            try {
-                console.log("📡 [DuckDB] INSTALL httpfs...");
-                await conn.query(`INSTALL httpfs;`);
-                console.log("📡 [DuckDB] LOAD httpfs...");
-                await conn.query(`LOAD httpfs;`);
-                httpfsLoaded = true;
-                console.log("✅ [DuckDB] HTTPFS cargado. Acceso S3/HTTP habilitado.");
-            } catch (httpfsErr) {
-                console.warn("⚠️ [DuckDB] HTTPFS falló:", httpfsErr.message);
-                console.warn("⚠️ [DuckDB] Sin HTTPFS no se pueden leer archivos S3 remotos. Causa probable: firewall o proxy bloqueando extensions.duckdb.org");
+            // --- PRE-CARGA E INSTALACIÓN INFALIBLE EN EL HILO PRINCIPAL ---
+            // Bypassea el error de sockets de Emscripten en el Worker (TypeError: fc.getSocket is not a function)
+            async function registerLocalExtension(name) {
+                try {
+                    const extUrl = `https://extensions.duckdb.org/v0.9.1/${arch}/${name}.duckdb_extension.wasm`;
+                    console.log(`⬇️ [DuckDB-Preload] Descargando extensión: ${name} desde ${extUrl}`);
+                    const resp = await fetch(extUrl);
+                    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                    const arrayBuffer = await resp.arrayBuffer();
+                    const u8 = new Uint8Array(arrayBuffer);
+                    
+                    // Rutas probables en el filesystem virtual
+                    const paths = [
+                        `/tmp/.duckdb/extensions/v0.9.1/${arch}/${name}.duckdb_extension`,
+                        `/tmp/.duckdb_ext/.duckdb/extensions/v0.9.1/${arch}/${name}.duckdb_extension`,
+                        `/home/web_user/.duckdb/extensions/v0.9.1/${arch}/${name}.duckdb_extension`
+                    ];
+                    
+                    for (const p of paths) {
+                        await dbInstance.registerFileBuffer(p, u8);
+                        console.log(`📦 [DuckDB-Preload] Registrada extensión ${name} en: ${p}`);
+                    }
+                    return true;
+                } catch(e) {
+                    console.error(`❌ [DuckDB-Preload] Error al pre-cargar ${name}:`, e.message);
+                    return false;
+                }
             }
 
-            // SPATIAL: requiere HTTPFS cargado previamente (descarga deps del CDN)
+            // Descargar y registrar ambas extensiones en MEMFS
+            await registerLocalExtension('httpfs');
+            await registerLocalExtension('spatial');
+
+            // HTTPFS: Cargar desde MEMFS registrado
+            let httpfsLoaded = false;
+            try {
+                console.log("📡 [DuckDB] Cargando httpfs desde MEMFS...");
+                await conn.query(`LOAD httpfs;`);
+                httpfsLoaded = true;
+                console.log("✅ [DuckDB] HTTPFS cargado exitosamente.");
+            } catch (httpfsErr) {
+                console.warn("⚠️ [DuckDB] HTTPFS falló al cargar:", httpfsErr.message);
+                console.warn("⚠️ Sin HTTPFS no se pueden leer archivos S3 remotos.");
+            }
+
+            // SPATIAL: Cargar desde MEMFS registrado
             let spatialLoaded = false;
             try {
-                console.log("🌍 [DuckDB] INSTALL spatial...");
-                await conn.query(`INSTALL spatial;`);
-                console.log("🌍 [DuckDB] LOAD spatial...");
+                console.log("🌍 [DuckDB] Cargando spatial desde MEMFS...");
                 await conn.query(`LOAD spatial;`);
                 spatialLoaded = true;
                 window.spatialExtensionLoaded = true;
-                console.log("✅ [DuckDB] SPATIAL cargado. GeoParquet/GPKG habilitados.");
+                console.log("✅ [DuckDB] SPATIAL cargada exitosamente.");
             } catch (spatialErr) {
                 window.spatialExtensionLoaded = false;
-                console.warn("⚠️ [DuckDB] SPATIAL falló:", spatialErr.message);
-                if (!httpfsLoaded) console.warn("⚠️ [DuckDB] SPATIAL requiere HTTPFS. Instala primero HTTPFS.");
+                console.warn("⚠️ [DuckDB] SPATIAL falló al cargar:", spatialErr.message);
             }
 
             // S3 config — SOLO si HTTPFS está cargado (s3_* son settings de httpfs)

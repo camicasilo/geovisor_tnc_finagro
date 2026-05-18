@@ -2468,11 +2468,19 @@
         
         try {
             if (!dbInstance) await initDuckDBEngine();
-            const conn = await dbInstance.connect();
 
-            // Las capas estáticas (Catastro) van al bucket 'catastro', las del usuario al bucket 'geovisor-tnc-finagro'
-            let fileRef = layer.static ? `s3://catastro/${layer.nombre}` : (layer.subido ? `s3://geovisor-tnc-finagro/${layer.nombre}` : layer.nombre);
-            console.log(`📦 [S3] Cargando capa: ${fileRef} (static=${layer.static}, subido=${layer.subido})`);
+            // Descargar y registrar el archivo en buffer de memoria si es de S3
+            let fileRef;
+            if (layer.static) {
+                fileRef = await window.loadS3LayerToBuffer(layer.nombre, 'catastro');
+            } else if (layer.subido) {
+                fileRef = await window.loadS3LayerToBuffer(layer.nombre, 'geovisor-tnc-finagro');
+            } else {
+                fileRef = layer.nombre;
+            }
+
+            const conn = await dbInstance.connect();
+            console.log(`📦 [S3] Cargando capa desde memoria local: ${fileRef} (static=${layer.static}, subido=${layer.subido})`);
             
             // Cargar extensión espacial
             await conn.query(`LOAD spatial;`);
@@ -2618,12 +2626,20 @@
             uploadStatus.style.display = 'block';
             uploadStatus.innerHTML = `<i class="fas fa-cog fa-spin"></i> Aplicando proyección y re-renderizando...`;
 
-            try {
                 if (!dbInstance) await initDuckDBEngine();
-                const conn = await dbInstance.connect();
 
-                let fileRef = layer.static ? `s3://catastro/${layer.nombre}` : (layer.subido ? `s3://geovisor-tnc-finagro/${layer.nombre}` : layer.nombre);
-                console.log(`📦 [S3] Recargando capa: ${fileRef}`);
+                // Descargar y registrar el archivo en buffer de memoria si es de S3
+                let fileRef;
+                if (layer.static) {
+                    fileRef = await window.loadS3LayerToBuffer(layer.nombre, 'catastro');
+                } else if (layer.subido) {
+                    fileRef = await window.loadS3LayerToBuffer(layer.nombre, 'geovisor-tnc-finagro');
+                } else {
+                    fileRef = layer.nombre;
+                }
+
+                const conn = await dbInstance.connect();
+                console.log(`📦 [S3] Recargando capa desde memoria local: ${fileRef}`);
                 
                 await conn.query(`LOAD spatial;`);
 
@@ -2805,6 +2821,47 @@
         return { type: 'fill', paint: { 'fill-color': '#2c5f2d', 'fill-opacity': 0.3, 'fill-outline-color': '#1e3a1f' } };
     };
 
+    // --- Cargador de Capas S3 a Buffer de Memoria (MEMFS) ---
+    const registeredDuckDBBuffers = new Set();
+
+    window.loadS3LayerToBuffer = async function(fileName, bucketName) {
+        if (!fileName) return '';
+        
+        // Si ya está registrado en memoria, retornarlo de inmediato
+        if (registeredDuckDBBuffers.has(fileName)) {
+            console.log(`✅ [S3-Buffer] ${fileName} ya está registrado en DuckDB MEMFS.`);
+            return fileName;
+        }
+
+        console.log(`📡 [S3-Buffer] Descargando y registrando: ${fileName} desde bucket: ${bucketName}...`);
+        
+        // Construir URL absoluta de descarga HTTP
+        const fileUrl = `https://s3.agrohoney.com/qparquets3/${bucketName}/${fileName}`;
+        const headers = {};
+        if (typeof S3_AUTH_HEADER !== 'undefined' && S3_AUTH_HEADER) {
+            headers["Authorization"] = S3_AUTH_HEADER;
+        }
+
+        try {
+            const resp = await fetch(fileUrl, { headers });
+            if (!resp.ok) {
+                throw new Error(`Error HTTP ${resp.status} al descargar desde S3`);
+            }
+            const arrayBuffer = await resp.arrayBuffer();
+            const u8 = new Uint8Array(arrayBuffer);
+            
+            if (!dbInstance) await initDuckDBEngine();
+            await dbInstance.registerFileBuffer(fileName, u8);
+            
+            registeredDuckDBBuffers.add(fileName);
+            console.log(`✅ [S3-Buffer] ${fileName} descargado y registrado en DuckDB MEMFS.`);
+            return fileName;
+        } catch (err) {
+            console.error(`❌ [S3-Buffer] Error al descargar/registrar ${fileName}:`, err);
+            throw err;
+        }
+    };
+
     // Carga de Capas desde S3
     async function toggleS3Layer(checkboxId) {
         const checkbox = document.getElementById(checkboxId);
@@ -2834,10 +2891,12 @@
                 throw new Error("La extensión 'spatial' de DuckDB-WASM no pudo cargarse en este navegador. Por favor haga clic en el botón de informe inferior izquierdo para más detalles.");
             }
 
+            // Descargar y registrar el archivo en buffer de memoria
+            const virtualFileName = await window.loadS3LayerToBuffer(fileName, 'catastro');
+
             const conn = await dbInstance.connect();
-            // Las capas subidas por el usuario van a geovisor-tnc-finagro, las estáticas van a catastro
-            const url = `s3://geovisor-tnc-finagro/${fileName}`;
-            console.log(`📤 [S3] Consultando capa subida: ${url}`);
+            const url = virtualFileName;
+            console.log(`📤 [S3] Consultando capa en memoria local: ${url}`);
             
             // Forzar carga de extensión spatial en la conexión si se requiere
             await conn.query(`LOAD spatial;`);
@@ -2964,9 +3023,7 @@
             // Configurar S3 / HTTPFS / Spatial
             const conn = await dbInstance.connect();
             
-            // ── DuckDB-WASM FIX CRÍTICO: establecer home_directory ANTES de INSTALL ──
-            // El WASM virtual filesystem (Emscripten) tiene /tmp disponible pero NO /home/web_user.
-            // Sin este SET, INSTALL falla con "Can't find the home directory at '/home/web_user'".
+            // ── DuckDB-WASM FIX CRÍTICO: establecer home_directory y extension_directory ──
             try {
                 await conn.query(`SET home_directory='/tmp'; SET extension_directory='/tmp/.duckdb_ext';`);
                 console.log('📂 [DuckDB] home_directory y extension_directory configurados en /tmp');
@@ -2980,79 +3037,19 @@
             const arch = isEH ? 'wasm_eh' : 'wasm_mvp';
             console.log(`📦 Arquitectura DuckDB-WASM: [${arch}] — usando autoinstall interno`);
 
-            // --- PRE-CARGA E INSTALACIÓN INFALIBLE EN EL HILO PRINCIPAL ---
-            // Bypassea el error de sockets de Emscripten en el Worker (TypeError: fc.getSocket is not a function)
-            async function registerLocalExtension(name) {
-                try {
-                    const extUrl = `https://extensions.duckdb.org/v0.9.1/${arch}/${name}.duckdb_extension.wasm`;
-                    console.log(`⬇️ [DuckDB-Preload] Descargando extensión: ${name} desde ${extUrl}`);
-                    const resp = await fetch(extUrl);
-                    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-                    const arrayBuffer = await resp.arrayBuffer();
-                    const u8 = new Uint8Array(arrayBuffer);
-                    
-                    // Rutas probables en el filesystem virtual
-                    const paths = [
-                        `/tmp/.duckdb/extensions/v0.9.1/${arch}/${name}.duckdb_extension`,
-                        `/tmp/.duckdb_ext/.duckdb/extensions/v0.9.1/${arch}/${name}.duckdb_extension`,
-                        `/home/web_user/.duckdb/extensions/v0.9.1/${arch}/${name}.duckdb_extension`
-                    ];
-                    
-                    for (const p of paths) {
-                        await dbInstance.registerFileBuffer(p, u8);
-                        console.log(`📦 [DuckDB-Preload] Registrada extensión ${name} en: ${p}`);
-                    }
-                    return true;
-                } catch(e) {
-                    console.error(`❌ [DuckDB-Preload] Error al pre-cargar ${name}:`, e.message);
-                    return false;
-                }
-            }
-
-            // Descargar y registrar ambas extensiones en MEMFS
-            await registerLocalExtension('httpfs');
-            await registerLocalExtension('spatial');
-
-            // HTTPFS: Cargar desde MEMFS registrado
-            let httpfsLoaded = false;
-            try {
-                console.log("📡 [DuckDB] Cargando httpfs desde MEMFS...");
-                await conn.query(`LOAD httpfs;`);
-                httpfsLoaded = true;
-                console.log("✅ [DuckDB] HTTPFS cargado exitosamente.");
-            } catch (httpfsErr) {
-                console.warn("⚠️ [DuckDB] HTTPFS falló al cargar:", httpfsErr.message);
-                console.warn("⚠️ Sin HTTPFS no se pueden leer archivos S3 remotos.");
-            }
-
-            // SPATIAL: Cargar desde MEMFS registrado
+            // SPATIAL: Cargar de forma nativa mediante autoinstall compatible con v1.28.0
             let spatialLoaded = false;
             try {
-                console.log("🌍 [DuckDB] Cargando spatial desde MEMFS...");
-                await conn.query(`LOAD spatial;`);
+                console.log("🌍 [DuckDB] Instalando y cargando extensión spatial compatible...");
+                await conn.query(`INSTALL spatial; LOAD spatial;`);
                 spatialLoaded = true;
                 window.spatialExtensionLoaded = true;
                 console.log("✅ [DuckDB] SPATIAL cargada exitosamente.");
             } catch (spatialErr) {
                 window.spatialExtensionLoaded = false;
-                console.warn("⚠️ [DuckDB] SPATIAL falló al cargar:", spatialErr.message);
+                console.error("❌ [DuckDB] SPATIAL falló al cargar:", spatialErr.message);
             }
 
-            // S3 config — SOLO si HTTPFS está cargado (s3_* son settings de httpfs)
-            if (httpfsLoaded) {
-                console.log("🔗 [S3] Configurando credenciales MinIO (s3.agrohoney.com/qparquets3)...");
-                await conn.query(`
-                    SET s3_endpoint='s3.agrohoney.com';
-                    SET s3_access_key_id='admin';
-                    SET s3_secret_access_key='AgroHoney2026!';
-                    SET s3_use_ssl=true;
-                    SET s3_url_style='path';
-                `);
-                console.log("✅ [S3] Credenciales configuradas. Bucket catastro disponible en s3://catastro/");
-            } else {
-                console.error("❌ [S3] No se configuraron credenciales S3 porque HTTPFS no está cargado.");
-                console.error("❌ [S3] Las capas GeoParquet del bucket 'catastro' no estarán disponibles en esta sesión.");
-            }
             await conn.close();
             
             // Test de comunicación asíncrono con S3

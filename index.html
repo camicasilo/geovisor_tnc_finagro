@@ -2626,6 +2626,7 @@
             uploadStatus.style.display = 'block';
             uploadStatus.innerHTML = `<i class="fas fa-cog fa-spin"></i> Aplicando proyección y re-renderizando...`;
 
+            try {
                 if (!dbInstance) await initDuckDBEngine();
 
                 // Descargar y registrar el archivo en buffer de memoria si es de S3

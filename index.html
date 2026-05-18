@@ -66,7 +66,7 @@
             width: 340px;
             max-height: calc(100vh - 40px);
             overflow: hidden;
-            padding: 24px;
+            padding: 0;
             display: flex;
             flex-direction: column;
         }
@@ -231,43 +231,51 @@
         input:checked + .slider { background-color: #2c5f2d; }
         input:checked + .slider:before { transform: translateX(12px); }
 
-        /* Wrapper del listado de capas para el efecto de desplazamiento horizontal */
+        /* Wrapper del listado de capas — se desliza fuera de la pantalla cuando el slide config está activo */
         .layers-list-wrapper {
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+            transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
             width: 100%;
-            height: 100%;
+            flex: 1;
             display: flex;
             flex-direction: column;
             overflow-y: auto;
             overflow-x: hidden;
+            padding: 24px;
+            box-sizing: border-box;
+            min-height: 0;
         }
         .layers-list-wrapper.shifted {
-            transform: translateX(100%);
+            transform: translateX(110%);
             opacity: 0;
             pointer-events: none;
         }
 
-        /* Panel Deslizante iPad-Style de Configuración de Capas */
+        /* Panel Deslizante iPad-Style — ocupa el mismo espacio que el wrapper */
         .layer-config-slide {
             position: absolute;
             top: 0;
-            left: -100%; /* Inicia desplazado a la izquierda */
+            left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.96);
+            background: rgba(255, 255, 255, 0.97);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             z-index: 100;
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
             display: flex;
             flex-direction: column;
             padding: 16px;
             box-sizing: border-box;
             border-radius: 12px;
-            box-shadow: 5px 0 20px rgba(0,0,0,0.1);
+            box-shadow: -5px 0 20px rgba(0,0,0,0.08);
+            transform: translateX(-110%); /* Inicia oculto a la izquierda */
+            opacity: 0;
+            pointer-events: none;
         }
         .layer-config-slide.active {
-            transform: translateX(100%); /* Se desplaza a la derecha para cubrir el panel derecho */
+            transform: translateX(0); /* Desliza al centro cubriendo la lista */
+            opacity: 1;
+            pointer-events: all;
         }
         .slide-header {
             display: flex;
@@ -1169,7 +1177,7 @@
                 <input type="checkbox" id="crud-select-all" class="section-select-all" data-section="usuario">
                 <span class="slider"></span>
             </label>
-            <i class="fas fa-database main-icon"></i> Capas de Usuario (S3 CRUD)
+            <i class="fas fa-database main-icon"></i> Cargue de Capas (S3)
             <i class="fas fa-chevron-down accordion-icon"></i>
         </div>
         <div class="layer-group-content">
@@ -2737,30 +2745,37 @@
             // Configurar S3 / HTTPFS / Spatial
             const conn = await dbInstance.connect();
             
-            // Habilitar la autoinstalación y autocarga segura del CDN oficial de DuckDB-WASM
+            // Desactivar autoload para evitar que intente instalar extensiones antes de configurar el endpoint
             await conn.query(`
-                SET autoinstall_known_extensions=1;
-                SET autoload_known_extensions=1;
+                SET autoinstall_known_extensions=0;
+                SET autoload_known_extensions=0;
             `);
             
-            // Cargar e instalar HTTPFS de forma resiliente
+            // Detectar arquitectura del bundle (wasm_eh o wasm_mvp) para URLs correctas de extensiones
+            const isEH = (bundle.mainWorker && bundle.mainWorker.includes('eh')) || (bundle.mainModule && bundle.mainModule.includes('eh'));
+            const arch = isEH ? 'wasm_eh' : 'wasm_mvp';
+            console.log(`📦 Arquitectura DuckDB detectada: [${arch}]`);
+
+            // HTTPFS: INSTALL explícito + LOAD (necesario porque autoinstall está OFF)
             try {
-                console.log("📡 Cargando extensión HTTPFS de forma nativa...");
-                await conn.query("LOAD httpfs;");
-                console.log("✅ Extensión HTTPFS cargada y activa.");
+                const httpfsUrl = `https://extensions.duckdb.org/v0.9.1/${arch}/httpfs.duckdb_extension.wasm`;
+                console.log("📡 Instalando HTTPFS desde CDN oficial...");
+                await conn.query(`INSTALL '${httpfsUrl}'; LOAD '${httpfsUrl}';`);
+                console.log("✅ Extensión HTTPFS instalada y activa.");
             } catch (httpfsErr) {
-                console.error("❌ Fallo al cargar HTTPFS nativo:", httpfsErr.message);
+                console.warn("⚠️ HTTPFS no se pudo instalar desde CDN:", httpfsErr.message);
             }
 
-            // Cargar e instalar SPATIAL de forma resiliente
+            // SPATIAL: INSTALL explícito + LOAD
             try {
-                console.log("📡 Cargando extensión SPATIAL de forma nativa...");
-                await conn.query("LOAD spatial;");
+                const spatialUrl = `https://extensions.duckdb.org/v0.9.1/${arch}/spatial.duckdb_extension.wasm`;
+                console.log("📡 Instalando SPATIAL desde CDN oficial...");
+                await conn.query(`INSTALL '${spatialUrl}'; LOAD '${spatialUrl}';`);
                 window.spatialExtensionLoaded = true;
-                console.log("✅ Extensión SPATIAL cargada y activa. GeoParquet/GPKG habilitados.");
+                console.log("✅ Extensión SPATIAL instalada y activa. GeoParquet/GPKG habilitados.");
             } catch (spatialErr) {
                 window.spatialExtensionLoaded = false;
-                console.error("❌ Fallo al cargar SPATIAL nativo:", spatialErr.message);
+                console.warn("⚠️ SPATIAL no se pudo instalar desde CDN:", spatialErr.message);
             }
 
             // Configuración S3 con credenciales de AgroHoney (MinIO con ruta /qparquets3)

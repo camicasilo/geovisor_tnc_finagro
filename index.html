@@ -22,154 +22,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@deck.gl/mapbox@8.9.33/dist.min.js"></script>
     
     <style>
-        /* Estilos de Configuración Avanzada y CRUD por Lotes v2.2.0 */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            z-index: 2000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .modal-overlay.active { display: flex; opacity: 1; }
-        .modal-content {
-            background: rgba(255, 255, 255, 0.96);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.6);
-            border-radius: 16px;
-            width: 520px;
-            max-width: 90%;
-            box-shadow: 0 24px 64px rgba(0,0,0,0.35);
-            padding: 26px;
-            color: #2c3e50;
-            transform: translateY(30px);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .modal-overlay.active .modal-content { transform: translateY(0); }
-        .modal-content h3 { color: #2c5f2d; font-size: 1.25rem; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
-        .modal-content h3 i { color: #2c5f2d; }
-        .modal-tech-details { background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05); border-radius: 8px; padding: 12px; font-size: 0.8rem; line-height: 1.4; color: #555; margin-bottom: 16px; }
-        .modal-tech-warning { color: #d35400; font-weight: 600; margin-top: 6px; display: flex; align-items: center; gap: 6px; }
-        .modal-section-title { font-size: 0.85rem; font-weight: 600; color: #2c3e50; margin-bottom: 8px; border-bottom: 1px solid rgba(0,0,0,0.06); padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
-        .column-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-height: 160px; overflow-y: auto; padding: 6px 2px; margin-bottom: 18px; border: 1px solid rgba(0,0,0,0.05); border-radius: 6px; background: rgba(255,255,255,0.5); }
-        .column-checkbox-container { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; cursor: pointer; user-select: none; }
-        .column-checkbox-container input { cursor: pointer; }
-        .config-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; }
-        .config-btn-secondary { background: rgba(0,0,0,0.05); border: none; border-radius: 8px; padding: 8px 16px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: background 0.2s; color: #555; }
-        .config-btn-secondary:hover { background: rgba(0,0,0,0.1); }
-        .config-btn-primary { background: #2c5f2d; border: none; border-radius: 8px; padding: 8px 18px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; color: white; box-shadow: 0 4px 12px rgba(44, 95, 45, 0.25); }
-        .config-btn-primary:hover { background: #1e421e; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(44, 95, 45, 0.35); }
-        
-        /* Lista de Capas y Acciones Individuales en Hover */
-        .layer-item-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 10px;
-            border: 1px solid rgba(44, 95, 45, 0.05);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: visible;
-        }
-        .layer-item-wrapper:hover {
-            background: rgba(255, 255, 255, 0.95);
-            border-color: rgba(44, 95, 45, 0.3);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            transform: translateY(-1px);
-        }
-        .layer-left-info { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
-        .layer-batch-checkbox { cursor: pointer; width: 14px; height: 14px; }
-        .layer-title-text { font-size: 0.82rem; font-weight: 500; color: #2c3e50; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
-        .layer-actions-container {
-            display: flex;
-            gap: 4px;
-            opacity: 0;
-            transition: all 0.2s ease;
-            transform: translateX(10px);
-            pointer-events: none;
-        }
-        .layer-item-wrapper:hover .layer-actions-container {
-            opacity: 1;
-            transform: translateX(0);
-            pointer-events: auto;
-        }
-        .layer-action-btn {
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            font-size: 0.85rem;
-            width: 26px;
-            height: 26px;
-            border-radius: 6px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            outline: none;
-        }
-        .layer-action-btn.config-btn { color: #2c5f2d; }
-        .layer-action-btn.config-btn:hover { background: rgba(44, 95, 45, 0.1); transform: scale(1.15); }
-        .layer-action-btn.delete-btn { color: #e74c3c; }
-        .layer-action-btn.delete-btn:hover { background: rgba(231, 76, 60, 0.1); transform: scale(1.15); }
-
-        /* Barra de Acciones Globales Flotante en Lote */
-        .batch-actions-bar {
-            position: sticky;
-            bottom: -24px;
-            left: 0;
-            width: calc(100% + 48px);
-            margin-left: -24px;
-            margin-bottom: -24px;
-            background: rgba(44, 95, 45, 0.96);
-            backdrop-filter: blur(12px);
-            border-top: 1px solid rgba(255,255,255,0.15);
-            border-radius: 0 0 12px 12px;
-            padding: 14px 24px;
-            display: none;
-            align-items: center;
-            justify-content: space-between;
-            z-index: 100;
-            color: white;
-            box-shadow: 0 -8px 24px rgba(0,0,0,0.2);
-            animation: slideUpBatch 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        @keyframes slideUpBatch {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-        .batch-actions-bar button {
-            background: rgba(255,255,255,0.18);
-            border: 1px solid rgba(255,255,255,0.25);
-            border-radius: 6px;
-            padding: 6px 12px;
-            color: white;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 600;
-        }
-        .batch-actions-bar button:hover {
-            background: white;
-            color: #2c5f2d;
-        }
-        .batch-actions-bar .delete-batch-btn {
-            background: rgba(231, 76, 60, 0.85);
-            border-color: rgba(255,255,255,0.1);
-        }
-        .batch-actions-bar .delete-batch-btn:hover {
-            background: #e74c3c;
-            color: white;
-        }
-
         * { margin: 0; padding: 0; box-sizing: border-box; scrollbar-width: thin; scrollbar-color: rgba(44, 95, 45, 0.6) rgba(0, 0, 0, 0.02); }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #000; overflow: hidden; }
         
@@ -735,14 +587,6 @@
                     Ninguna capa cargada en esta sesión.
                 </div>
             </div>
-        </div>
-    </div>
-    
-    <!-- Barra de Acciones Globales Flotante (Batch CRUD v2.2.0) -->
-    <div class="batch-actions-bar" id="batch-crud-bar">
-        <span style="font-size: 0.75rem; display: flex; align-items: center; gap: 6px; font-weight: 600;"><i class="fas fa-check-square"></i> <span id="batch-selected-count">0</span> seleccionadas</span>
-        <div style="display: flex; gap: 6px;">
-            <button class="delete-batch-btn" id="batch-delete-btn" onclick="eliminarCapasEnLote()"><i class="fas fa-trash-alt"></i> Borrar</button>
         </div>
     </div>
 </div>
@@ -2116,6 +1960,7 @@
         }
     }
 
+    function loadFallbackHelp() {
         const fallbackData = [{"id": "TITULO_SIGAGRO", "categoria": "Interfaz", "explicacion": "<b>SIGAGRO Geovisor:</b> Plataforma analítica avanzada para la simulación de riesgo agropecuario y toma de decisiones financieras."}, {"id": "R_TERRENO", "categoria": "Capa Catastro", "explicacion": "<b>Predios Formales:</b> Límites de fincas, parcelas y lotes con soporte jurídico y registral completo."}, {"id": "R_TERRENO_INFORMAL", "categoria": "Capa Catastro", "explicacion": "<b>Informalidad de la Tierra:</b> Ocupaciones o posesiones que no tienen título formalizado pero existen físicamente."}, {"id": "R_CONSTRUCCION", "categoria": "Capa Catastro", "explicacion": "<b>Huellas de Edificación:</b> Plantas de casas, bodegas y establos dentro de predios formales."}, {"id": "R_CONSTRUCCION_INFORMAL", "categoria": "Capa Catastro", "explicacion": "<b>Edificaciones Informales:</b> Construcciones levantadas en terrenos sin títulos o licencias formalizadas."}, {"id": "R_VEREDA", "categoria": "Capa Administrativa", "explicacion": "<b>Límites Veredales:</b> División político-administrativa interna del municipio rural. Vital para zonificación."}, {"id": "R_SECTOR", "categoria": "Capa Administrativa", "explicacion": "<b>Sectores Catastrales:</b> División técnica del IGAC para organizar el territorio (agrupa veredas y terrenos)."}, {"id": "R_NOMENCLATURA_DOMICILIARIA", "categoria": "Capa Vial", "explicacion": "<b>Nomenclatura Domiciliaria:</b> Direcciones, nombres de fincas y accesos con sus coordenadas exactas."}, {"id": "R_NOMENCLATURA_VIAL", "categoria": "Capa Vial", "explicacion": "<b>Nomenclatura Vial:</b> Ejes viales rurales, caminos, carreteables y servidumbres de paso."}, {"id": "MUNICIPIOS", "categoria": "Capa Divipola", "explicacion": "<b>Municipios:</b> Límites políticos de la Divipola (DANE). Base para el reporte de estadísticas de FINAGRO."}, {"id": "PROVINCIAS", "categoria": "Capa Divipola", "explicacion": "<b>Provincias/Subregiones:</b> Agrupaciones regionales que comparten características económicas y agroecológicas."}, {"id": "PRODUCTOR", "categoria": "Control Simulador", "explicacion": "<b>Tipo de Productor:</b> Define el perfil socioeconómico. Ajusta la vulnerabilidad y la capacidad de resiliencia en el modelo."}, {"id": "PEQUENO_BAJOS", "categoria": "Tipo Productor", "explicacion": "<b>Ingresos Bajos:</b> Productores con alta dependencia del ciclo climático y activos limitados."}, {"id": "PEQUENO", "categoria": "Tipo Productor", "explicacion": "<b>Pequeño Productor:</b> Escala familiar con acceso moderado a crédito de fomento y asistencia técnica."}, {"id": "MEDIANO", "categoria": "Tipo Productor", "explicacion": "<b>Mediano Productor:</b> Capacidad técnica intermedia, mayor diversificación y solvencia financiera."}, {"id": "GRANDE", "categoria": "Tipo Productor", "explicacion": "<b>Gran Productor:</b> Escala industrial, alta tecnificación y gran capacidad de mitigación de riesgos."}, {"id": "TASA_INTERES", "categoria": "Control Económico", "explicacion": "<b>Tasa de Interés:</b> Costo financiero del crédito. Un aumento reduce el margen neto de utilidad del productor."}, {"id": "PRECIO_PRODUCTO", "categoria": "Control Económico", "explicacion": "<b>Precio Producto:</b> Factor de mercado. Simula caídas de precios que pueden llevar a la insolvencia técnica."}, {"id": "NORMAL_CLIMA", "categoria": "Escenario", "explicacion": "<b>🌿 Normal Climática:</b> Estado base del territorio según promedios históricos del IDEAM (1981-2010)."}, {"id": "NINO_EXTREMO", "categoria": "Escenario", "explicacion": "<b>☀️ El Niño Extremo:</b> Estrés hídrico severo, sequías prolongadas y riesgo de incendios forestales."}, {"id": "NINA_ACTIVO", "categoria": "Escenario", "explicacion": "<b>🌧️ La Niña Activa:</b> Exceso de lluvias, inundaciones, saturación de suelos y daños en infraestructura vial."}, {"id": "DEEPMIND_CAST", "categoria": "Escenario", "explicacion": "<b>🧠 Google DeepMindCast:</b> Pronóstico de alta precisión basado en IA para alertas tempranas de corto plazo."}, {"id": "RIESGO_SANITARIO", "categoria": "Escenario", "explicacion": "<b>📉 Riesgo Sanitario:</b> Simulación de brotes de plagas o enfermedades asociados a cambios bruscos de temperatura."}, {"id": "SAAMM", "categoria": "Escenario", "explicacion": "<b>🏦 Escenario SAAMM:</b> Sistema de Alerta FINAGRO que cruza saldos de cartera con zonas de alta afectación climática."}, {"id": "BASE_POSITRON", "categoria": "Capa Base", "explicacion": "<b>Capa Positron:</b> Mapa base claro y minimalista. Maximiza el contraste de las capas de riesgo."}, {"id": "BASE_DARK", "categoria": "Capa Base", "explicacion": "<b>Capa Dark Matter:</b> Mapa base oscuro. Ideal para resaltar mapas de calor (Heatmaps) y datos brillantes."}, {"id": "BASE_OSM", "categoria": "Capa Base", "explicacion": "<b>OpenStreetMap:</b> Mapa comunitario detallado con nombres de calles, puntos de interés e infraestructura."}, {"id": "BASE_TOPO", "categoria": "Capa Base", "explicacion": "<b>OpenTopoMap:</b> Visualiza el relieve, curvas de nivel y la geografía física del terreno."}, {"id": "RIESGO_CLIMA", "categoria": "Modelo Riesgo", "explicacion": "<b>Riesgo Climático:</b> Mapa de calor que identifica áreas con mayor probabilidad de pérdida por factores climáticos."}, {"id": "ZONAS_INUNDABLES", "categoria": "Modelo Riesgo", "explicacion": "<b>Zonas Inundables:</b> Modelado de áreas con recurrencia de inundación por desbordamiento de ríos o lluvias."}, {"id": "CARGAR_LOCAL", "categoria": "Sección", "explicacion": "<b>Carga de Capas:</b> Permite integrar tus propios datos (.parquet, .geojson) para análisis cruzado con el catastro."}, {"id": "CAPAS_BASE", "categoria": "Sección", "explicacion": "<b>Sección Capas Base:</b> Define el contexto visual y geográfico sobre el cual se montan los datos."}, {"id": "CAPAS_TRABAJO", "categoria": "Sección", "explicacion": "<b>Sección Capas de Trabajo:</b> Contiene la infraestructura de datos oficial del proyecto (Catastro e IGAC)."}, {"id": "MODELO_RIESGO", "categoria": "Sección", "explicacion": "<b>Modelos de Riesgo:</b> Algoritmos avanzados que procesan datos de clima, sanidad y mercado para generar mapas de amenaza específicos para el sector agropecuario."}, {"id": "HERRAMIENTA_MANO", "categoria": "Herramienta", "explicacion": "<b>Modo Paneo:</b> Herramienta para navegar y desplazarse libremente por el mapa sin activar consultas."}, {"id": "HERRAMIENTA_SELECCION", "categoria": "Herramienta", "explicacion": "<b>Modo Selección:</b> Al activarse, permite hacer clic en el mapa para abrir el tablero detallado de cada entidad."}, {"id": "SUPRESION_ETIQUETAS", "categoria": "Herramienta", "explicacion": "<b>Control de Etiquetas:</b> Oculta los nombres de lugares para facilitar la lectura de capas técnicas densas."}, {"id": "DESCARGAR_DIAGNOSTICO", "categoria": "Herramienta", "explicacion": "<b>Descargar Diagnóstico:</b> Genera y descarga de forma instantánea un reporte en formato .txt con el estado de DuckDB, conexión S3 y el registro completo de errores de la sesión en el navegador."}, {"id": "SIMULAR_BTN", "categoria": "Boton", "explicacion": "<b>Actualizar Modelo:</b> Ejecuta el motor de cálculo 'What-If' recalculando el riesgo para todo el país."}, {"id": "WELCOME", "categoria": "Sistema", "explicacion": "Pasa el mouse sobre cualquier elemento (capas, botones o selectores) para ver sus detalles técnicos aquí."}];
         fallbackData.forEach(item => helpDataMap.set(item.id, item.explicacion));
     }
@@ -2336,43 +2181,6 @@ GUÍA DE RESOLUCIÓN DE ANOMALÍAS DE LECTURA (S3 & GPKG):
         });
     }
 </script>
-
-<!-- Modal de Configuración Avanzada de Capas v2.2.0 -->
-<div class="modal-overlay" id="modal-layer-config">
-    <div class="modal-content">
-        <h3><i class="fas fa-sliders-h"></i> Configurar Capa GeoParquet / GPKG</h3>
-        <div style="font-size: 0.8rem; color: #7f8c8d; margin-bottom: 12px;" id="config-layer-subtitle">Ajuste de parámetros y selección de atributos</div>
-        
-        <div class="modal-tech-details" id="config-tech-details">
-            <!-- Rellenado dinámicamente con JS -->
-        </div>
-
-        <div class="modal-section-title">
-            <span>Atributos a Cargar (Columnas)</span>
-            <span style="font-size: 0.72rem; color: #2c5f2d; cursor: pointer; font-weight: 700;" onclick="toggleAllConfigColumns(true)">Seleccionar Todo</span>
-        </div>
-        <div class="column-grid" id="config-column-grid">
-            <!-- Rellenado dinámicamente con JS -->
-        </div>
-
-        <div class="control-group" style="margin-bottom: 14px; border: none; padding-bottom: 0;">
-            <label for="config-row-limit" style="font-size: 0.8rem; font-weight: 600; margin-bottom: 4px;">Límite de Filas a Renderizar</label>
-            <div class="custom-select-container" style="margin-top: 2px;">
-                <select id="config-row-limit" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid rgba(44, 95, 45, 0.2); font-size: 0.8rem; outline: none; background: white; cursor: pointer;">
-                    <option value="5000">5,000 filas</option>
-                    <option value="10000" selected>10,000 filas (Recomendado)</option>
-                    <option value="30000">30,000 filas (Carga más lenta)</option>
-                    <option value="100000">100,000 filas (Uso intensivo de RAM)</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="config-actions">
-            <button class="config-btn-secondary" onclick="closeLayerConfigModal()">Cancelar</button>
-            <button class="config-btn-primary" id="config-btn-apply">Aplicar y Renderizar</button>
-        </div>
-    </div>
-</div>
 
 </body>
 </html>

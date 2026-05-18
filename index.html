@@ -1736,13 +1736,6 @@
         uploadError.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${msg}`;
     }
 
-    function mostrarError(msg) {
-        uploadStatus.style.display = 'none';
-        progressContainer.style.display = 'none';
-        uploadError.style.display = 'block';
-        uploadError.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${msg}`;
-    }
-
 
     // --- 8. Eventos Generales UI ---
     document.getElementById('tasaInteres').addEventListener('input', function() { document.getElementById('tasaValor').textContent = this.value + '%'; });

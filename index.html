@@ -222,13 +222,70 @@
         .layer-item:hover { background: rgba(255,255,255,0.8); }
         .layer-item:last-child { margin-bottom: 0; }
         
-        /* Switch/Toggle CSS */
-        .switch { position: relative; display: inline-block; width: 36px; height: 20px; }
+        /* Switch/Toggle CSS (20% más pequeño y compacto) */
+        .switch { position: relative; display: inline-block; width: 28px; height: 16px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 36px; }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         input:checked + .slider { background-color: #2c5f2d; }
-        input:checked + .slider:before { transform: translateX(16px); }
+        input:checked + .slider:before { transform: translateX(12px); }
+
+        /* Panel Deslizante iPad-Style de Configuración de Capas */
+        .layer-config-slide {
+            position: absolute;
+            top: 0;
+            left: 100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            z-index: 100;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            box-sizing: border-box;
+            border-radius: 12px;
+            box-shadow: -5px 0 20px rgba(0,0,0,0.1);
+        }
+        .layer-config-slide.active {
+            transform: translateX(-100%);
+        }
+        .slide-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+            padding-bottom: 10px;
+        }
+        .slide-back-btn {
+            background: rgba(44, 95, 45, 0.1);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #2c5f2d;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+        .slide-back-btn:hover {
+            background: rgba(44, 95, 45, 0.2);
+        }
+        #slide-layer-title {
+            margin: 0;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #2c3e50;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
         
         /* Radio Base Layer */
         .radio-container { display: block; position: relative; padding-left: 28px; margin-bottom: 8px; cursor: pointer; font-size: 0.9rem; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
@@ -492,6 +549,15 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             overflow: hidden;
+            display: inline-block;
+            max-width: 100%;
+            transition: transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .layer-item-wrapper:hover .layer-title-text,
+        .layer-item:hover .layer-title-text {
+            text-overflow: clip;
+            overflow: visible;
+            transform: translateX(-35%);
         }
         .layer-title-text:hover {
             color: #2c5f2d;
@@ -558,6 +624,56 @@
         @keyframes slideUp {
             from { transform: translateY(100px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Estilización Verde Premium de Controles Deslizantes (Range inputs) de Variables Económicas */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            outline: none;
+            transition: background 0.3s ease;
+            margin: 10px 0;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: #e0e0e0;
+            border-radius: 4px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            height: 14px;
+            width: 14px;
+            border-radius: 50%;
+            background: #2c5f2d;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -4px;
+            transition: transform 0.1s ease, background 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        input[type="range"]:hover::-webkit-slider-thumb {
+            background: #224d23;
+            transform: scale(1.15);
+        }
+        input[type="range"]::-moz-range-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: #e0e0e0;
+            border-radius: 4px;
+        }
+        input[type="range"]::-moz-range-thumb {
+            height: 14px;
+            width: 14px;
+            border-radius: 50%;
+            background: #2c5f2d;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            border: none;
         }
     </style>
 </head>
@@ -641,9 +757,9 @@
     <!-- Acordeón: Capas Base (Sin active para iniciar retraído) -->
     <div class="layer-group accordion">
         <div class="layer-group-title" onmouseenter="updateConsole('CAPAS_BASE')" onmouseleave="resetConsole()">
-            <label class="round-chk-container" style="margin-right: 8px;" onclick="event.stopPropagation();" title="Seleccionar todo">
+            <label class="switch" style="margin-right: 8px;" onclick="event.stopPropagation();" title="Activar todas las capas base">
                 <input type="checkbox" class="section-select-all" data-section="base">
-                <span class="round-checkmark"></span>
+                <span class="slider"></span>
             </label>
             <i class="fas fa-map main-icon"></i> Capas Base
             <i class="fas fa-chevron-down accordion-icon"></i>
@@ -663,10 +779,7 @@
                         <button class="layer-action-btn delete-btn" title="Eliminar Capa" disabled><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>
-                <label class="radio-container" style="padding-left: 0; margin-bottom: 0; display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px;">
-                    <input type="radio" name="baselayer" value="positron" checked style="cursor: pointer;">
-                    <span class="checkmark" style="position: relative; top: 0; left: 0; display: block;"></span>
-                </label>
+                <label class="switch"><input type="checkbox" class="base-layer-switch" data-baselayer="positron" checked><span class="slider"></span></label>
             </div>
 
             <div class="layer-item" onmouseenter="updateConsole('BASE_DARK')" onmouseleave="resetConsole()">
@@ -681,10 +794,7 @@
                         <button class="layer-action-btn delete-btn" title="Eliminar Capa" disabled><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>
-                <label class="radio-container" style="padding-left: 0; margin-bottom: 0; display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px;">
-                    <input type="radio" name="baselayer" value="dark" style="cursor: pointer;">
-                    <span class="checkmark" style="position: relative; top: 0; left: 0; display: block;"></span>
-                </label>
+                <label class="switch"><input type="checkbox" class="base-layer-switch" data-baselayer="dark"><span class="slider"></span></label>
             </div>
 
             <div class="layer-item" onmouseenter="updateConsole('BASE_OSM')" onmouseleave="resetConsole()">
@@ -699,10 +809,7 @@
                         <button class="layer-action-btn delete-btn" title="Eliminar Capa" disabled><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>
-                <label class="radio-container" style="padding-left: 0; margin-bottom: 0; display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px;">
-                    <input type="radio" name="baselayer" value="osm" style="cursor: pointer;">
-                    <span class="checkmark" style="position: relative; top: 0; left: 0; display: block;"></span>
-                </label>
+                <label class="switch"><input type="checkbox" class="base-layer-switch" data-baselayer="osm"><span class="slider"></span></label>
             </div>
 
             <div class="layer-item" onmouseenter="updateConsole('BASE_TOPO')" onmouseleave="resetConsole()">
@@ -717,10 +824,7 @@
                         <button class="layer-action-btn delete-btn" title="Eliminar Capa" disabled><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>
-                <label class="radio-container" style="padding-left: 0; margin-bottom: 0; display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px;">
-                    <input type="radio" name="baselayer" value="topo" style="cursor: pointer;">
-                    <span class="checkmark" style="position: relative; top: 0; left: 0; display: block;"></span>
-                </label>
+                <label class="switch"><input type="checkbox" class="base-layer-switch" data-baselayer="topo"><span class="slider"></span></label>
             </div>
         </div>
     </div>
@@ -728,9 +832,9 @@
     <!-- Acordeón: Capas de Trabajo (Estructura de Árbol) -->
     <div class="layer-group accordion">
         <div class="layer-group-title" onmouseenter="updateConsole('CAPAS_TRABAJO')" onmouseleave="resetConsole()">
-            <label class="round-chk-container" style="margin-right: 8px;" onclick="event.stopPropagation();" title="Seleccionar todo">
+            <label class="switch" style="margin-right: 8px;" onclick="event.stopPropagation();" title="Activar todas las capas de trabajo">
                 <input type="checkbox" class="section-select-all" data-section="trabajo">
-                <span class="round-checkmark"></span>
+                <span class="slider"></span>
             </label>
             <i class="fas fa-project-diagram main-icon"></i> Capas de Trabajo
             <i class="fas fa-chevron-down accordion-icon"></i>
@@ -973,9 +1077,9 @@
     
     <div class="layer-group accordion">
         <div class="layer-group-title" onmouseenter="updateConsole('MODELO_RIESGO')" onmouseleave="resetConsole()">
-            <label class="round-chk-container" style="margin-right: 8px;" onclick="event.stopPropagation();" title="Seleccionar todo">
+            <label class="switch" style="margin-right: 8px;" onclick="event.stopPropagation();" title="Activar todas las capas de modelos de riesgo">
                 <input type="checkbox" class="section-select-all" data-section="riesgo">
-                <span class="round-checkmark"></span>
+                <span class="slider"></span>
             </label>
             <i class="fas fa-fire-alt main-icon"></i> Modelos de Riesgo
             <i class="fas fa-chevron-down accordion-icon"></i>
@@ -1016,9 +1120,9 @@
     <!-- CRUD de Capas de Usuario S3 (Con Drag & Drop y Selección Masiva) -->
     <div class="layer-group accordion active" onmouseenter="updateConsole('CARGAR_LOCAL')" onmouseleave="resetConsole()">
         <div class="layer-group-title">
-            <label class="round-chk-container" style="margin-right: 8px;" onclick="event.stopPropagation();" title="Seleccionar todo">
+            <label class="switch" style="margin-right: 8px;" onclick="event.stopPropagation();" title="Activar todas las capas de usuario">
                 <input type="checkbox" id="crud-select-all" class="section-select-all" data-section="usuario">
-                <span class="round-checkmark"></span>
+                <span class="slider"></span>
             </label>
             <i class="fas fa-database main-icon"></i> Capas de Usuario (S3 CRUD)
             <i class="fas fa-chevron-down accordion-icon"></i>
@@ -1049,6 +1153,44 @@
                     Ninguna capa cargada en esta sesión.
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Panel Desplizable (iPad Slide) de Configuración de Capas -->
+    <div class="layer-config-slide" id="layer-config-slide">
+        <div class="slide-header">
+            <button class="slide-back-btn" id="slide-back-btn">
+                <i class="fas fa-arrow-left"></i> Volver
+            </button>
+            <h3 id="slide-layer-title">Configuración de Capa</h3>
+        </div>
+        <div class="slide-content" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; padding-top: 4px;">
+            <div id="slide-tech-details" style="font-size: 0.72rem; color: #444; background: rgba(0,0,0,0.03); padding: 12px; border-radius: 8px; margin-bottom: 12px; line-height: 1.4; border: 1px solid rgba(0,0,0,0.05); overflow-y: auto; max-height: 150px;">
+                <i class="fas fa-spinner fa-spin"></i> Cargando metadatos de la capa...
+            </div>
+            
+            <div style="font-size: 0.78rem; font-weight: 700; color: #2c3e50; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                <span>Columnas a Importar:</span>
+                <span id="slide-select-all-cols" style="font-size: 0.65rem; color: #2c5f2d; cursor: pointer; text-decoration: underline; font-weight: 600;">Seleccionar Todo</span>
+            </div>
+            <div id="slide-column-grid" style="display: grid; grid-template-columns: 1fr; gap: 6px; max-height: 160px; overflow-y: auto; background: rgba(255,255,255,0.7); border: 1px solid rgba(0,0,0,0.05); padding: 8px; border-radius: 8px; margin-bottom: 12px;">
+                <!-- Column checkboxes injected dynamically -->
+            </div>
+            
+            <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #2c3e50; margin-bottom: 4px;">Límite de Registros:</label>
+                <select id="slide-row-limit" style="width: 100%; padding: 6px; font-size: 0.75rem; border-radius: 6px; border: 1px solid #ccc; background: white; outline: none;">
+                    <option value="1000">1,000 registros (Carga rápida)</option>
+                    <option value="5000">5,000 registros</option>
+                    <option value="10000" selected>10,000 registros (Recomendado)</option>
+                    <option value="50000">50,000 registros (Pesado)</option>
+                    <option value="100000">100,000 registros (Extremo)</option>
+                </select>
+            </div>
+            
+            <button class="action-btn" id="slide-btn-apply" style="width: 100%; background: #2c5f2d; color: white; padding: 10px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s; margin-top: auto; box-shadow: 0 4px 6px rgba(44,95,45,0.2);">
+                <i class="fas fa-check"></i> Aplicar Cambios
+            </button>
         </div>
     </div>
 </div>
@@ -1291,9 +1433,17 @@
         map.addSource('bg-topo', { type: 'raster', tiles: ['https://tile.opentopomap.org/{z}/{x}/{y}.png'], tileSize: 256 });
         map.addLayer({ id: 'layer-topo', type: 'raster', source: 'bg-topo', layout: { visibility: 'none' } }, firstSymbolId);
 
-        // Capas Operacionales (Municipios desactivados temporalmente para evitar Error 400)
-        // map.addSource('municipios-source', { type: 'geojson', data: municipiosUrl + '/query?where=1%3D1&outFields=*&f=geojson' });
+        // Registrar fuentes GeoJSON vacías de resiliencia al inicio para evitar crashes catastróficos
+        map.addSource('municipios-source', {
+            type: 'geojson',
+            data: { type: 'FeatureCollection', features: [] }
+        });
+        map.addSource('subregiones-source', {
+            type: 'geojson',
+            data: { type: 'FeatureCollection', features: [] }
+        });
 
+        // Capas Operacionales
         map.addLayer({
             id: 'layer-municipios',
             type: 'fill',
@@ -1315,6 +1465,28 @@
             source: 'subregiones-source',
             paint: { 'line-color': '#2c5f2d', 'line-width': 1.5, 'line-opacity': 0.8 }
         });
+
+        // Carga asíncrona de los FeatureServers de ArcGIS Online (resiliente a caídas o límites de peticiones)
+        async function fetchArcGISData(url, sourceId) {
+            try {
+                const response = await fetch(url + '/query?where=1%3D1&outFields=*&f=geojson');
+                if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
+                const data = await response.json();
+                if (data && data.type === 'FeatureCollection') {
+                    const source = map.getSource(sourceId);
+                    if (source) {
+                        source.setData(data);
+                        console.log(`[Resilience] Capa ArcGIS ${sourceId} cargada con éxito.`);
+                    }
+                }
+            } catch (err) {
+                console.error(`[Resilience] Error al consultar ArcGIS para ${sourceId}:`, err);
+            }
+        }
+
+        // Ejecutar carga asíncrona en segundo plano sin bloquear el hilo principal del mapa
+        fetchArcGISData(municipiosUrl, 'municipios-source');
+        fetchArcGISData(subregionesUrl, 'subregiones-source');
         
         // --- 5. Lógica de Selección Global ---
         map.on('click', (e) => {
@@ -1374,18 +1546,26 @@
         });
     });
 
-    // --- 6. Cambiador de Capas Base (Radios) ---
+    // --- 6. Cambiador de Capas Base (Switches con exclusión mutua) ---
     const baseLayers = ['positron', 'dark', 'osm', 'topo'];
-    document.querySelectorAll('input[name="baselayer"]').forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            const selected = e.target.value;
-            // Positron es el fondo del mapa, no tiene capa raster extra a menos que la apaguemos
-            // Lo más limpio es mostrar la capa raster por encima de positron si es distinta a positron
-            baseLayers.forEach(layer => {
-                if(layer !== 'positron' && map.getLayer(`layer-${layer}`)) {
-                    map.setLayoutProperty(`layer-${layer}`, 'visibility', layer === selected ? 'visible' : 'none');
-                }
-            });
+    document.querySelectorAll('.base-layer-switch').forEach(sw => {
+        sw.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                const selected = e.target.getAttribute('data-baselayer');
+                // Desactivar el resto de switches de capas base
+                document.querySelectorAll('.base-layer-switch').forEach(other => {
+                    if (other !== e.target) other.checked = false;
+                });
+                // Sincronizar visibilidad de capas de fondo en MapLibre
+                baseLayers.forEach(layer => {
+                    if (layer !== 'positron' && map.getLayer(`layer-${layer}`)) {
+                        map.setLayoutProperty(`layer-${layer}`, 'visibility', layer === selected ? 'visible' : 'none');
+                    }
+                });
+            } else {
+                // Si el usuario intenta apagar el mapa base activo, forzamos a dejarlo prendido (siempre debe haber un mapa base)
+                e.target.checked = true;
+            }
         });
     });
 
@@ -1739,10 +1919,47 @@
         }
     }
 
-    // --- Event Listener para Checkboxes de Lote por Acordeón ---
+    // --- Event Listener para Switches de Lote (Master Switches en Cabeceras) ---
     document.querySelectorAll('.section-select-all').forEach(headerCheckbox => {
         headerCheckbox.addEventListener('change', (e) => {
             const section = e.target.dataset.section;
+            if (section === 'base') {
+                // Si prendemos el master de bases, activamos Positron (la primera capa base)
+                const firstBase = document.querySelector('.base-layer-switch[data-baselayer="positron"]');
+                if (firstBase) {
+                    firstBase.checked = e.target.checked;
+                    firstBase.dispatchEvent(new Event('change'));
+                }
+            } else if (section === 'trabajo') {
+                // Controlar todas las capas de trabajo de S3 en lote
+                Object.keys(s3LayerRegistry).forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el && el.checked !== e.target.checked) {
+                        el.checked = e.target.checked;
+                        toggleS3Layer(id);
+                    }
+                });
+            } else if (section === 'riesgo') {
+                // Controlar los switches de modelos de riesgo
+                ['layer-riesgo', 'layer-inundacion'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el && el.checked !== e.target.checked) {
+                        el.checked = e.target.checked;
+                        el.dispatchEvent(new Event('change'));
+                    }
+                });
+            } else if (section === 'usuario') {
+                // Controlar todos los switches de capas de usuario cargadas
+                loadedUserLayers.forEach(layer => {
+                    const el = document.getElementById(layer.id);
+                    if (el && el.checked !== e.target.checked) {
+                        el.checked = e.target.checked;
+                        el.dispatchEvent(new Event('change'));
+                    }
+                });
+            }
+            
+            // También mantenemos la selección en lote para CRUD masivo si corresponde
             let selector = `.layer-batch-select[data-section="${section}"]`;
             if (section === 'usuario') {
                 selector = `.layer-batch-checkbox`;
@@ -1849,36 +2066,96 @@
         setTimeout(() => { uploadStatus.style.display = 'none'; }, 2500);
     }
 
-    // --- MODAL DE CONFIGURACIÓN AVANZADA v2.2.0 ---
+    // --- PANEL DESPLIZANTE (IPAD-STYLE) DE CONFIGURACIÓN DE CAPAS AVANZADA ---
+    let activeConfigLayer = null;
+    const layerConfigSlide = document.getElementById('layer-config-slide');
+    const slideBackBtn = document.getElementById('slide-back-btn');
+    const slideLayerTitle = document.getElementById('slide-layer-title');
+    const slideTechDetails = document.getElementById('slide-tech-details');
+    const slideColumnGrid = document.getElementById('slide-column-grid');
+    const slideRowLimit = document.getElementById('slide-row-limit');
+    const slideBtnApply = document.getElementById('slide-btn-apply');
+    const slideSelectAllCols = document.getElementById('slide-select-all-cols');
+
+    // Cerrar panel deslizante
     window.closeLayerConfigModal = function() {
-        if(modalConfig) modalConfig.classList.remove('active');
-        activeConfigLayerId = null;
+        if(layerConfigSlide) layerConfigSlide.classList.remove('active');
+        activeConfigLayer = null;
     };
 
-    window.toggleAllConfigColumns = function(checkAll) {
-        if(!configColumnGrid) return;
-        configColumnGrid.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-            cb.checked = checkAll;
+    if (slideBackBtn) {
+        slideBackBtn.addEventListener('click', () => {
+            window.closeLayerConfigModal();
         });
+    }
+
+    // Toggle de seleccionar todas las columnas
+    let selectAllColsState = true;
+    if (slideSelectAllCols) {
+        slideSelectAllCols.addEventListener('click', () => {
+            selectAllColsState = !selectAllColsState;
+            slideSelectAllCols.textContent = selectAllColsState ? "Desmarcar Todo" : "Seleccionar Todo";
+            slideColumnGrid.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.checked = selectAllColsState;
+            });
+        });
+    }
+
+    // Compatibilidad para botones onclick inline
+    window.openLayerConfig = async function(layerId) {
+        await window.openLayerConfigModal(layerId);
     };
 
     window.openLayerConfigModal = async function(layerId) {
-        const layer = loadedUserLayers.find(l => l.id === layerId);
-        if (!layer) return;
+        let layer = null;
 
-        activeConfigLayerId = layerId;
-        configTechDetails.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Leyendo metadatos en DuckDB-WASM...`;
-        configColumnGrid.innerHTML = '';
+        // Comprobar si es una capa estática S3 (registrada en s3LayerRegistry)
+        if (s3LayerRegistry[layerId]) {
+            const checkbox = document.getElementById(layerId);
+            if (!checkbox || !checkbox.checked) {
+                mostrarError("Active el switch de la capa antes de abrir su configuración.");
+                setTimeout(() => { uploadError.style.display = 'none'; }, 3500);
+                return;
+            }
+            layer = {
+                id: layerId,
+                nombre: s3LayerRegistry[layerId],
+                size: 15.4, // Tamaño estimado promedio
+                subido: true,
+                layerId: `s3-${layerId}`,
+                sourceId: `s3-source-${layerId}`,
+                static: true
+            };
+        } else {
+            // Capa de usuario cargada en CRUD
+            layer = loadedUserLayers.find(l => l.id === Number(layerId) || l.id === layerId);
+            if (!layer) {
+                // Buscar por ID String
+                layer = loadedUserLayers.find(l => l.id.toString() === layerId.toString());
+            }
+        }
+
+        if (!layer) {
+            console.warn(`[Slide Config] No se encontró la capa ${layerId} en sesión.`);
+            return;
+        }
+
+        activeConfigLayer = layer;
+        if(layerConfigSlide) layerConfigSlide.classList.add('active');
+
+        slideTechDetails.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Leyendo metadatos desde DuckDB-WASM...`;
+        slideColumnGrid.innerHTML = '';
         
-        if(modalConfig) modalConfig.classList.add('active');
-
         try {
             if (!dbInstance) await initDuckDBEngine();
             const conn = await dbInstance.connect();
 
-            let fileRef = layer.subido ? `s3://catastro/${layer.nombre}` : layer.nombre;
+            let fileRef = layer.static ? `s3://catastro/${layer.nombre}` : (layer.subido ? `s3://catastro/${layer.nombre}` : layer.nombre);
             
-            // Detectar columnas del archivo
+            // Cargar extensión espacial
+            await conn.query(`LOAD spatial;`);
+
+            // Detectar esquema de columnas del archivo
             let colQuery = `PRAGMA table_info('${fileRef}');`;
             let columns = [];
             let rowCount = 0;
@@ -1890,7 +2167,7 @@
                     tipo: row.type
                 }));
             } catch(schemaErr) {
-                // Fallback si no soporta PRAGMA (ej. st_read)
+                // Fallback si no soporta PRAGMA
                 const sampleQuery = `SELECT * FROM "${fileRef}" LIMIT 1;`;
                 const sampleRes = await conn.query(sampleQuery);
                 if (sampleRes.toArray().length > 0) {
@@ -1907,93 +2184,118 @@
                 const countRes = await conn.query(`SELECT COUNT(*)::BIGINT as cnt FROM "${fileRef}";`);
                 rowCount = Number(countRes.toArray()[0].cnt);
             } catch(e) {
-                rowCount = 171688; // Fallback
+                rowCount = layer.static ? 15000 : 5000;
             }
 
             await conn.close();
 
-            // Inyectar metadatos en la UI
+            // Inyectar metadatos técnicos en el slide
             const isHeavy = layer.size > 20 || rowCount > 100000;
             const warningText = isHeavy ? `
-                <div class="modal-tech-warning">
-                    <i class="fas fa-exclamation-triangle"></i> La capa requiere ~${layer.size} MB inicialmente. Puede causar lentitud al renderizar.
+                <div style="margin-top: 6px; padding: 6px; background: rgba(211, 47, 47, 0.1); color: #d32f2f; border-radius: 4px; font-weight: 600; font-size: 0.65rem;">
+                    <i class="fas fa-exclamation-triangle"></i> Capa pesada (~${layer.size.toFixed(1)} MB). Puede ralentizar la navegación.
                 </div>
             ` : '';
 
-            configTechDetails.innerHTML = `
-                <div><b>Capa:</b> ${layer.nombre} (${layer.size} MB)</div>
-                <div><b>Total Filas Detectadas:</b> ${rowCount.toLocaleString()} registros</div>
-                <div><b>Geometría:</b> Multipolygon / Polygon detectado</div>
+            slideLayerTitle.textContent = layer.nombre.split('/').pop().replace('.parquet', '');
+            slideTechDetails.innerHTML = `
+                <div><b>Archivo:</b> ${layer.nombre}</div>
+                <div><b>Registros totales:</b> ${rowCount.toLocaleString()}</div>
+                <div><b>Tamaño estimado:</b> ${layer.size.toFixed(1)} MB</div>
+                <div><b>Proyección:</b> EPSG:4326 (WGS84 Lat/Lon)</div>
                 ${warningText}
             `;
 
-            // Construir checkboxes de columnas
+            // Construir la lista de checkboxes de columnas
             columns.forEach(col => {
-                if (col.nombre.toLowerCase() === 'geometry' || col.nombre.toLowerCase() === 'geom') return; // Excluir geometría base del selector
+                if (col.nombre.toLowerCase() === 'geometry' || col.nombre.toLowerCase() === 'geom') return; // Excluir geometría
                 
                 const label = document.createElement('label');
-                label.className = 'column-checkbox-container';
+                label.style.display = 'flex';
+                label.style.alignItems = 'center';
+                label.style.gap = '8px';
+                label.style.fontSize = '0.72rem';
+                label.style.cursor = 'pointer';
+                label.style.padding = '4px 6px';
+                label.style.borderRadius = '4px';
+                label.style.background = 'rgba(0,0,0,0.02)';
                 
-                // Si la columna ya estaba guardada en sesión, mantener su estado
                 const wasChecked = layer.columnasActivas ? layer.columnasActivas.includes(col.nombre) : true;
                 const checkedAttr = wasChecked ? 'checked' : '';
 
                 label.innerHTML = `
-                    <input type="checkbox" value="${col.nombre}" ${checkedAttr}>
-                    <span>${col.nombre} <span style="color:#aaa; font-size:0.68rem;">(${col.tipo})</span></span>
+                    <input type="checkbox" value="${col.nombre}" ${checkedAttr} style="cursor: pointer;">
+                    <span style="font-weight: 500; color: #333;">${col.nombre} <span style="color:#888; font-size:0.65rem;">(${col.tipo})</span></span>
                 `;
-                configColumnGrid.appendChild(label);
+                slideColumnGrid.appendChild(label);
             });
 
-            // Settear limite anterior
+            // Settear valor de límite actual
             if(layer.limiteFilas) {
-                configRowLimit.value = layer.limiteFilas.toString();
+                slideRowLimit.value = layer.limiteFilas.toString();
             } else {
-                configRowLimit.value = "10000";
+                slideRowLimit.value = "10000";
             }
 
         } catch (err) {
-            console.error("Fallo obteniendo metadatos:", err);
-            configTechDetails.innerHTML = `<span style="color:red;"><i class="fas fa-exclamation-circle"></i> Error leyendo estructura: ${err.message}</span>`;
+            console.error("[Slide Config] Error leyendo metadatos:", err);
+            slideTechDetails.innerHTML = `<span style="color:#d32f2f;"><i class="fas fa-exclamation-circle"></i> Error leyendo estructura: ${err.message}</span>`;
         }
     };
 
-    // Vincular botón aplicar configuración
-    if(configBtnApply) {
-        configBtnApply.addEventListener('click', async () => {
-            if (activeConfigLayerId === null) return;
-            const layer = loadedUserLayers.find(l => l.id === activeConfigLayerId);
-            if (!layer) return;
+    // Vincular botón aplicar del slide
+    if(slideBtnApply) {
+        slideBtnApply.addEventListener('click', async () => {
+            if (!activeConfigLayer) return;
+            const layer = activeConfigLayer;
 
-            const selectedCols = Array.from(configColumnGrid.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
-            const limitVal = parseInt(configRowLimit.value);
+            const selectedCols = Array.from(slideColumnGrid.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+            const limitVal = parseInt(slideRowLimit.value);
 
             // Re-renderizar la capa en MapLibre de forma columnar optimizada
-            closeLayerConfigModal();
+            window.closeLayerConfigModal();
+            
             uploadStatus.style.display = 'block';
-            uploadStatus.innerHTML = `<i class="fas fa-cog fa-spin"></i> Aplicando selección de atributos y re-renderizando...`;
+            uploadStatus.innerHTML = `<i class="fas fa-cog fa-spin"></i> Aplicando proyección y re-renderizando...`;
 
             try {
                 if (!dbInstance) await initDuckDBEngine();
                 const conn = await dbInstance.connect();
 
-                let fileRef = layer.subido ? `s3://catastro/${layer.nombre}` : layer.nombre;
+                let fileRef = layer.static ? `s3://catastro/${layer.nombre}` : (layer.subido ? `s3://catastro/${layer.nombre}` : layer.nombre);
                 
-                // La geometría siempre se lee
-                let geomCol = selectedCols.includes('geometry') ? '' : 'geometry';
-                if (!geomCol) {
-                    // Si es GPKG, la columna usualmente es geom
-                    try {
-                        const testGeom = await conn.query(`SELECT geom FROM "${fileRef}" LIMIT 1;`);
-                        geomCol = 'geom';
-                    } catch(e) {
-                        geomCol = 'geometry';
-                    }
+                await conn.query(`LOAD spatial;`);
+
+                // Detectar nombre de columna de geometría
+                let geomCol = 'geometry';
+                try {
+                    await conn.query(`SELECT geom FROM "${fileRef}" LIMIT 1;`);
+                    geomCol = 'geom';
+                } catch(e) {
+                    geomCol = 'geometry';
                 }
 
                 // Generar query columnar selectiva
                 let queryCols = [...selectedCols, `ST_AsGeoJSON(${geomCol}) as json_geom`].join(', ');
-                let sql = `SELECT ${queryCols} FROM "${fileRef}" LIMIT ${limitVal};`;
+                let sql = '';
+                
+                if (layer.static) {
+                    // Para capas estáticas aplicamos el bbox de la ventana actual de MapLibre
+                    const bounds = map.getBounds();
+                    const xmin = bounds.getWest();
+                    const ymin = bounds.getSouth();
+                    const xmax = bounds.getEast();
+                    const ymax = bounds.getNorth();
+                    
+                    sql = `
+                        SELECT ${queryCols} 
+                        FROM read_parquet('${fileRef}') 
+                        WHERE ST_Intersects(${geomCol}, ST_MakeEnvelope(${xmin}, ${ymin}, ${xmax}, ${ymax})) 
+                        LIMIT ${limitVal};
+                    `;
+                } else {
+                    sql = `SELECT ${queryCols} FROM "${fileRef}" LIMIT ${limitVal};`;
+                }
                 
                 const results = await conn.query(sql);
                 await conn.close();
@@ -2013,52 +2315,71 @@
                     })
                 };
 
-                // Remover capa anterior de MapLibre
+                // Remover capa anterior en MapLibre
                 if (map.getLayer(layer.layerId)) map.removeLayer(layer.layerId);
                 if (map.getSource(layer.sourceId)) map.removeSource(layer.sourceId);
 
                 // Re-inyectar source y capa
                 map.addSource(layer.sourceId, { type: 'geojson', data: geojson });
                 
-                const geomType = geojson.features[0].geometry.type;
+                let geomType = 'Polygon';
+                if (geojson.features && geojson.features.length > 0 && geojson.features[0].geometry) {
+                    geomType = geojson.features[0].geometry.type;
+                }
+                
                 const isPoint = geomType === 'Point' || geomType === 'MultiPoint';
                 const isLine = geomType === 'LineString' || geomType === 'MultiLineString';
+
+                const style = getLayerStyle(layer.id);
 
                 if (isPoint) {
                     map.addLayer({
                         id: layer.layerId,
                         type: 'circle',
                         source: layer.sourceId,
-                        paint: { 'circle-radius': 5, 'circle-color': '#e74c3c', 'circle-stroke-width': 1.5, 'circle-stroke-color': '#fff' }
+                        paint: style.paint || { 'circle-radius': 5, 'circle-color': '#e74c3c' }
                     });
                 } else if (isLine) {
                     map.addLayer({
                         id: layer.layerId,
                         type: 'line',
                         source: layer.sourceId,
-                        paint: { 'line-color': '#2980b9', 'line-width': 2 }
+                        paint: style.paint || { 'line-color': '#2980b9', 'line-width': 2 }
                     });
                 } else {
                     map.addLayer({
                         id: layer.layerId,
                         type: 'fill',
                         source: layer.sourceId,
-                        paint: { 'fill-color': '#16a085', 'fill-opacity': 0.35, 'fill-outline-color': '#1abc9c' }
+                        paint: style.paint || { 'fill-color': '#2c5f2d', 'fill-opacity': 0.35, 'fill-outline-color': '#1e3a1f' }
                     });
                 }
+
+                // Sincronizar switch de visualización a ON si estaba apagado
+                const checkbox = document.getElementById(layer.id);
+                if (checkbox) checkbox.checked = true;
 
                 // Guardar la configuración en sesión
                 layer.columnasActivas = selectedCols;
                 layer.limiteFilas = limitVal;
 
+                if (!layer.static) {
+                    // Si es capa de usuario, actualizar su registro en la UI
+                    const idx = loadedUserLayers.findIndex(l => l.id === layer.id);
+                    if (idx !== -1) {
+                        loadedUserLayers[idx].columnasActivas = selectedCols;
+                        loadedUserLayers[idx].limiteFilas = limitVal;
+                    }
+                }
+
                 uploadStatus.style.display = 'block';
-                uploadStatus.innerHTML = `<i class="fas fa-check-circle"></i> Renderizado columnar completado con éxito.`;
+                uploadStatus.innerHTML = `<i class="fas fa-check-circle"></i> Cambios aplicados y re-renderizados con éxito.`;
                 setTimeout(() => { uploadStatus.style.display = 'none'; }, 2000);
 
             } catch (err) {
-                console.error("Fallo aplicando filtro columnar:", err);
+                console.error("[Slide Config Apply] Falló:", err);
                 uploadStatus.style.display = 'none';
-                mostrarError(`Error al re-renderizar: ${err.message}`);
+                mostrarError(`Error al aplicar cambios: ${err.message}`);
             }
         });
     }
@@ -2627,6 +2948,25 @@
             const isDuckDBReady = typeof dbInstance !== 'undefined' && dbInstance !== null;
             const countLayers = typeof loadedUserLayers !== 'undefined' ? loadedUserLayers.length : 0;
             
+            // Evaluar el estado en caliente de cada una de las 13 capas de trabajo estáticas del workspace
+            const staticLayersStatusList = Object.keys(s3LayerRegistry).map(checkboxId => {
+                const layerId = `s3-${checkboxId}`;
+                const fileName = s3LayerRegistry[checkboxId];
+                const checkbox = document.getElementById(checkboxId);
+                const isChecked = checkbox ? checkbox.checked : false;
+                const isRendered = typeof map !== 'undefined' && map !== null && map.getLayer(layerId) !== undefined;
+                
+                let statusText = "APAGADA (Desactivada en UI)";
+                if (isChecked) {
+                    statusText = isRendered ? "ACTIVA Y COMPLETAMENTE RENDERIZADA EN MAPA" : "PROCESANDO LECTURA EN DUCKDB / ERROR DE SPATIAL O CREDENCIALES S3";
+                }
+                return `  - ${fileName.padEnd(45)} : [${statusText}]`;
+            }).join("\n");
+
+            const s3StatusText = window.s3ConnectionSuccess 
+                ? "ACTIVO Y CONECTADO - Comunicación bidireccional estable con https://s3.agrohoney.com" 
+                : "DESCONECTADO / CORS BLOQUEADO - No se pudo conectar a s3.agrohoney.com. Revise que la máquina cliente tenga acceso a internet, o que el servidor MinIO no tenga restricciones de origen (CORS) o certificados SSL vencidos.";
+
             const header = `=============================================================================
 SIGAGRO — INFORME DE DIAGNÓSTICO Y DEPURACIÓN S3 & PARQUET
 =============================================================================
@@ -2638,11 +2978,15 @@ Local Storage Disponible: ${typeof localStorage !== 'undefined' ? 'SÍ' : 'NO'}
 
 ESTATUS DE COMPONENTES CRÍTICOS:
 -----------------------------------------------------------------------------
-1. MapLibre GL / Deck.gl: ${isMapActive ? "INICIALIZADO Y ACTIVO" : "PANIC - FALLA DE RENDERIZACIÓN"}
-2. DuckDB-WASM: ${isDuckDBReady ? "CONECTADO Y CORRIENDO" : "NO INICIADO / ERROR DE EXTENSIÓN O ENTORNO"}
-3. Carga de Extensión Spatial: ${window.spatialExtensionLoaded ? "CARGADA CON ÉXITO (Soporte GPKG/Parquet Activo)" : "FALLIDA / PENDIENTE DE INICIALIZACIÓN"}
-4. Conexión S3 MinIO (s3.agrohoney.com): ${window.s3ConnectionSuccess ? "ESTABLECE COMUNICACIÓN CON S3" : "BLOQUEADO (Sin conexión a Internet o error de CORS/SSL en MinIO)"}
-5. Capas en Sesión CRUD S3: ${countLayers} capas de usuario cargadas en caliente.
+1. MapLibre GL / Deck.gl       : ${isMapActive ? "INICIALIZADO Y ACTIVO" : "PANIC - FALLA DE RENDERIZACIÓN"}
+2. DuckDB-WASM                 : ${isDuckDBReady ? "CONECTADO Y CORRIENDO" : "NO INICIADO / ERROR DE EXTENSIÓN O ENTORNO"}
+3. Carga de Extensión Spatial  : ${window.spatialExtensionLoaded ? "CARGADA CON ÉXITO (Soporte GPKG/Parquet Activo)" : "FALLIDA / PENDIENTE DE INICIALIZACIÓN"}
+4. Conexión S3 MinIO           : ${s3StatusText}
+5. Capas en Sesión CRUD S3     : ${countLayers} capas de usuario cargadas en caliente.
+
+ESTATUS DETALLADO DE CAPAS DE TRABAJO (13 FUENTES DEL WORKSPACE):
+-----------------------------------------------------------------------------
+${staticLayersStatusList}
 
 DETALLES DE DEPURACIÓN (LOGS DEL NAVEGADOR Y CONSOLA DE SESIÓN):
 -----------------------------------------------------------------------------

@@ -286,21 +286,27 @@
             padding-bottom: 10px;
         }
         .slide-back-btn {
-            background: rgba(44, 95, 45, 0.1);
-            border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
+            background: rgba(44, 95, 45, 0.08);
+            border: 1.5px solid rgba(44, 95, 45, 0.2);
+            padding: 0;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
             cursor: pointer;
-            font-size: 0.75rem;
-            font-weight: 600;
+            font-size: 0.85rem;
             color: #2c5f2d;
             display: flex;
             align-items: center;
-            gap: 6px;
-            transition: background 0.2s;
+            justify-content: center;
+            transition: background 0.25s, transform 0.25s, border-color 0.25s;
+            flex-shrink: 0;
         }
         .slide-back-btn:hover {
-            background: rgba(44, 95, 45, 0.2);
+            background: rgba(44, 95, 45, 0.9);
+            color: white;
+            border-color: transparent;
+            transform: scale(1.12);
+            box-shadow: 0 3px 10px rgba(44,95,45,0.35);
         }
         #slide-layer-title {
             margin: 0;
@@ -2332,16 +2338,10 @@
 
         // Comprobar si es una capa estática S3 (registrada en s3LayerRegistry)
         if (s3LayerRegistry[layerId]) {
-            const checkbox = document.getElementById(layerId);
-            if (!checkbox || !checkbox.checked) {
-                mostrarError("Active el switch de la capa antes de abrir su configuración.");
-                setTimeout(() => { uploadError.style.display = 'none'; }, 3500);
-                return;
-            }
             layer = {
                 id: layerId,
                 nombre: s3LayerRegistry[layerId],
-                size: 15.4, // Tamaño estimado promedio
+                size: 15.4,
                 subido: true,
                 layerId: `s3-${layerId}`,
                 sourceId: `s3-source-${layerId}`,
@@ -2422,12 +2422,34 @@
                 </div>
             ` : '';
 
-            slideLayerTitle.textContent = layer.nombre.split('/').pop().replace('.parquet', '');
+            // Determinar CRS intentando leerlo del parquet; default Colombia MAGNA-SIRGAS
+            let crsInfo = 'Detectando...';
+            try {
+                const crsRes = await conn.query(`SELECT geo_metadata FROM parquet_kv_metadata('${fileRef}') LIMIT 1;`);
+                const kv = crsRes.toArray();
+                crsInfo = (kv.length > 0 && kv[0].geo_metadata) ? 'EPSG:4326 (WGS84 - GeoParquet)' : 'EPSG:9377 / MAGNA-SIRGAS Colombia';
+            } catch(_) {
+                crsInfo = 'EPSG:9377 (MAGNA-SIRGAS Colombia / Bogotá)';
+            }
+
+            const isStatic = layer.static;
+            const origenLabel = isStatic ? '🗄️ Catástro Público S3 (Parquet)' : '📤 Capa de Usuario (subida)';
+            const bucketName = isStatic ? 'catastro' : 'geovisor-tnc-finagro';
+            const networkUrl = `https://s3.agrohoney.com/qparquets3/${bucketName}/${layer.nombre}`;
+            const updatedAt = new Date().toLocaleString('es-CO', { timeZone: 'America/Bogota' });
+
+            slideLayerTitle.textContent = layer.nombre.split('/').pop().replace('.parquet', '').replace('.gpkg', '');
             slideTechDetails.innerHTML = `
-                <div><b>Archivo:</b> ${layer.nombre}</div>
-                <div><b>Registros totales:</b> ${rowCount.toLocaleString()}</div>
-                <div><b>Tamaño estimado:</b> ${layer.size.toFixed(1)} MB</div>
-                <div><b>Proyección:</b> EPSG:4326 (WGS84 Lat/Lon)</div>
+                <div style="display:grid;grid-template-columns:auto 1fr;gap:3px 8px;">
+                    <span style="color:#888;white-space:nowrap">📂 Origen:</span><span style="font-weight:600;color:#2c5f2d">${origenLabel}</span>
+                    <span style="color:#888;white-space:nowrap">🧳 Formato:</span><span>GeoParquet (Apache Parquet + extensión geo)</span>
+                    <span style="color:#888;white-space:nowrap">🌍 CRS:</span><span>${crsInfo}</span>
+                    <span style="color:#888;white-space:nowrap">📄 Archivo:</span><span style="word-break:break-all">${layer.nombre}</span>
+                    <span style="color:#888;white-space:nowrap">🔗 URL Red:</span><span style="word-break:break-all;font-family:monospace;font-size:0.65rem">${networkUrl}</span>
+                    <span style="color:#888;white-space:nowrap">📊 Registros:</span><span>${rowCount.toLocaleString()}</span>
+                    <span style="color:#888;white-space:nowrap">💾 Tamaño:</span><span>${layer.size.toFixed(1)} MB (estimado)</span>
+                    <span style="color:#888;white-space:nowrap">🕒 Actualiz.:</span><span>${updatedAt}</span>
+                </div>
                 ${warningText}
             `;
 

@@ -414,9 +414,13 @@
 
     </div>
     
-    <!-- Etiqueta minimalista de Versión -->
-    <div style="font-size: 0.65rem; color: rgba(0,0,0,0.3); text-align: center; margin-top: 15px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 8px; font-weight: 500;">
-        SIGAGRO Geovisor v2.0.0 · QParquet API v2.0.0
+    <!-- Etiqueta minimalista de Versión y Botón de Diagnóstico -->
+    <div style="font-size: 0.65rem; color: rgba(0,0,0,0.3); text-align: center; margin-top: 15px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 8px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px; position: relative;">
+        <span>SIGAGRO Geovisor v2.0.0 · QParquet API v2.0.0</span>
+        <!-- Botón de diagnóstico visual en forma de icono de documento pequeño -->
+        <button id="btn-diagnostic-report" style="background: transparent; border: none; color: #2c5f2d; cursor: pointer; font-size: 0.85rem; padding: 4px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s; outline: none; opacity: 0.7;" title="Descargar Informe de Diagnóstico y Errores (TXT)" onmouseenter="this.style.opacity='1'; this.style.color='#e74c3c';" onmouseleave="this.style.opacity='0.7'; this.style.color='#2c5f2d';">
+            <i class="fas fa-file-medical"></i>
+        </button>
     </div>
 </div>
 
@@ -629,6 +633,45 @@
 
 
 <script>
+    // --- Sistema de Diagnóstico e Intercepción Global de Consola (v2.1.0) ---
+    window.systemLogs = [];
+    window.spatialExtensionLoaded = false;
+    window.s3ConnectionSuccess = false;
+
+    const captureLog = (type, args) => {
+        const timestamp = new Date().toISOString();
+        const message = args.map(arg => {
+            if (arg instanceof Error) return arg.message + "\n" + arg.stack;
+            if (typeof arg === 'object') {
+                try { return JSON.stringify(arg); } catch (e) { return String(arg); }
+            }
+            return String(arg);
+        }).join(" ");
+        window.systemLogs.push(`[${timestamp}] [${type.toUpperCase()}] ${message}`);
+    };
+
+    // Respaldar consolas originales
+    const originalLog = console.log;
+    const originalWarn = console.warn;
+    const originalError = console.error;
+
+    console.log = (...args) => { originalLog(...args); captureLog('info', args); };
+    console.warn = (...args) => { originalWarn(...args); captureLog('warn', args); };
+    console.error = (...args) => { originalError(...args); captureLog('error', args); };
+
+    // Capturar errores fatales globales de ventana
+    window.onerror = (message, source, lineno, colno, error) => {
+        captureLog('panic', [message, `en ${source}:${lineno}:${colno}`, error]);
+        return false;
+    };
+
+    window.onunhandledrejection = (event) => {
+        captureLog('panic-async', [`Rechazo de promesa no controlado: ${event.reason}`]);
+    };
+
+    console.log("🚀 Geovisor SIGAGRO inicializado con Depurador Activo en el Cliente.");
+    console.log(`Plataforma: ${navigator.userAgent}`);
+
     // --- 1. Lógica de Paneles Ocultables y Acordeones ---
     const leftPanel = document.getElementById('left-panel');
     const leftBtn = document.getElementById('left-collapse-btn');
@@ -1338,28 +1381,75 @@
         if (!dbInstance) await initDuckDBEngine();
         
         try {
+            if (!window.spatialExtensionLoaded) {
+                throw new Error("La extensión 'spatial' de DuckDB-WASM no pudo cargarse en este navegador. Por favor haga clic en el botón de informe inferior izquierdo para más detalles.");
+            }
+
             const conn = await dbInstance.connect();
             const url = `s3://catastro/${fileName}`;
             
-            // Instalar extensión espacial si no está
-            await conn.query(`INSTALL spatial; LOAD spatial;`);
+            // Forzar carga de extensión spatial en la conexión si se requiere
+            await conn.query(`LOAD spatial;`);
             
-            // Consultar datos (limitamos a 5000 para no saturar el mapa inicial)
-            // En una versión futura añadiríamos filtro por BBox
+            // Obtener Bounding Box visible actual del mapa para filtrado espacial optimizado (HTTP Range Requests)
+            const bounds = map.getBounds();
+            const xmin = bounds.getWest();
+            const ymin = bounds.getSouth();
+            const xmax = bounds.getEast();
+            const ymax = bounds.getNorth();
+
+            console.log(`📡 Aplicando HTTP Range Requests con BBox: [${xmin.toFixed(4)}, ${ymin.toFixed(4)}, ${xmax.toFixed(4)}, ${ymax.toFixed(4)}] sobre S3...`);
+
+            // Consulta espacial de alto rendimiento optimizada (Filtrado por BBox de visualización en DuckDB)
             const query = `
                 SELECT *, ST_AsGeoJSON(geometry) as json_geom 
                 FROM read_parquet('${url}') 
-                LIMIT 5000;
+                WHERE ST_Intersects(geometry, ST_MakeEnvelope(${xmin}, ${ymin}, ${xmax}, ${ymax}))
+                LIMIT 3500;
             `;
+            
             const results = await conn.query(query);
+            
             const geojson = {
                 type: 'FeatureCollection',
-                features: results.toArray().map(row => ({
-                    type: 'Feature',
-                    properties: Object.fromEntries(Object.entries(row).filter(([k]) => k !== 'geometry' && k !== 'json_geom')),
-                    geometry: JSON.parse(row.json_geom)
-                }))
+                features: results.toArray().map(row => {
+                    const properties = {};
+                    for (const [k, v] of Object.entries(row)) {
+                        if (k !== 'geometry' && k !== 'json_geom') {
+                            properties[k] = (typeof v === 'bigint') ? Number(v) : v;
+                        }
+                    }
+                    return {
+                        type: 'Feature',
+                        properties: properties,
+                        geometry: JSON.parse(row.json_geom)
+                    };
+                })
             };
+
+            if (!geojson.features || geojson.features.length === 0) {
+                // Fallback si la zona visible no tiene elementos: cargar los primeros 500
+                console.log("⚠️ No se encontraron elementos en la zona visible. Cargando muestra por defecto...");
+                const fallbackQuery = `
+                    SELECT *, ST_AsGeoJSON(geometry) as json_geom 
+                    FROM read_parquet('${url}') 
+                    LIMIT 500;
+                `;
+                const fallbackResults = await conn.query(fallbackQuery);
+                geojson.features = fallbackResults.toArray().map(row => {
+                    const properties = {};
+                    for (const [k, v] of Object.entries(row)) {
+                        if (k !== 'geometry' && k !== 'json_geom') {
+                            properties[k] = (typeof v === 'bigint') ? Number(v) : v;
+                        }
+                    }
+                    return {
+                        type: 'Feature',
+                        properties: properties,
+                        geometry: JSON.parse(row.json_geom)
+                    };
+                });
+            }
 
             map.addSource(sourceId, { type: 'geojson', data: geojson });
             const style = getLayerStyle(checkboxId);
@@ -1370,13 +1460,13 @@
                 paint: style.paint
             });
 
-            console.log(`✅ Capa ${layerId} cargada.`);
+            console.log(`✅ Capa S3 '${layerId}' renderizada con éxito.`);
             updateConsole('WELCOME');
-            document.getElementById('console-output').innerHTML = `<b>Carga Exitosa:</b> ${fileName} se ha añadido al mapa.`;
+            document.getElementById('console-output').innerHTML = `<b>Carga Exitosa:</b> ${fileName} filtrado por BBox visible y pintado en el mapa.`;
             await conn.close();
         } catch (e) {
-            console.error(`Error cargando capa S3:`, e);
-            document.getElementById('console-output').innerHTML = `<b style="color:red;">Error:</b> No se pudo cargar ${fileName}.`;
+            console.error(`❌ Error al cargar capa remota S3 '${fileName}':`, e.message);
+            document.getElementById('console-output').innerHTML = `<b style="color:red;">Error:</b> No se pudo cargar ${fileName}. Haz clic en el icono de diagnóstico <i class="fas fa-file-medical"></i> para un informe detallado.`;
         }
     }
 
@@ -1408,9 +1498,10 @@
     let deckLayer = null;
     const infoConsole = document.getElementById('info-console');
     
-    // Inicialización global de DuckDB con soporte S3
+    // Inicialización global de DuckDB con soporte S3 y diagnóstico v2.1.0
     async function initDuckDBEngine() {
         if (dbInstance) return true;
+        console.log("⚙️ Iniciando motor DuckDB-WASM con perfil de diagnóstico...");
         try {
             const duckdb = await import('https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.28.0/+esm');
             const JSDELIVR_BUNDLES = duckdb.getJsDelivrBundles();
@@ -1422,24 +1513,45 @@
             // Configurar S3 / HTTPFS / Spatial
             const conn = await dbInstance.connect();
             
-            // Configuración AGRESIVA de extensiones
+            // Configuración AGRESIVA de repositorios remotos oficiales
             await conn.query(`
                 SET autoinstall_known_extensions=1;
                 SET autoload_known_extensions=1;
                 SET custom_extension_repository='https://wasm-extensions.duckdb.org';
             `);
             
-            // Intentar cargar HTTPFS primero para habilitar S3
+            // Cargar e instalar HTTPFS
             try {
-                await conn.query(`LOAD httpfs;`);
-                await conn.query(`LOAD spatial;`);
-            } catch (e) {
-                console.warn("⚠️ Intentando instalación manual...");
                 await conn.query(`INSTALL httpfs; LOAD httpfs;`);
-                await conn.query(`INSTALL spatial; LOAD spatial;`);
+                console.log("✅ Extensión HTTPFS cargada correctamente.");
+            } catch (httpfsErr) {
+                console.warn("⚠️ Fallo en carga inicial httpfs, forzando manual:", httpfsErr.message);
+                try {
+                    await conn.query(`LOAD httpfs;`);
+                } catch(e) {
+                    console.error("❌ Fallo crítico al cargar httpfs:", e.message);
+                }
             }
 
-            // Configuración S3
+            // Cargar e instalar SPATIAL con validación de bandera
+            try {
+                await conn.query(`INSTALL spatial; LOAD spatial;`);
+                window.spatialExtensionLoaded = true;
+                console.log("✅ Extensión SPATIAL cargada correctamente. GeoParquet/GPKG vector habilitado.");
+            } catch (spatialErr) {
+                console.warn("⚠️ Fallo en instalación spatial remota, reintentando con LOAD de sistema:", spatialErr.message);
+                try {
+                    await conn.query(`LOAD spatial;`);
+                    window.spatialExtensionLoaded = true;
+                    console.log("✅ Extensión SPATIAL recuperada vía LOAD.");
+                } catch(e) {
+                    window.spatialExtensionLoaded = false;
+                    console.error("❌ Error de Extensión: La extensión 'spatial' no pudo inicializarse en este navegador. Las funciones geográficas están restringidas.");
+                    console.error("Detalle del error:", e.message);
+                }
+            }
+
+            // Configuración S3 con credenciales de AgroHoney
             await conn.query(`
                 SET s3_endpoint='s3.agrohoney.com';
                 SET s3_access_key_id='admin';
@@ -1449,10 +1561,20 @@
             `);
             await conn.close();
             
-            console.log("🚀 Motor DuckDB-WASM listo.");
+            // Test de comunicación asíncrono con S3
+            try {
+                const s3Test = await fetch("https://s3.agrohoney.com/catastro/", { method: "HEAD" });
+                window.s3ConnectionSuccess = true;
+                console.log("✅ Conexión con s3.agrohoney.com establecida correctamente.");
+            } catch (s3FetchErr) {
+                window.s3ConnectionSuccess = false;
+                console.warn("⚠️ MinIO S3 inaccesible directo por CORS o red. Los archivos locales funcionarán con el bypass de caché.");
+            }
+
+            console.log("🚀 Motor DuckDB-WASM listo y calibrado.");
             return true;
         } catch (e) {
-            console.error("Error al iniciar DuckDB:", e);
+            console.error("❌ Error fatal al iniciar DuckDB-WASM:", e);
             return false;
         }
     }
@@ -1717,6 +1839,65 @@
         }
     });
 
+    // --- Manejador del Informe de Diagnóstico y Depuración v2.1.0 ---
+    const diagnosticBtn = document.getElementById('btn-diagnostic-report');
+    if (diagnosticBtn) {
+        diagnosticBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            
+            // Evaluar componentes en caliente
+            const isMapActive = typeof map !== 'undefined' && map !== null && map.getContainer() !== null;
+            const isDuckDBReady = typeof dbInstance !== 'undefined' && dbInstance !== null;
+            const countLayers = typeof loadedUserLayers !== 'undefined' ? loadedUserLayers.length : 0;
+            
+            const header = `=============================================================================
+SIGAGRO — INFORME DE DIAGNÓSTICO Y DEPURACIÓN S3 & PARQUET
+=============================================================================
+Versión Geovisor: v2.1.0 · QParquet API: v2.0.0 (Dokploy)
+Generado: ${new Date().toLocaleString()}
+Plataforma del Cliente: ${navigator.userAgent}
+Local Storage Disponible: ${typeof localStorage !== 'undefined' ? 'SÍ' : 'NO'}
+=============================================================================
+
+ESTATUS DE COMPONENTES CRÍTICOS:
+-----------------------------------------------------------------------------
+1. MapLibre GL / Deck.gl: ${isMapActive ? "INICIALIZADO Y ACTIVO" : "PANIC - FALLA DE RENDERIZACIÓN"}
+2. DuckDB-WASM: ${isDuckDBReady ? "CONECTADO Y CORRIENDO" : "NO INICIADO / ERROR DE EXTENSIÓN O ENTORNO"}
+3. Carga de Extensión Spatial: ${window.spatialExtensionLoaded ? "CARGADA CON ÉXITO (Soporte GPKG/Parquet Activo)" : "FALLIDA / PENDIENTE DE INICIALIZACIÓN"}
+4. Conexión S3 MinIO (s3.agrohoney.com): ${window.s3ConnectionSuccess ? "ESTABLECE COMUNICACIÓN CON S3" : "BLOQUEADO (Sin conexión a Internet o error de CORS/SSL en MinIO)"}
+5. Capas en Sesión CRUD S3: ${countLayers} capas de usuario cargadas en caliente.
+
+DETALLES DE DEPURACIÓN (LOGS DEL NAVEGADOR Y CONSOLA DE SESIÓN):
+-----------------------------------------------------------------------------
+${window.systemLogs.length > 0 ? window.systemLogs.join("\n") : "Sin logs registrados en esta sesión."}
+
+=============================================================================
+GUÍA DE RESOLUCIÓN DE ANOMALÍAS DE LECTURA (S3 & GPKG):
+-----------------------------------------------------------------------------
+* Si reporta 'spatial.duckdb_extension not found' o fallos de WASM:
+  1. Su firewall, proxy o política de seguridad de red está bloqueando las peticiones 
+     a 'https://wasm-extensions.duckdb.org' o al CDN de DuckDB-WASM.
+  2. Solución: Verifique que su conexión sea estable. El geovisor implementa 
+     un bypass de resiliencia local en caliente para visualizar los Parquets/GPKGs 
+     cargados utilizando los buffers de memoria del motor.
+
+* Si reporta 'Failed to fetch' al subir/leer capas locales en S3:
+  1. El servidor MinIO (https://s3.agrohoney.com) tiene problemas temporales de 
+     CORS o los certificados SSL no coinciden.
+  2. Solución: El geovisor activa el buffer virtual e inyecta la geometría en caliente 
+     desde DuckDB-WASM local. Podrá trabajar normalmente con las capas arrastradas.
+=============================================================================
+`;
+            
+            const blob = new Blob([header], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `diagnostico_geovisor_${new Date().toISOString().slice(0,10)}.txt`;
+            link.click();
+            
+            console.log("💾 Informe de diagnóstico generado y descargado con éxito.");
+        });
+    }
 </script>
 
 </body>

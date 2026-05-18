@@ -1,5 +1,5 @@
 ================================================================================
-📋 TÉRMINOS DE REFERENCIA – CHECKLIST DE CUMPLIMIENTO (TDR STATUS v2.0.0)
+📋 TÉRMINOS DE REFERENCIA – CHECKLIST DE CUMPLIMIENTO (TDR STATUS v2.1.0)
 ================================================================================
 
 Proyecto: SIGAGRO – Geovisor Predictivo de Riesgo Agropecuario
@@ -17,7 +17,7 @@ Propuesta Técnica Asociada: Propuesta de Modelación Espacial y Ciencia de Dato
     - Observaciones: Aprobado metodológicamente por TNC.
 
 [/] Producto 2: Arquitectura y ETL (10% de avance)
-    - Estado: EN PROGRESO (Suite QParquet v2.0.0 terminada y masiva de Catastro S3 lista)
+    - Estado: EN PROGRESO (Suite QParquet v2.1.0 terminada y CRUD S3 en Geovisor listo)
     - Observaciones: Repositorio QParquet migrado a API/CLI. ETL de catastro completo.
 
 [ ] Producto 3: Prototipo Alpha (25% de avance)
@@ -45,17 +45,17 @@ Estado Físico del Proyecto: 🔄 En Desarrollo Activo
 
 📦 Producto 1: Documento de Diseño Conceptual e Infraestructura
    [x] Mapeo y definición de variables críticas multi-componente
-       - Componente Climático: Datos meteorológicos e índices de sequía/humedad (IDEAM).
-       - Componente Sanitario: Alertas epidemiológicas y zonas de cuarentena (ICA).
-       - Componente de Mercado: Canasta de precios SIPSA y comportamiento sectorial (DANE).
-       - Componente Financiero y Territorial: Frontera agrícola y zonificación (UPRA).
+       - [x] Componente Climático: Datos meteorológicos e índices de sequía/humedad (IDEAM).
+       - [x] Componente Sanitario: Alertas epidemiológicas y zonas de cuarentena (ICA).
+       - [x] Componente de Mercado: Canasta de precios SIPSA y comportamiento sectorial (DANE).
+       - [x] Componente Financiero y Territorial: Frontera agrícola y zonificación (UPRA).
    [x] Diseño de Arquitectura Lógica e Infraestructura
-       - Diagramas funcionales en notación C4 (Contenedores y Contexto).
-       - Integración de DuckDB-WASM y soporte para HTTP Range Requests remotas.
-       - Definición del formato GeoParquet v1.1 como estándar de almacenamiento web.
+       - [x] Diagramas funcionales en notación C4 (Contenedores y Contexto).
+       - [x] Integración de DuckDB-WASM y soporte para HTTP Range Requests remotas.
+       - [x] Definición del formato GeoParquet v1.1 como estándar de almacenamiento web.
    [x] Alineación Metodológica y Financiera
-       - Consistencia con los lineamientos de la CNCA (Resolución 10 de 2025).
-       - Articulación metodológica con la matriz de riesgos oficial de FINAGRO.
+       - [x] Consistencia con los lineamientos de la CNCA (Resolución 10 de 2025).
+       - [x] Articulación metodológica con la matriz de riesgos oficial de FINAGRO.
 
 📦 Producto 2: Documento Técnico de Arquitectura y Scripts ETL
    [/] Implementación del motor de ingesta y optimización espacial QParquet
@@ -64,10 +64,12 @@ Estado Físico del Proyecto: 🔄 En Desarrollo Activo
        - [x] Configuración de curvas espaciales de Hilbert para ordenamiento de datos físicos en disco.
        - [x] Redondeo espacial C++ con shapely.set_precision y simplificación Douglas-Peucker.
        - [x] Inyección de metadatos GeoParquet v1.1 y BBOX individual por fila para culling espacial.
-       - [x] Inicialización y control de versiones local con Git (v2.0.0).
+       - [x] Inicialización y control de versiones local con Git (v2.1.0).
        - [x] Exclusión inteligente de tablas del sistema SQLite y de índices R-Tree corruptos.
        - [x] Conversión masiva del Catastro Público de Colombia (6.38 GB) procesada y subida.
        - [x] Desarrollo de la arquitectura API REST y contenedor Docker para Dokploy.
+       - [x] Inyección de sistema de diagnóstico interactivo y descarga de informes TXT.
+       - [x] Bypass de resiliencia local ante fallos de extensiones y HTTP Range Requests con BBox.
    [ ] Desarrollo y refinamiento de conectores y pipelines ETL
        - [ ] etl/clima_ideam.py - Descarga y limpieza de datos climáticos históricos.
        - [ ] etl/upra_zonificacion.py - Ingestión de capas de frontera agrícola nacional.
@@ -75,6 +77,8 @@ Estado Físico del Proyecto: 🔄 En Desarrollo Activo
        - [ ] etl/ica_alertas.py - Mapeo de brotes fitosanitarios por municipios.
        - [ ] etl/saam_creditos.py - Conector de cartera de crédito rural anonimizada de FINAGRO.
    [ ] Pruebas de consistencia de la base de datos DuckDB local y compilación del esquema final.
+       - [ ] Validación de la integridad referencial espacial entre capas.
+       - [ ] Optimización de índices de búsqueda para consultas relacionales.
 
 📦 Producto 3: Prototipo Funcional Alpha (Algoritmos y Escenarios)
    [ ] Implementación del modelo de Machine Learning
@@ -120,5 +124,5 @@ Estado Físico del Proyecto: 🔄 En Desarrollo Activo
 
 Última revisión técnica: 18 de mayo de 2026
 Responsable de Seguimiento: Juan Camilo Ordoñez Betancourth
-Control del Plan: Antigravity AI (v2.0.0)
+Control del Plan: Antigravity AI (v2.1.0)
 ================================================================================

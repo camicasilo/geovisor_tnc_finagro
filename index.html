@@ -65,9 +65,10 @@
             right: 20px;
             width: 340px;
             max-height: calc(100vh - 40px);
-            overflow-y: auto;
+            overflow: hidden;
             padding: 24px;
-            display: block;
+            display: flex;
+            flex-direction: column;
         }
         .right-sidebar.collapsed { transform: translateX(400px); }
 
@@ -230,11 +231,27 @@
         input:checked + .slider { background-color: #2c5f2d; }
         input:checked + .slider:before { transform: translateX(12px); }
 
+        /* Wrapper del listado de capas para el efecto de desplazamiento horizontal */
+        .layers-list-wrapper {
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        .layers-list-wrapper.shifted {
+            transform: translateX(100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
         /* Panel Deslizante iPad-Style de Configuración de Capas */
         .layer-config-slide {
             position: absolute;
             top: 0;
-            left: 100%;
+            left: -100%; /* Inicia desplazado a la izquierda */
             width: 100%;
             height: 100%;
             background: rgba(255, 255, 255, 0.96);
@@ -247,10 +264,10 @@
             padding: 16px;
             box-sizing: border-box;
             border-radius: 12px;
-            box-shadow: -5px 0 20px rgba(0,0,0,0.1);
+            box-shadow: 5px 0 20px rgba(0,0,0,0.1);
         }
         .layer-config-slide.active {
-            transform: translateX(-100%);
+            transform: translateX(100%); /* Se desplaza a la derecha para cubrir el panel derecho */
         }
         .slide-header {
             display: flex;
@@ -448,6 +465,9 @@
             cursor: pointer;
             user-select: none;
             position: relative;
+            z-index: 5;
+            background: inherit;
+            padding-right: 6px;
         }
         .round-chk-container input {
             position: absolute;
@@ -578,33 +598,57 @@
             display: flex;
         }
 
-        /* Soporte para que los items precargados también revelen acciones en hover */
-        .layer-item-actions {
-            display: none;
-            gap: 4px;
+        /* Contenedor derecho que agrupa el switch, los MB y los botones CRUD */
+        .layer-right-controls {
+            display: flex;
             align-items: center;
-            margin-left: 8px;
+            position: relative;
+            overflow: visible;
         }
+
+        .layer-item-actions {
+            display: flex !important;
+            align-items: center;
+            gap: 6px;
+            width: 0;
+            opacity: 0;
+            transform: translateX(-15px); /* Inicia ligeramente detrás del switch */
+            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+                        opacity 0.3s ease, 
+                        transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                        margin-left 0.3s ease;
+            overflow: hidden;
+            white-space: nowrap;
+            margin-left: 0;
+            z-index: 1;
+        }
+
+        /* Al pasar el mouse, emergen los botones CRUD hacia la derecha */
         .layer-item:hover .layer-item-actions,
         .layer-item.nested:hover .layer-item-actions {
-            display: inline-flex !important;
+            width: 48px;
+            opacity: 1;
+            transform: translateX(0);
+            margin-left: 8px;
         }
 
         .layer-item-actions .layer-action-btn,
         .layer-actions-container .layer-action-btn {
-            background: none; border: none; cursor: pointer; padding: 2px 4px;
-            font-size: 0.75rem; border-radius: 4px; transition: all 0.15s ease;
+            background: none; border: none; cursor: pointer; padding: 2px;
+            font-size: 0.78rem; border-radius: 4px; transition: all 0.2s ease;
             display: flex; align-items: center; justify-content: center;
         }
+
+        /* Engranaje verde y papelera roja al pasar el mouse */
         .layer-item-actions .config-btn,
-        .layer-actions-container .config-btn { color: #2c5f2d; }
+        .layer-actions-container .config-btn { color: #7f8c8d; }
         .layer-item-actions .config-btn:hover,
-        .layer-actions-container .config-btn:hover { background: rgba(44, 95, 45, 0.08); color: #1e3a1f; }
+        .layer-actions-container .config-btn:hover { color: #27ae60 !important; background: rgba(39, 174, 96, 0.08) !important; }
 
         .layer-item-actions .delete-btn,
-        .layer-actions-container .delete-btn { color: #e74c3c; }
+        .layer-actions-container .delete-btn { color: #7f8c8d; }
         .layer-item-actions .delete-btn:hover,
-        .layer-actions-container .delete-btn:hover { background: rgba(231, 76, 60, 0.1); }
+        .layer-actions-container .delete-btn:hover { color: #e74c3c !important; background: rgba(231, 76, 60, 0.08) !important; }
         .layer-item-actions .delete-btn:disabled { color: #ccc !important; cursor: not-allowed !important; background: none !important; }
 
         /* Barra Global de Lotes Flotante */
@@ -751,8 +795,9 @@
 
 <!-- Panel Derecho: Gestor de Capas -->
 <div class="glass-panel right-sidebar" id="right-panel">
-    <h2 onmouseenter="updateConsole('TITULO_CAPAS')" onmouseleave="resetConsole()"><i class="fas fa-layer-group"></i> Capas del Mapa</h2>
-    <div class="subtitle">Gestión de datos espaciales</div>
+    <div class="layers-list-wrapper" id="layers-list-wrapper">
+        <h2 onmouseenter="updateConsole('TITULO_CAPAS')" onmouseleave="resetConsole()"><i class="fas fa-layer-group"></i> Capas del Mapa</h2>
+        <div class="subtitle">Gestión de datos espaciales</div>
 
     <!-- Acordeón: Capas Base (Sin active para iniciar retraído) -->
     <div class="layer-group accordion">
@@ -1155,6 +1200,7 @@
             </div>
         </div>
     </div>
+    </div> <!-- Fin de layers-list-wrapper -->
 
     <!-- Panel Desplizable (iPad Slide) de Configuración de Capas -->
     <div class="layer-config-slide" id="layer-config-slide">
@@ -1272,6 +1318,65 @@
 
     console.log("🚀 Geovisor SIGAGRO inicializado con Depurador Activo en el Cliente.");
     console.log(`Plataforma: ${navigator.userAgent}`);
+
+    // --- Definición global de Configuración de Capas Base ---
+    window.openBaseLayerConfig = function(layerId) {
+        const title = layerId === 'base-positron' ? 'Positron (Claro / Defecto)' :
+                      layerId === 'base-dark' ? 'CartoDB Dark Matter' :
+                      layerId === 'base-osm' ? 'OpenStreetMap Clásico' : 'OpenTopoMap (Topográfico)';
+                      
+        const details = layerId === 'base-positron' ? 'Capa base optimizada con colores claros, ideal para la visualización de parcelas catastrales y límites territoriales.' :
+                      layerId === 'base-dark' ? 'Capa de fondo oscura (Dark Matter) diseñada para mapas temáticos de alto contraste.' :
+                      layerId === 'base-osm' ? 'Cartografía estándar y detallada provista de forma abierta por la comunidad global de OpenStreetMap.' : 
+                      'Mapa topográfico con relieve y curvas de nivel detalladas para análisis de pendientes.';
+
+        // Inyectar metadatos en el slide de configuración
+        const slideLayerTitle = document.getElementById('slide-layer-title');
+        const slideTechDetails = document.getElementById('slide-tech-details');
+        const slideColumnGrid = document.getElementById('slide-column-grid');
+        const slideBtnApply = document.getElementById('slide-btn-apply');
+        
+        if (slideLayerTitle) slideLayerTitle.innerText = title;
+        if (slideTechDetails) {
+            slideTechDetails.innerHTML = `
+                <strong>Tipo:</strong> Capa Base Raster/Vectorial de Fondo<br>
+                <strong>ID de Capa:</strong> ${layerId}<br>
+                <strong>Descripción:</strong> ${details}
+            `;
+        }
+        if (slideColumnGrid) {
+            slideColumnGrid.innerHTML = `
+                <div style="font-size: 0.72rem; color: #666; padding: 12px; font-style: italic; text-align: center; grid-column: 1/-1;">
+                    Esta capa base no posee esquema de columnas de DuckDB. Se configura a nivel de MapLibre GL.
+                </div>
+            `;
+        }
+        if (slideBtnApply) slideBtnApply.style.display = 'none';
+        
+        // Abrir el slide
+        const layerConfigSlide = document.getElementById('layer-config-slide');
+        const layersListWrapper = document.getElementById('layers-list-wrapper');
+        if (layerConfigSlide) layerConfigSlide.classList.add('active');
+        if (layersListWrapper) layersListWrapper.classList.add('shifted');
+    };
+
+    // --- Restructuración Dinámica de Controles CRUD en Capas Estáticas ---
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.layer-item').forEach(item => {
+            const actions = item.querySelector('.layer-item-actions');
+            const sw = item.querySelector('.switch');
+            if (actions && sw) {
+                // Crear el contenedor derecho que agrupa el switch y las acciones emergentes
+                const rightControls = document.createElement('div');
+                rightControls.className = 'layer-right-controls';
+                
+                // Insertar el contenedor justo antes de la casilla switch
+                sw.parentNode.insertBefore(rightControls, sw);
+                rightControls.appendChild(sw);
+                rightControls.appendChild(actions);
+            }
+        });
+    });
 
     // --- 1. Lógica de Paneles Ocultables y Acordeones ---
     const leftPanel = document.getElementById('left-panel');
@@ -1552,16 +1657,41 @@
         sw.addEventListener('change', (e) => {
             if (e.target.checked) {
                 const selected = e.target.getAttribute('data-baselayer');
+                
                 // Desactivar el resto de switches de capas base
                 document.querySelectorAll('.base-layer-switch').forEach(other => {
                     if (other !== e.target) other.checked = false;
                 });
-                // Sincronizar visibilidad de capas de fondo en MapLibre
+                
+                // Sincronizar visibilidad de capas en MapLibre de forma dinámica y resiliente
+                const style = map.getStyle();
+                const isPositronActive = (selected === 'positron');
+                
+                // 1. Mostrar u ocultar las capas raster base
                 baseLayers.forEach(layer => {
                     if (layer !== 'positron' && map.getLayer(`layer-${layer}`)) {
                         map.setLayoutProperty(`layer-${layer}`, 'visibility', layer === selected ? 'visible' : 'none');
                     }
                 });
+                
+                // 2. Apagar selectivamente las capas vectoriales opacas del fondo de Positron
+                if (style && style.layers) {
+                    style.layers.forEach(layer => {
+                        const isCoreVectorLayer = layer.id !== 'layer-dark' && 
+                                                  layer.id !== 'layer-osm' && 
+                                                  layer.id !== 'layer-topo' && 
+                                                  !layer.id.startsWith('s3-') && 
+                                                  !layer.id.startsWith('user-') &&
+                                                  layer.id !== 'municipios-layer' &&
+                                                  layer.id !== 'subregiones-layer' &&
+                                                  layer.id !== 'heatmap-layer' &&
+                                                  layer.id !== 'flood-layer';
+                                                  
+                        if (isCoreVectorLayer && layer.type !== 'symbol') {
+                            map.setLayoutProperty(layer.id, 'visibility', isPositronActive ? 'visible' : 'none');
+                        }
+                    });
+                }
             } else {
                 // Si el usuario intenta apagar el mapa base activo, forzamos a dejarlo prendido (siempre debe haber un mapa base)
                 e.target.checked = true;
@@ -1585,7 +1715,7 @@
     let customLayerCounter = 1;
 
     // Configuración de credenciales de S3 para subida directa desde el cliente
-    const S3_PUT_ENDPOINT = "https://s3.agrohoney.com/catastro";
+    const S3_PUT_ENDPOINT = "https://s3.agrohoney.com/qparquets3/geovisor-layers";
     const S3_AUTH_HEADER = "Basic YWRtaW46QWdyb0hvbmV5MjAyNiE="; // admin:AgroHoney2026!
 
     // Abrir selector de archivos al hacer clic en la zona de drop
@@ -1704,7 +1834,7 @@
 
             let urlConsulta;
             if (subidaExitosaS3) {
-                urlConsulta = `s3://catastro/${file.name}`;
+                urlConsulta = `s3://geovisor-layers/${file.name}`;
             } else {
                 // Registrar buffer en caliente de DuckDB-WASM si falló la subida física (Bypass infalible)
                 const arrayBuffer = await file.arrayBuffer();
@@ -1880,18 +2010,18 @@
                         <span class="round-checkmark"></span>
                     </label>
                     <span class="layer-title-text" style="font-size: 0.75rem; font-weight: 600; color: #333;" title="${layer.nombre}">${layer.nombre}</span>
-                    <div class="layer-item-actions">
-                        <button class="layer-action-btn config-btn" onclick="openLayerConfigModal(${layer.id}); event.stopPropagation();" title="Configuración Columnar Avanzada"><i class="fas fa-cog"></i></button>
-                        <button class="layer-action-btn delete-btn" onclick="eliminarCapaIndividual(${layer.id}); event.stopPropagation();" title="Eliminar Capa"><i class="fas fa-trash-alt"></i></button>
-                    </div>
                 </div>
-                <div style="display: flex; align-items: center; gap: 6px;">
+                <div class="layer-right-controls" style="display: flex; align-items: center; gap: 6px;">
                     <span style="color: #888; font-size: 0.65rem; font-weight: 500; white-space: nowrap;">${layer.size} MB</span>
                     ${iconS3}
                     <label class="switch" style="width: 28px; height: 16px; margin-bottom: 0;">
                         <input type="checkbox" id="visibility-${layer.id}" checked>
                         <span class="slider" style="border-radius: 10px;"></span>
                     </label>
+                    <div class="layer-item-actions">
+                        <button class="layer-action-btn config-btn" onclick="openLayerConfigModal(${layer.id}); event.stopPropagation();" title="Configuración Columnar Avanzada"><i class="fas fa-cog"></i></button>
+                        <button class="layer-action-btn delete-btn" onclick="eliminarCapaIndividual(${layer.id}); event.stopPropagation();" title="Eliminar Capa"><i class="fas fa-trash-alt"></i></button>
+                    </div>
                 </div>
             `;
             userLayersList.appendChild(item);
@@ -2080,6 +2210,10 @@
     // Cerrar panel deslizante
     window.closeLayerConfigModal = function() {
         if(layerConfigSlide) layerConfigSlide.classList.remove('active');
+        const layersListWrapper = document.getElementById('layers-list-wrapper');
+        if (layersListWrapper) layersListWrapper.classList.remove('shifted');
+        const slideBtnApply = document.getElementById('slide-btn-apply');
+        if (slideBtnApply) slideBtnApply.style.display = 'block';
         activeConfigLayer = null;
     };
 
@@ -2142,6 +2276,8 @@
 
         activeConfigLayer = layer;
         if(layerConfigSlide) layerConfigSlide.classList.add('active');
+        const layersListWrapper = document.getElementById('layers-list-wrapper');
+        if (layersListWrapper) layersListWrapper.classList.add('shifted');
 
         slideTechDetails.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Leyendo metadatos desde DuckDB-WASM...`;
         slideColumnGrid.innerHTML = '';
@@ -2150,7 +2286,7 @@
             if (!dbInstance) await initDuckDBEngine();
             const conn = await dbInstance.connect();
 
-            let fileRef = layer.static ? `s3://catastro/${layer.nombre}` : (layer.subido ? `s3://catastro/${layer.nombre}` : layer.nombre);
+            let fileRef = layer.static ? `s3://geovisor-layers/${layer.nombre}` : (layer.subido ? `s3://geovisor-layers/${layer.nombre}` : layer.nombre);
             
             // Cargar extensión espacial
             await conn.query(`LOAD spatial;`);
@@ -2262,7 +2398,7 @@
                 if (!dbInstance) await initDuckDBEngine();
                 const conn = await dbInstance.connect();
 
-                let fileRef = layer.static ? `s3://catastro/${layer.nombre}` : (layer.subido ? `s3://catastro/${layer.nombre}` : layer.nombre);
+                let fileRef = layer.static ? `s3://geovisor-layers/${layer.nombre}` : (layer.subido ? `s3://geovisor-layers/${layer.nombre}` : layer.nombre);
                 
                 await conn.query(`LOAD spatial;`);
 
@@ -2474,7 +2610,7 @@
             }
 
             const conn = await dbInstance.connect();
-            const url = `s3://catastro/${fileName}`;
+            const url = `s3://geovisor-layers/${fileName}`;
             
             // Forzar carga de extensión spatial en la conexión si se requiere
             await conn.query(`LOAD spatial;`);
@@ -2601,57 +2737,35 @@
             // Configurar S3 / HTTPFS / Spatial
             const conn = await dbInstance.connect();
             
-            // DESACTIVAR de forma agresiva auto-instalación/autoload virtuales que causan fallos de rutas '/home/web_user'
+            // Habilitar la autoinstalación y autocarga segura del CDN oficial de DuckDB-WASM
             await conn.query(`
-                SET autoinstall_known_extensions=0;
-                SET autoload_known_extensions=0;
+                SET autoinstall_known_extensions=1;
+                SET autoload_known_extensions=1;
             `);
             
-            // Detectar arquitectura del bundle cargado de forma dinámica (wasm_eh o wasm_mvp)
-            const isEH = (bundle.mainWorker && bundle.mainWorker.includes('eh')) || (bundle.mainModule && bundle.mainModule.includes('eh'));
-            const arch = isEH ? 'wasm_eh' : 'wasm_mvp';
-            
-            const httpfsUrl = `https://extensions.duckdb.org/v0.9.1/${arch}/httpfs.duckdb_extension.wasm`;
-            const spatialUrl = `https://extensions.duckdb.org/v0.9.1/${arch}/spatial.duckdb_extension.wasm`;
-            
-            console.log(`📡 Instalando extensiones directas del CDN oficial DuckDB para arquitectura [${arch}]...`);
-
-            // Cargar e instalar HTTPFS vía URL absoluta directa
+            // Cargar e instalar HTTPFS de forma resiliente
             try {
-                console.log(`Descargando httpfs desde: ${httpfsUrl}`);
-                await conn.query(`INSTALL '${httpfsUrl}'; LOAD '${httpfsUrl}';`);
-                console.log("✅ Extensión HTTPFS cargada y activa de forma remota.");
+                console.log("📡 Cargando extensión HTTPFS de forma nativa...");
+                await conn.query("LOAD httpfs;");
+                console.log("✅ Extensión HTTPFS cargada y activa.");
             } catch (httpfsErr) {
-                console.error("❌ Error al instalar HTTPFS remoto:", httpfsErr.message);
-                try {
-                    console.log("Reintentando carga simple local httpfs...");
-                    await conn.query(`LOAD httpfs;`);
-                } catch(e) {
-                    console.error("❌ Fallo definitivo en HTTPFS:", e.message);
-                }
+                console.error("❌ Fallo al cargar HTTPFS nativo:", httpfsErr.message);
             }
 
-            // Cargar e instalar SPATIAL vía URL absoluta directa
+            // Cargar e instalar SPATIAL de forma resiliente
             try {
-                console.log(`Descargando spatial desde: ${spatialUrl}`);
-                await conn.query(`INSTALL '${spatialUrl}'; LOAD '${spatialUrl}';`);
+                console.log("📡 Cargando extensión SPATIAL de forma nativa...");
+                await conn.query("LOAD spatial;");
                 window.spatialExtensionLoaded = true;
-                console.log("✅ Extensión SPATIAL cargada y activa de forma remota. GeoParquet/GPKG habilitados.");
+                console.log("✅ Extensión SPATIAL cargada y activa. GeoParquet/GPKG habilitados.");
             } catch (spatialErr) {
-                console.error("❌ Error al instalar SPATIAL remoto:", spatialErr.message);
-                try {
-                    console.log("Reintentando carga simple local spatial...");
-                    await conn.query(`LOAD spatial;`);
-                    window.spatialExtensionLoaded = true;
-                } catch(e) {
-                    window.spatialExtensionLoaded = false;
-                    console.error("❌ Error de Extensión: La extensión 'spatial' no se pudo inicializar en este navegador.");
-                }
+                window.spatialExtensionLoaded = false;
+                console.error("❌ Fallo al cargar SPATIAL nativo:", spatialErr.message);
             }
 
-            // Configuración S3 con credenciales de AgroHoney
+            // Configuración S3 con credenciales de AgroHoney (MinIO con ruta /qparquets3)
             await conn.query(`
-                SET s3_endpoint='s3.agrohoney.com';
+                SET s3_endpoint='s3.agrohoney.com/qparquets3';
                 SET s3_access_key_id='admin';
                 SET s3_secret_access_key='AgroHoney2026!';
                 SET s3_use_ssl=true;
@@ -2661,9 +2775,12 @@
             
             // Test de comunicación asíncrono con S3
             try {
-                const s3Test = await fetch("https://s3.agrohoney.com/catastro/", { method: "HEAD" });
+                const s3Test = await fetch("https://s3.agrohoney.com/qparquets3/geovisor-layers/", { 
+                    method: "HEAD",
+                    headers: { "Authorization": S3_AUTH_HEADER }
+                });
                 window.s3ConnectionSuccess = true;
-                console.log("✅ Conexión con s3.agrohoney.com establecida correctamente.");
+                console.log("✅ Conexión con s3.agrohoney.com/qparquets3/geovisor-layers/ establecida correctamente.");
             } catch (s3FetchErr) {
                 window.s3ConnectionSuccess = false;
                 console.warn("⚠️ MinIO S3 inaccesible directo por CORS o red. Los archivos locales funcionarán con el bypass de caché.");

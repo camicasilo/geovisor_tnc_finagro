@@ -1829,17 +1829,24 @@
                     // Registrar en todas las rutas posibles del filesystem virtual
                     const paths = [
                         `/tmp/.duckdb/extensions/v0.9.1/wasm_eh/spatial.duckdb_extension`,
+                        `/tmp/.duckdb/extensions/v0.9.1/wasm_eh/spatial.duckdb_extension.wasm`,
                         `/tmp/.duckdb_ext/.duckdb/extensions/v0.9.1/wasm_eh/spatial.duckdb_extension`,
+                        `/tmp/.duckdb_ext/.duckdb/extensions/v0.9.1/wasm_eh/spatial.duckdb_extension.wasm`,
                         `/home/web_user/.duckdb/extensions/v0.9.1/wasm_eh/spatial.duckdb_extension`,
+                        `/home/web_user/.duckdb/extensions/v0.9.1/wasm_eh/spatial.duckdb_extension.wasm`,
                         `/tmp/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension`,
+                        `/tmp/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension.wasm`,
                         `/tmp/.duckdb_ext/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension`,
-                        `/home/web_user/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension`
+                        `/tmp/.duckdb_ext/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension.wasm`,
+                        `/home/web_user/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension`,
+                        `/home/web_user/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension.wasm`
                     ];
                     
                     for (const p of paths) {
                         await dbInstance.registerFileBuffer(p, u8);
                     }
                     
+                    await conn.query(`SET allow_unsigned_extensions=true;`);
                     await conn.query(`LOAD spatial;`);
                     window.spatialExtensionLoaded = true;
                     console.log("✅ Extensión spatial recuperada localmente en dropzone.");
@@ -3014,7 +3021,9 @@
             const duckdb = await import('./wasm/duckdb-wasm.esm.js');
             const worker = new Worker('./wasm/duckdb-browser-eh.worker.js');
             dbInstance = new duckdb.AsyncDuckDB(new duckdb.ConsoleLogger(), worker);
-            await dbInstance.instantiate('./wasm/duckdb-eh.wasm');
+            await dbInstance.instantiate('./wasm/duckdb-eh.wasm', null, {
+                allowUnsignedExtensions: true
+            });
             
             // Configurar S3 / HTTPFS / Spatial
             const conn = await dbInstance.connect();
@@ -3027,8 +3036,8 @@
                 console.warn('⚠️ [DuckDB] No se pudo configurar home_directory:', homeErr.message);
             }
 
-            // Evitar consultas a repositorios de extensiones remotos
-            await conn.query(`SET autoinstall_known_extensions=0; SET autoload_known_extensions=0;`);
+            // Evitar consultas a repositorios de extensiones remotos y permitir firmas locales
+            await conn.query(`SET autoinstall_known_extensions=0; SET autoload_known_extensions=0; SET allow_unsigned_extensions=true;`);
 
             // SPATIAL: Cargar de forma local y offline mediante registro en VFS
             let spatialLoaded = false;
@@ -3042,11 +3051,17 @@
                 // Mapear rutas virtuales para máxima compatibilidad de versiones
                 const paths = [
                     `/tmp/.duckdb/extensions/v0.9.1/wasm_eh/spatial.duckdb_extension`,
+                    `/tmp/.duckdb/extensions/v0.9.1/wasm_eh/spatial.duckdb_extension.wasm`,
                     `/tmp/.duckdb_ext/.duckdb/extensions/v0.9.1/wasm_eh/spatial.duckdb_extension`,
+                    `/tmp/.duckdb_ext/.duckdb/extensions/v0.9.1/wasm_eh/spatial.duckdb_extension.wasm`,
                     `/home/web_user/.duckdb/extensions/v0.9.1/wasm_eh/spatial.duckdb_extension`,
+                    `/home/web_user/.duckdb/extensions/v0.9.1/wasm_eh/spatial.duckdb_extension.wasm`,
                     `/tmp/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension`,
+                    `/tmp/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension.wasm`,
                     `/tmp/.duckdb_ext/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension`,
-                    `/home/web_user/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension`
+                    `/tmp/.duckdb_ext/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension.wasm`,
+                    `/home/web_user/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension`,
+                    `/home/web_user/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension.wasm`
                 ];
                 
                 for (const p of paths) {

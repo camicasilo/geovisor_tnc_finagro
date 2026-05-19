@@ -3065,10 +3065,22 @@
 
         try {
             window.perfMarks[`layer_${fileName}_start`] = performance.now();
-            // Realizar petición pública y anónima sin headers de autenticación para evitar HTTP 400
-            const resp = await fetch(fileUrl);
-            if (!resp.ok) {
-                throw new Error(`Error HTTP ${resp.status} al descargar desde S3`);
+            let resp;
+            try {
+                // Intento 1: Descarga pública y anónima (ideal para evitar error 400 de MinIO en buckets públicos)
+                resp = await fetch(fileUrl);
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            } catch (anonErr) {
+                console.warn(`⚠️ [S3-Buffer] Descarga anónima falló (${anonErr.message}), intentando con credenciales...`);
+                // Intento 2: Descarga con cabecera de autenticación (si el bucket es privado o requiere auth proxy)
+                const headers = {};
+                if (typeof S3_AUTH_HEADER !== 'undefined' && S3_AUTH_HEADER) {
+                    headers["Authorization"] = S3_AUTH_HEADER;
+                }
+                resp = await fetch(fileUrl, { headers });
+                if (!resp.ok) {
+                    throw new Error(`Error HTTP ${resp.status} al descargar desde S3`);
+                }
             }
             
             const contentLength = resp.headers.get('content-length');

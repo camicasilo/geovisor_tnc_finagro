@@ -1335,7 +1335,7 @@
 
 
 <script>
-    // --- Sistema de Diagnóstico e Intercepción Global de Consola (v2.1.0) ---
+    // --- Sistema de Diagnóstico e Intercepción Global de Consola (v2.2.0) ---
     window.systemLogs = [];
     window.spatialExtensionLoaded = false;
     window.s3ConnectionSuccess = false;
@@ -1346,8 +1346,33 @@
         pageLoad: 0,
         duckdbInitStart: null,
         duckdbInitEnd: null,
-        duckdbInitDuration: null
+        duckdbInitDuration: null,
+        ttfb: 0,
+        lcp: 0
     };
+
+    // Registrar TTFB y LCP en caliente de forma nativa e inmediata
+    try {
+        const navEntries = performance.getEntriesByType('navigation');
+        if (navEntries.length > 0) {
+            window.perfMarks.ttfb = Math.round(navEntries[0].responseStart - navEntries[0].requestStart);
+        } else if (performance.timing) {
+            window.perfMarks.ttfb = Math.round(performance.timing.responseStart - performance.timing.requestStart);
+        }
+    } catch (e) {
+        console.warn("⚠️ No se pudo calcular el TTFB:", e.message);
+    }
+
+    try {
+        const observer = new PerformanceObserver((entryList) => {
+            const entries = entryList.getEntries();
+            const lastEntry = entries[entries.length - 1];
+            window.perfMarks.lcp = Math.round(lastEntry.startTime);
+        });
+        observer.observe({ type: 'largest-contentful-paint', buffered: true });
+    } catch (e) {
+        console.warn("⚠️ LCP no es soportado por el navegador:", e.message);
+    }
 
     window.addEventListener('load', () => {
         setTimeout(() => {
@@ -1390,6 +1415,10 @@
             diagBtn.style.color = '#27ae60';
             diagBtn.style.background = 'rgba(39, 174, 96, 0.15)';
             diagBtn.style.borderTop = '1px solid rgba(39, 174, 96, 0.3)';
+            
+            // Actualizar el tooltip del navegador (title attribute)
+            const formattedTime = window.lastLogUpdateTime.toLocaleString('es-CO', { timeZone: 'America/Bogota' });
+            diagBtn.setAttribute('title', `Último log: ${formattedTime}. Descargar Informe de Diagnóstico y Errores (TXT)`);
             
             // Inyectar animación CSS de pulso verde de forma dinámica si no existe
             if (!document.getElementById('pulse-green-style')) {
@@ -3150,14 +3179,17 @@
             const xmax = bounds.getEast();
             const ymax = bounds.getNorth();
 
-            console.log(`📡 Aplicando HTTP Range Requests con BBox: [${xmin.toFixed(4)}, ${ymin.toFixed(4)}, ${xmax.toFixed(4)}, ${ymax.toFixed(4)}] sobre S3...`);
+            captureLog('s3-spatial-query', [`Capa ${fileName} en lectura. BBox visible: xmin=${xmin.toFixed(5)}, ymin=${ymin.toFixed(5)}, xmax=${xmax.toFixed(5)}, ymax=${ymax.toFixed(5)}`]);
 
-            // Consulta espacial de alto rendimiento optimizada (Filtrado por BBox de visualización en DuckDB)
+            // Consulta espacial de alto rendimiento ultra-optimizada (Lazy Loading por BBox estructurado en DuckDB)
             const query = `
                 SELECT *, ST_AsGeoJSON(geometry) as json_geom 
                 FROM read_parquet('${url}') 
-                WHERE ST_Intersects(geometry, ST_MakeEnvelope(${xmin}, ${ymin}, ${xmax}, ${ymax}))
-                LIMIT 3500;
+                WHERE bbox.xmin <= ${xmax}
+                  AND bbox.xmax >= ${xmin}
+                  AND bbox.ymin <= ${ymax}
+                  AND bbox.ymax >= ${ymin}
+                LIMIT 50000;
             `;
             
             const results = await conn.query(query);
@@ -3181,7 +3213,7 @@
 
             if (!geojson.features || geojson.features.length === 0) {
                 // Fallback si la zona visible no tiene elementos: cargar los primeros 500
-                console.log("⚠️ No se encontraron elementos en la zona visible. Cargando muestra por defecto...");
+                captureLog('s3-spatial-fallback', [`Capa ${fileName} sin registros en BBox visible. Disparando lectura de primeros 500 predios como muestra...`]);
                 const fallbackQuery = `
                     SELECT *, ST_AsGeoJSON(geometry) as json_geom 
                     FROM read_parquet('${url}') 
@@ -3201,6 +3233,8 @@
                         geometry: JSON.parse(row.json_geom)
                     };
                 });
+            } else {
+                captureLog('s3-spatial-success', [`Capa ${fileName} leída con Lazy Loading. Registros visibles cargados: ${geojson.features.length}`]);
             }
 
             map.addSource(sourceId, { type: 'geojson', data: geojson });
@@ -3213,11 +3247,13 @@
             });
 
             console.log(`✅ Capa S3 '${layerId}' renderizada con éxito.`);
+            captureLog('s3-layer-rendered', [`Capa S3 '${layerId}' renderizada exitosamente en el mapa con ${geojson.features.length} geometrías`]);
             updateConsole('WELCOME');
             document.getElementById('console-output').innerHTML = `<b>Carga Exitosa:</b> ${fileName} filtrado por BBox visible y pintado en el mapa.`;
             await conn.close();
         } catch (e) {
             console.error(`❌ Error al cargar capa remota S3 '${fileName}':`, e.message);
+            captureLog('s3-layer-error', [`Error crítico en capa S3 '${fileName}': ${e.message}`]);
             document.getElementById('console-output').innerHTML = `<b style="color:red;">Error:</b> No se pudo cargar ${fileName}. Haz clic en el icono de diagnóstico <i class="fas fa-file-medical"></i> para un informe detallado.`;
         }
     }
@@ -3650,7 +3686,9 @@
             duckdbWASM: !!dbInstance,
             duckdbExtensions: [],
             s3Endpoint: 'https://s3.agrohoney.com',
-            memoryMB: (performance && performance.memory) ? (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(1) + ' MB' : 'N/D (No expuesto)'
+            memoryMB: (performance && performance.memory) ? (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(1) + ' MB' : 'N/D (No expuesto)',
+            ttfb: window.perfMarks.ttfb ? window.perfMarks.ttfb + ' ms' : 'N/D',
+            lcp: window.perfMarks.lcp ? window.perfMarks.lcp + ' ms' : 'N/D'
         };
         
         if (dbInstance) {
@@ -3675,6 +3713,8 @@
         const countLayers = typeof loadedUserLayers !== 'undefined' ? loadedUserLayers.length : 0;
         const metrics = {
             '⏱️ Carga Inicial HTML (loadEvent)': (window.perfMarks.pageLoad ? window.perfMarks.pageLoad + ' ms' : 'Cargando...'),
+            '⚡ Time to First Byte (TTFB)': window.perfMarks.ttfb ? window.perfMarks.ttfb + ' ms' : 'N/D',
+            '🎨 Largest Contentful Paint (LCP)': window.perfMarks.lcp ? window.perfMarks.lcp + ' ms' : 'N/D (Aún calculándose o no soportado)',
             '🧠 Memoria JS Usada': (performance && performance.memory) ? (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(1) + ' MB' : 'N/D',
             '🔌 Inicialización DuckDB': window.perfMarks.duckdbInitDuration ? window.perfMarks.duckdbInitDuration.toFixed(1) + ' ms' : 'No iniciado/Fallido',
             '🗺️ MapLibre GL / Deck.gl': window.map ? 'Activo' : 'No iniciado',
@@ -3685,6 +3725,17 @@
         console.group('📊 SIGAGRO Performance & Telemetry Dashboard');
         console.table(metrics);
         console.groupEnd();
+
+        // Enriquecer la bitácora de logs del sistema
+        captureLog('perf-telemetry-dashboard', [JSON.stringify({
+            loadEvent: window.perfMarks.pageLoad,
+            ttfb: window.perfMarks.ttfb,
+            lcp: window.perfMarks.lcp,
+            memory: (performance && performance.memory) ? performance.memory.usedJSHeapSize : null,
+            duckdbInit: window.perfMarks.duckdbInitDuration,
+            userLayers: countLayers,
+            s3Connected: window.s3ConnectionSuccess
+        })]);
     };
 
     // --- Diagnóstico de Conexión S3 & CORS en Caliente ---
@@ -3791,6 +3842,8 @@
 
             // Generar tabla de tiempos de rendimiento
             let perfReport = `  - Carga Inicial de Página (loadEvent) : ${window.perfMarks.pageLoad ? window.perfMarks.pageLoad + ' ms' : 'N/D (Aún cargando o no soportado)'}\n`;
+            perfReport += `  - Tiempo al Primer Byte (TTFB)         : ${window.perfMarks.ttfb ? window.perfMarks.ttfb + ' ms' : 'N/D'}\n`;
+            perfReport += `  - Largest Contentful Paint (LCP)      : ${window.perfMarks.lcp ? window.perfMarks.lcp + ' ms' : 'N/D (Aún calculándose o no soportado)'}\n`;
             perfReport += `  - Inicialización Motor DuckDB-WASM    : ${window.perfMarks.duckdbInitDuration ? window.perfMarks.duckdbInitDuration.toFixed(1) + ' ms' : 'NO INICIALIZADO / FALLIDO'}\n`;
             
             const layerDurations = Object.keys(window.perfMarks)
@@ -3816,6 +3869,8 @@
   - Deck.gl DeckGL compatible          : ${techPayload.deckGL}
   - DuckDB-WASM Motor Local            : ${techPayload.duckdbWASM ? 'INICIALIZADO Y ACTIVO' : 'NO DETECTADO'}
   - Consumo Estimado de Memoria heap   : ${techPayload.memoryMB}
+  - Tiempo al Primer Byte (TTFB)       : ${techPayload.ttfb}
+  - Largest Contentful Paint (LCP)     : ${techPayload.lcp}
   - Endpoint de origen S3 MinIO        : ${techPayload.s3Endpoint}\n`;
             
             if (techPayload.duckdbExtensions.length > 0) {

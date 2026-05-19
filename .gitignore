@@ -19,3 +19,7 @@ DataSets_Parquet/
 .env
 config_local.json
 dokploy_project.json
+
+# Ignorar binarios de extensiones y herramientas locales de desarrollo
+*.wasm
+devdocs-mcp-server/

@@ -3008,96 +3008,105 @@
 
     // --- 9. Arquitectura de Datos: DuckDB-WASM + Streaming Espacial ---
     let dbInstance = null;
+    let initPromise = null;
     let helpDataMap = new Map();
     let deckLayer = null;
     const infoConsole = document.getElementById('info-console');
     
     // Inicialización global de DuckDB con soporte S3 y diagnóstico v2.1.0
     async function initDuckDBEngine() {
-        if (dbInstance) return true;
-        console.log("⚙️ Iniciando motor DuckDB-WASM con perfil de diagnóstico local...");
-        try {
-            // Importación local sin CDN
-            const duckdb = await import('./wasm/duckdb-wasm.esm.js');
-            const worker = new Worker('./wasm/duckdb-browser-eh.worker.js');
-            dbInstance = new duckdb.AsyncDuckDB(new duckdb.ConsoleLogger(), worker);
-            await dbInstance.instantiate('./wasm/duckdb-eh.wasm', null, {
-                allowUnsignedExtensions: true
-            });
-            
-            // Configurar S3 / HTTPFS / Spatial
-            const conn = await dbInstance.connect();
-            
-            // ── DuckDB-WASM FIX CRÍTICO: establecer home_directory y extension_directory ──
+        if (initPromise) return initPromise;
+        
+        initPromise = (async () => {
+            if (dbInstance) return true;
+            console.log("⚙️ Iniciando motor DuckDB-WASM con perfil de diagnóstico local...");
             try {
-                await conn.query(`SET home_directory='/tmp'; SET extension_directory='/tmp/.duckdb_ext';`);
-                console.log('📂 [DuckDB] home_directory y extension_directory configurados en /tmp');
-            } catch(homeErr) {
-                console.warn('⚠️ [DuckDB] No se pudo configurar home_directory:', homeErr.message);
-            }
-
-            // Evitar consultas a repositorios de extensiones remotos y permitir firmas locales
-            await conn.query(`SET autoinstall_known_extensions=0; SET autoload_known_extensions=0; SET allow_unsigned_extensions=true;`);
-
-            // SPATIAL: Cargar de forma local y offline mediante registro en VFS
-            let spatialLoaded = false;
-            try {
-                console.log("🌍 [DuckDB] Cargando extensión spatial local...");
-                const resp = await fetch('./wasm/spatial.duckdb_extension.wasm');
-                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-                const arrayBuffer = await resp.arrayBuffer();
-                const u8 = new Uint8Array(arrayBuffer);
-                
-                // Mapear rutas virtuales para máxima compatibilidad de versiones
-                const paths = [
-                    `/tmp/.duckdb/extensions/v0.9.1/wasm_eh/spatial.duckdb_extension`,
-                    `/tmp/.duckdb/extensions/v0.9.1/wasm_eh/spatial.duckdb_extension.wasm`,
-                    `/tmp/.duckdb_ext/.duckdb/extensions/v0.9.1/wasm_eh/spatial.duckdb_extension`,
-                    `/tmp/.duckdb_ext/.duckdb/extensions/v0.9.1/wasm_eh/spatial.duckdb_extension.wasm`,
-                    `/home/web_user/.duckdb/extensions/v0.9.1/wasm_eh/spatial.duckdb_extension`,
-                    `/home/web_user/.duckdb/extensions/v0.9.1/wasm_eh/spatial.duckdb_extension.wasm`,
-                    `/tmp/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension`,
-                    `/tmp/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension.wasm`,
-                    `/tmp/.duckdb_ext/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension`,
-                    `/tmp/.duckdb_ext/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension.wasm`,
-                    `/home/web_user/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension`,
-                    `/home/web_user/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension.wasm`
-                ];
-                
-                for (const p of paths) {
-                    await dbInstance.registerFileBuffer(p, u8);
-                }
-                
-                await conn.query(`LOAD spatial;`);
-                spatialLoaded = true;
-                window.spatialExtensionLoaded = true;
-                console.log("✅ [DuckDB] SPATIAL cargada localmente y de forma offline.");
-            } catch (spatialErr) {
-                window.spatialExtensionLoaded = false;
-                console.error("❌ [DuckDB] SPATIAL falló al cargar localmente:", spatialErr.message);
-            }
-
-            await conn.close();
-            
-            // Test de comunicación asíncrono con S3
-            try {
-                const s3Test = await fetch("https://s3.agrohoney.com/qparquets3/catastro/", { 
-                    method: "HEAD",
-                    headers: { "Authorization": S3_AUTH_HEADER }
+                // Importación local sin CDN
+                const duckdb = await import('./wasm/duckdb-wasm.esm.js');
+                const worker = new Worker('./wasm/duckdb-browser-eh.worker.js');
+                const instance = new duckdb.AsyncDuckDB(new duckdb.ConsoleLogger(), worker);
+                await instance.instantiate('./wasm/duckdb-eh.wasm', null, {
+                    allowUnsignedExtensions: true
                 });
-                window.s3ConnectionSuccess = true;
-                console.log("✅ Conexión con s3.agrohoney.com establecida.");
-            } catch (s3FetchErr) {
-                window.s3ConnectionSuccess = false;
-                console.warn("⚠️ MinIO S3 inaccesible directo por CORS o red. Bypass activo.");
-            }
+                
+                // Configurar S3 / HTTPFS / Spatial
+                const conn = await instance.connect();
+                
+                // ── DuckDB-WASM FIX CRÍTICO: establecer home_directory y extension_directory ──
+                try {
+                    await conn.query(`SET home_directory='/tmp'; SET extension_directory='/tmp/.duckdb_ext';`);
+                    console.log('📂 [DuckDB] home_directory y extension_directory configurados en /tmp');
+                } catch(homeErr) {
+                    console.warn('⚠️ [DuckDB] No se pudo configurar home_directory:', homeErr.message);
+                }
 
-            console.log("🚀 Motor DuckDB-WASM listo y calibrado.");
-            return true;
-        } catch (e) {
-            console.error("❌ Error fatal al iniciar DuckDB-WASM local:", e);
-            return false;
-        }
+                // Evitar consultas a repositorios de extensiones remotos y permitir firmas locales
+                await conn.query(`SET autoinstall_known_extensions=0; SET autoload_known_extensions=0; SET allow_unsigned_extensions=true;`);
+
+                // SPATIAL: Cargar de forma local y offline mediante registro en VFS
+                let spatialLoaded = false;
+                try {
+                    console.log("🌍 [DuckDB] Cargando extensión spatial local...");
+                    const resp = await fetch('./wasm/spatial.duckdb_extension.wasm');
+                    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                    const arrayBuffer = await resp.arrayBuffer();
+                    const u8 = new Uint8Array(arrayBuffer);
+                    
+                    // Mapear rutas virtuales para máxima compatibilidad de versiones
+                    const paths = [
+                        `/tmp/.duckdb/extensions/v0.9.1/wasm_eh/spatial.duckdb_extension`,
+                        `/tmp/.duckdb/extensions/v0.9.1/wasm_eh/spatial.duckdb_extension.wasm`,
+                        `/tmp/.duckdb_ext/.duckdb/extensions/v0.9.1/wasm_eh/spatial.duckdb_extension`,
+                        `/tmp/.duckdb_ext/.duckdb/extensions/v0.9.1/wasm_eh/spatial.duckdb_extension.wasm`,
+                        `/home/web_user/.duckdb/extensions/v0.9.1/wasm_eh/spatial.duckdb_extension`,
+                        `/home/web_user/.duckdb/extensions/v0.9.1/wasm_eh/spatial.duckdb_extension.wasm`,
+                        `/tmp/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension`,
+                        `/tmp/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension.wasm`,
+                        `/tmp/.duckdb_ext/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension`,
+                        `/tmp/.duckdb_ext/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension.wasm`,
+                        `/home/web_user/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension`,
+                        `/home/web_user/.duckdb/extensions/v0.9.2/wasm_eh/spatial.duckdb_extension.wasm`
+                    ];
+                    
+                    for (const p of paths) {
+                        await instance.registerFileBuffer(p, u8);
+                    }
+                    
+                    await conn.query(`LOAD spatial;`);
+                    spatialLoaded = true;
+                    window.spatialExtensionLoaded = true;
+                    console.log("✅ [DuckDB] SPATIAL cargada localmente y de forma offline.");
+                } catch (spatialErr) {
+                    window.spatialExtensionLoaded = false;
+                    console.error("❌ [DuckDB] SPATIAL falló al cargar localmente:", spatialErr.message);
+                }
+
+                await conn.close();
+                
+                // Test de comunicación asíncrono con S3
+                try {
+                    const s3Test = await fetch("https://s3.agrohoney.com/qparquets3/catastro/", { 
+                        method: "HEAD",
+                        headers: { "Authorization": S3_AUTH_HEADER }
+                    });
+                    window.s3ConnectionSuccess = true;
+                    console.log("✅ Conexión con s3.agrohoney.com establecida.");
+                } catch (s3FetchErr) {
+                    window.s3ConnectionSuccess = false;
+                    console.warn("⚠️ MinIO S3 inaccesible directo por CORS o red. Bypass activo.");
+                }
+
+                console.log("🚀 Motor DuckDB-WASM listo y calibrado.");
+                dbInstance = instance;
+                return true;
+            } catch (e) {
+                console.error("❌ Error fatal al iniciar DuckDB-WASM local:", e);
+                initPromise = null;
+                return false;
+            }
+        })();
+        
+        return initPromise;
     }
 
     // Cargar Ayuda desde Parquet
@@ -3124,6 +3133,7 @@
 
     // Streaming de Capas Yosegi (GeoParquet Piramidal)
     async function updateSpatialStreaming() {
+        if (!dbInstance) await initDuckDBEngine();
         if (!dbInstance || !map) return;
         
         const bounds = map.getBounds();
@@ -3205,7 +3215,13 @@
     }
 
     // Iniciar arquitectura de datos
-    loadHelpSystem();
+    async function initApp() {
+        await initDuckDBEngine();
+        await loadHelpSystem();
+        await updateSpatialStreaming();
+    }
+    initApp();
+
     map.on('moveend', updateSpatialStreaming);
     map.on('zoomend', updateSpatialStreaming);
 

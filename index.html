@@ -1947,7 +1947,7 @@
                     ];
                     
                     for (const p of paths) {
-                        await dbInstance.registerFileBuffer(p, u8);
+                        await dbInstance.registerFileBuffer(p, new Uint8Array(arrayBuffer.slice(0)));
                     }
                     
                     await conn.query(`LOAD spatial;`);
@@ -3352,7 +3352,7 @@
                     ];
                     
                     for (const p of paths) {
-                        await instance.registerFileBuffer(p, u8);
+                        await instance.registerFileBuffer(p, new Uint8Array(arrayBuffer.slice(0)));
                     }
                     
                     await conn.query(`LOAD spatial;`);

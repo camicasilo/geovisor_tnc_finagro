@@ -1950,10 +1950,22 @@
                         await dbInstance.registerFileBuffer(p, new Uint8Array(arrayBuffer.slice(0)));
                     }
                     
-                    await conn.query(`LOAD spatial;`);
+                    try {
+                        await conn.query(`LOAD spatial;`);
+                        console.log("✅ Extensión spatial recuperada localmente en dropzone.");
+                    } catch (loadErr) {
+                        console.warn("⚠️ Extensión spatial local falló en dropzone, intentando repositorio oficial nightly...", loadErr.message);
+                        await conn.query(`
+                            SET autoinstall_known_extensions=1;
+                            SET custom_extension_repository = 'https://nightly-extensions.duckdb.org';
+                            INSTALL spatial;
+                            LOAD spatial;
+                        `);
+                        console.log("✅ Extensión spatial cargada desde repositorio nightly en dropzone.");
+                    }
                     window.spatialExtensionLoaded = true;
-                    console.log("✅ Extensión spatial recuperada localmente en dropzone.");
                 } catch(err) {
+                    window.spatialExtensionLoaded = false;
                     console.error("❌ Spatial inaccesible definitivo:", err.message);
                 }
             }
@@ -3050,14 +3062,11 @@
         
         // Construir URL absoluta de descarga HTTP
         const fileUrl = `https://s3.agrohoney.com/qparquets3/${bucketName}/${fileName}`;
-        const headers = {};
-        if (typeof S3_AUTH_HEADER !== 'undefined' && S3_AUTH_HEADER) {
-            headers["Authorization"] = S3_AUTH_HEADER;
-        }
 
         try {
             window.perfMarks[`layer_${fileName}_start`] = performance.now();
-            const resp = await fetch(fileUrl, { headers });
+            // Realizar petición pública y anónima sin headers de autenticación para evitar HTTP 400
+            const resp = await fetch(fileUrl);
             if (!resp.ok) {
                 throw new Error(`Error HTTP ${resp.status} al descargar desde S3`);
             }
@@ -3360,8 +3369,22 @@
                     window.spatialExtensionLoaded = true;
                     console.log("✅ [DuckDB] SPATIAL cargada localmente y de forma offline.");
                 } catch (spatialErr) {
-                    window.spatialExtensionLoaded = false;
-                    console.error("❌ [DuckDB] SPATIAL falló al cargar localmente:", spatialErr.message);
+                    console.warn("⚠️ [DuckDB] SPATIAL local falló al cargar (posible dynamic linking error), intentando repositorio oficial nightly...", spatialErr.message);
+                    try {
+                        // Habilitar autoinstalación para el repositorio nightly
+                        await conn.query(`
+                            SET autoinstall_known_extensions=1;
+                            SET custom_extension_repository = 'https://nightly-extensions.duckdb.org';
+                            INSTALL spatial;
+                            LOAD spatial;
+                        `);
+                        spatialLoaded = true;
+                        window.spatialExtensionLoaded = true;
+                        console.log("✅ [DuckDB] SPATIAL cargada exitosamente desde el repositorio oficial nightly.");
+                    } catch (remoteErr) {
+                        window.spatialExtensionLoaded = false;
+                        console.error("❌ [DuckDB] SPATIAL falló definitivamente al cargar local y remotamente:", remoteErr.message);
+                    }
                 }
 
                 await conn.close();

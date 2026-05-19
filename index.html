@@ -1950,7 +1950,6 @@
                         await dbInstance.registerFileBuffer(p, u8);
                     }
                     
-                    await conn.query(`SET allow_unsigned_extensions=true;`);
                     await conn.query(`LOAD spatial;`);
                     window.spatialExtensionLoaded = true;
                     console.log("✅ Extensión spatial recuperada localmente en dropzone.");
@@ -3307,6 +3306,11 @@
                 const instance = new duckdb.AsyncDuckDB(new duckdb.ConsoleLogger(), worker);
                 await instance.instantiate(wasmURL);
                 
+                // Abrir la base de datos permitiendo firmas locales (unsigned extensions) antes de conectar
+                await instance.open({
+                    allowUnsignedExtensions: true
+                });
+                
                 // Configurar S3 / HTTPFS / Spatial
                 const conn = await instance.connect();
                 
@@ -3318,8 +3322,8 @@
                     console.warn('⚠️ [DuckDB] No se pudo configurar home_directory:', homeErr.message);
                 }
 
-                // Evitar consultas a repositorios de extensiones remotos y permitir firmas locales
-                await conn.query(`SET autoinstall_known_extensions=0; SET autoload_known_extensions=0; SET allow_unsigned_extensions=true;`);
+                // Evitar consultas a repositorios de extensiones remotos
+                await conn.query(`SET autoinstall_known_extensions=0; SET autoload_known_extensions=0;`);
 
                 // SPATIAL: Cargar de forma local y offline mediante registro en VFS
                 let spatialLoaded = false;

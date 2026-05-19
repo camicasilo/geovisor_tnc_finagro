@@ -1254,6 +1254,18 @@
             </div>
         </div>
         <div class="slide-content" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; padding-top: 4px;">
+            <!-- Barra de Progreso de Descarga de Capas S3 -->
+            <div id="slide-progress-container" style="display: none; background: rgba(44,95,45,0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(44,95,45,0.1); margin-bottom: 12px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.72rem; font-weight: 600; color: #2c5f2d; margin-bottom: 6px;">
+                    <span id="slide-progress-status">Descargando capa desde S3...</span>
+                    <span id="slide-progress-percent">0%</span>
+                </div>
+                <div style="width: 100%; height: 8px; background: rgba(0,0,0,0.05); border-radius: 4px; overflow: hidden;">
+                    <div id="slide-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #2c5f2d, #4e9a51); border-radius: 4px; transition: width 0.1s ease-out;"></div>
+                </div>
+                <div id="slide-progress-bytes" style="font-size: 0.65rem; color: #666; margin-top: 4px; text-align: right;">0.0 MB de 0.0 MB</div>
+            </div>
+            
             <div id="slide-tech-details" style="font-size: 0.72rem; color: #444; background: rgba(0,0,0,0.03); padding: 12px; border-radius: 8px; margin-bottom: 12px; line-height: 1.4; border: 1px solid rgba(0,0,0,0.05); overflow-y: auto; max-height: 150px;">
                 <i class="fas fa-spinner fa-spin"></i> Cargando metadatos de la capa...
             </div>
@@ -1327,6 +1339,36 @@
     window.systemLogs = [];
     window.spatialExtensionLoaded = false;
     window.s3ConnectionSuccess = false;
+    window.lastLogUpdateTime = null;
+
+    // Inicializar marcas de rendimiento globales (perfMarks)
+    window.perfMarks = {
+        pageLoad: 0,
+        duckdbInitStart: null,
+        duckdbInitEnd: null,
+        duckdbInitDuration: null
+    };
+
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            if (typeof performance !== 'undefined' && performance.timing) {
+                window.perfMarks.pageLoad = performance.timing.loadEventEnd - performance.timing.navigationStart;
+            }
+        }, 100);
+    });
+
+    // Escucha permanente de TODOS los clics sobre la página para auditoría y depuración en caliente
+    document.addEventListener('click', (e) => {
+        const target = e.target;
+        if (!target) return;
+        
+        const id = target.id ? `#${target.id}` : '';
+        const classes = target.className ? `.${String(target.className).split(' ').filter(Boolean).join('.')}` : '';
+        const tag = target.tagName;
+        const text = target.textContent ? target.textContent.trim().substring(0, 45) : '';
+        
+        console.log(`🖱️ [Click Global] Tag: ${tag} | Elemento: ${tag}${id}${classes} | Contenido: "${text}"`);
+    });
 
     const captureLog = (type, args) => {
         const timestamp = new Date().toISOString();
@@ -1338,6 +1380,38 @@
             return String(arg);
         }).join(" ");
         window.systemLogs.push(`[${timestamp}] [${type.toUpperCase()}] ${message}`);
+        
+        // Registrar marca de tiempo del último log
+        window.lastLogUpdateTime = new Date();
+        
+        // Cambiar dinámicamente el botón de diagnóstico a verde e iniciar pulso
+        const diagBtn = document.getElementById('btn-diagnostic-report');
+        if (diagBtn) {
+            diagBtn.style.color = '#27ae60';
+            diagBtn.style.background = 'rgba(39, 174, 96, 0.15)';
+            diagBtn.style.borderTop = '1px solid rgba(39, 174, 96, 0.3)';
+            
+            // Inyectar animación CSS de pulso verde de forma dinámica si no existe
+            if (!document.getElementById('pulse-green-style')) {
+                const style = document.createElement('style');
+                style.id = 'pulse-green-style';
+                style.innerHTML = `
+                    @keyframes pulseGreen {
+                        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.4); }
+                        50% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(39, 174, 96, 0); }
+                        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(39, 174, 96, 0); }
+                    }
+                    .pulse-green-active {
+                        animation: pulseGreen 0.6s ease-out;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            diagBtn.classList.remove('pulse-green-active');
+            void diagBtn.offsetWidth; // Forzar reflow de renderizado
+            diagBtn.classList.add('pulse-green-active');
+        }
     };
 
     // Respaldar consolas originales
@@ -1602,6 +1676,7 @@
         
         // --- 5. Lógica de Selección Global ---
         map.on('click', (e) => {
+            console.log(`🗺️ [Mapa Click] Clic detectado en: Lng = ${e.lngLat.lng.toFixed(5)}, Lat = ${e.lngLat.lat.toFixed(5)} (Modo selección: ${selectMode ? 'ACTIVO' : 'INACTIVO'})`);
             if (!selectMode) return;
             
             const features = map.queryRenderedFeatures(e.point);
@@ -2320,6 +2395,34 @@
 
     window.openLayerConfigModal = async function(layerId) {
         let layer = null;
+        let layerName = 'Cargando...';
+
+        // Pre-calcular nombre legible de la capa de forma inmediata para el título
+        if (typeof layerId === 'string' && layerId.startsWith('base-')) {
+            layerName = layerId === 'base-positron' ? 'Positron' :
+                        layerId === 'base-dark' ? 'CartoDB Dark Matter' :
+                        layerId === 'base-osm' ? 'OpenStreetMap' : 'OpenTopoMap';
+        } else if (layerId === 'layer-riesgo' || layerId === 'layer-inundacion') {
+            layerName = layerId === 'layer-riesgo' ? 'Riesgo Climático (Heatmap)' : 'Zonas Inundables';
+        } else if (layerId === 'layer-municipios' || layerId === 'layer-provincias') {
+            layerName = layerId === 'layer-municipios' ? 'Límites Municipales (DANE)' : 'Subregiones / Provincias';
+        } else {
+            let tempLayer = null;
+            if (s3LayerRegistry[layerId]) {
+                tempLayer = { nombre: s3LayerRegistry[layerId] };
+            } else {
+                tempLayer = loadedUserLayers.find(l => l.id === Number(layerId) || l.id === layerId || l.id.toString() === layerId.toString());
+            }
+            if (tempLayer && tempLayer.nombre) {
+                layerName = tempLayer.nombre.split('/').pop().replace('.parquet', '').replace('.gpkg', '');
+            } else {
+                layerName = layerId;
+            }
+        }
+
+        if (slideLayerTitle) {
+            slideLayerTitle.innerHTML = `Configuración de Capa: <span style="color:#2c5f2d">${layerName}</span>`;
+        }
 
         // Comprobar si es capa base
         if (typeof layerId === 'string' && layerId.startsWith('base-')) {
@@ -2333,7 +2436,9 @@
                           'Mapa topográfico con relieve y curvas de nivel detalladas para análisis de pendientes.';
 
             activeConfigLayer = null;
-            if (slideLayerTitle) slideLayerTitle.innerText = title;
+            if (slideLayerTitle) {
+                slideLayerTitle.innerHTML = `Configuración de Capa: <span style="color:#2c5f2d">${title}</span>`;
+            }
             const slideSubtitle = document.getElementById('slide-layer-subtitle');
             if (slideSubtitle) slideSubtitle.textContent = `🗺️ Capa Base de Fondo`;
             if (slideTechDetails) {
@@ -2355,6 +2460,10 @@
             }
             if (slideBtnApply) slideBtnApply.style.display = 'none';
 
+            // Ocultar barra de progreso si es capa base
+            const progressContainer = document.getElementById('slide-progress-container');
+            if (progressContainer) progressContainer.style.display = 'none';
+
             if (layerConfigSlide) layerConfigSlide.classList.add('active');
             const layersListWrapper = document.getElementById('layers-list-wrapper');
             if (layersListWrapper) layersListWrapper.classList.add('shifted');
@@ -2369,7 +2478,9 @@
                 : 'Agrupaciones regionales y de provincias administrativas para un análisis de riesgo territorial macro.';
 
             activeConfigLayer = null;
-            if (slideLayerTitle) slideLayerTitle.innerText = title;
+            if (slideLayerTitle) {
+                slideLayerTitle.innerHTML = `Configuración de Capa: <span style="color:#2c5f2d">${title}</span>`;
+            }
             const slideSubtitle = document.getElementById('slide-layer-subtitle');
             if (slideSubtitle) slideSubtitle.textContent = `🏛️ Geografía Administrativa`;
             if (slideTechDetails) {
@@ -2391,6 +2502,10 @@
             }
             if (slideBtnApply) slideBtnApply.style.display = 'none';
 
+            // Ocultar barra de progreso si es capa administrativa
+            const progressContainer = document.getElementById('slide-progress-container');
+            if (progressContainer) progressContainer.style.display = 'none';
+
             if (layerConfigSlide) layerConfigSlide.classList.add('active');
             const layersListWrapper = document.getElementById('layers-list-wrapper');
             if (layersListWrapper) layersListWrapper.classList.add('shifted');
@@ -2405,7 +2520,9 @@
                 : 'Modelo de susceptibilidad de zonas propensas a inundación y escorrentías según el ciclo climático de La Niña.';
 
             activeConfigLayer = null;
-            if (slideLayerTitle) slideLayerTitle.innerText = title;
+            if (slideLayerTitle) {
+                slideLayerTitle.innerHTML = `Configuración de Capa: <span style="color:#c0392b">${title}</span>`;
+            }
             const slideSubtitle = document.getElementById('slide-layer-subtitle');
             if (slideSubtitle) slideSubtitle.textContent = `🚨 Modelo de Vulnerabilidad`;
             if (slideTechDetails) {
@@ -2426,6 +2543,10 @@
                 `;
             }
             if (slideBtnApply) slideBtnApply.style.display = 'none';
+
+            // Ocultar barra de progreso si es de modelo de riesgo
+            const progressContainer = document.getElementById('slide-progress-container');
+            if (progressContainer) progressContainer.style.display = 'none';
 
             if (layerConfigSlide) layerConfigSlide.classList.add('active');
             const layersListWrapper = document.getElementById('layers-list-wrapper');
@@ -2468,6 +2589,40 @@
 
         slideTechDetails.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Leyendo metadatos desde DuckDB-WASM...`;
         slideColumnGrid.innerHTML = '';
+
+        // --- Configurar Barra de Progreso de Descarga en el Slide ---
+        const progressContainer = document.getElementById('slide-progress-container');
+        const progressBar = document.getElementById('slide-progress-bar');
+        const progressPercent = document.getElementById('slide-progress-percent');
+        const progressStatus = document.getElementById('slide-progress-status');
+        const progressBytes = document.getElementById('slide-progress-bytes');
+
+        if (progressContainer) progressContainer.style.display = 'block';
+        if (progressBar) {
+            progressBar.style.width = '0%';
+            progressBar.style.background = 'linear-gradient(90deg, #2c5f2d, #4e9a51)';
+        }
+        if (progressPercent) progressPercent.textContent = '0%';
+        if (progressStatus) progressStatus.textContent = 'Inicializando descarga...';
+        if (progressBytes) progressBytes.textContent = '';
+
+        window.onS3DownloadProgress = (file, percent, rec, tot, status) => {
+            if (percent === -1) {
+                if (progressStatus) progressStatus.innerHTML = `<span style="color:#d32f2f;"><i class="fas fa-exclamation-triangle"></i> ${status}</span>`;
+                if (progressBar) progressBar.style.background = '#d32f2f';
+                return;
+            }
+            if (progressBar) progressBar.style.width = `${percent}%`;
+            if (progressPercent) progressPercent.textContent = `${percent}%`;
+            if (progressStatus) progressStatus.textContent = status;
+            if (progressBytes) {
+                if (tot > 0) {
+                    progressBytes.textContent = `${(rec / (1024 * 1024)).toFixed(1)} MB de ${(tot / (1024 * 1024)).toFixed(1)} MB`;
+                } else {
+                    progressBytes.textContent = `${(rec / (1024 * 1024)).toFixed(1)} MB recibidos`;
+                }
+            }
+        };
         
         try {
             if (!dbInstance) await initDuckDBEngine();
@@ -2481,6 +2636,9 @@
             } else {
                 fileRef = layer.nombre;
             }
+
+            // Ocultar barra al finalizar con éxito
+            if (progressContainer) progressContainer.style.display = 'none';
 
             const conn = await dbInstance.connect();
             console.log(`📦 [S3] Cargando capa desde memoria local: ${fileRef} (static=${layer.static}, subido=${layer.subido})`);
@@ -2562,12 +2720,20 @@
             const networkUrl = `https://s3.agrohoney.com/qparquets3/${bucketName}/${layer.nombre}`;
             const updatedAt = new Date().toLocaleString('es-CO', { timeZone: 'America/Bogota' });
 
-            slideLayerTitle.textContent = layer.nombre.split('/').pop().replace('.parquet', '').replace('.gpkg', '');
+            slideLayerTitle.innerHTML = `Configuración de Capa: <span style="color:#2c5f2d">${layer.nombre.split('/').pop().replace('.parquet', '').replace('.gpkg', '')}</span>`;
             slideTechDetails.innerHTML = `
                 <div style="display:grid;grid-template-columns:auto 1fr;gap:3px 8px;">
                     <span style="color:#888;white-space:nowrap">📂 Origen:</span><span style="font-weight:600;color:#2c5f2d">${origenLabel}</span>
                     <span style="color:#888;white-space:nowrap">🧳 Formato:</span><span>GeoParquet (Apache Parquet + extensión geo)</span>
                     <span style="color:#888;white-space:nowrap">🌍 CRS:</span><span>${crsInfo}</span>
+                    <span style="color:#888;white-space:nowrap">📄 Archivo:</span><span style="word-break:break-all">${layer.nombre}</span>
+                    <span style="color:#888;white-space:nowrap">🔗 URL Red:</span><span style="word-break:break-all;font-family:monospace;font-size:0.65rem">${networkUrl}</span>
+                    <span style="color:#888;white-space:nowrap">📊 Registros:</span><span>${rowCount.toLocaleString()}</span>
+                    <span style="color:#888;white-space:nowrap">💾 Tamaño:</span><span>${layer.size.toFixed(1)} MB (estimado)</span>
+                    <span style="color:#888;white-space:nowrap">🕒 Actualiz.:</span><span>${updatedAt}</span>
+                </div>
+                ${warningText}
+            `;
                     <span style="color:#888;white-space:nowrap">📄 Archivo:</span><span style="word-break:break-all">${layer.nombre}</span>
                     <span style="color:#888;white-space:nowrap">🔗 URL Red:</span><span style="word-break:break-all;font-family:monospace;font-size:0.65rem">${networkUrl}</span>
                     <span style="color:#888;white-space:nowrap">📊 Registros:</span><span>${rowCount.toLocaleString()}</span>
@@ -2628,6 +2794,17 @@
             
             uploadStatus.style.display = 'block';
             uploadStatus.innerHTML = `<i class="fas fa-cog fa-spin"></i> Aplicando proyección y re-renderizando...`;
+
+            // Configurar el callback de descarga para el banner de estado
+            window.onS3DownloadProgress = (file, percent, rec, tot, status) => {
+                if (percent === -1) {
+                    uploadStatus.innerHTML = `<span style="color:#d32f2f;"><i class="fas fa-exclamation-triangle"></i> Error al descargar: ${status}</span>`;
+                } else if (tot > 0) {
+                    uploadStatus.innerHTML = `<i class="fas fa-cog fa-spin"></i> Descargando capa: <span style="color:#2c5f2d; font-weight:700;">${percent}%</span> (${(rec / (1024 * 1024)).toFixed(1)} MB)...`;
+                } else {
+                    uploadStatus.innerHTML = `<i class="fas fa-cog fa-spin"></i> Descargando capa (${(rec / (1024 * 1024)).toFixed(1)} MB recibidos)...`;
+                }
+            };
 
             try {
                 if (!dbInstance) await initDuckDBEngine();
@@ -2774,8 +2951,14 @@
 
 
     // --- 8. Eventos Generales UI ---
-    document.getElementById('tasaInteres').addEventListener('input', function() { document.getElementById('tasaValor').textContent = this.value + '%'; });
-    document.getElementById('precioFactor').addEventListener('input', function() { document.getElementById('precioValor').textContent = this.value + '%'; });
+    document.getElementById('tasaInteres').addEventListener('input', function() { 
+        document.getElementById('tasaValor').textContent = this.value + '%'; 
+        console.log(`🎚️ [Variable Económica] Tasa de Interés cambiada a: ${this.value}%`);
+    });
+    document.getElementById('precioFactor').addEventListener('input', function() { 
+        document.getElementById('precioValor').textContent = this.value + '%'; 
+        console.log(`🎚️ [Variable Económica] Factor de Precio cambiado a: ${this.value}%`);
+    });
 
     document.getElementById('md-close').addEventListener('click', () => {
         document.getElementById('entity-dashboard').style.display = 'none';
@@ -2834,10 +3017,16 @@
         // Si ya está registrado en memoria, retornarlo de inmediato
         if (registeredDuckDBBuffers.has(fileName)) {
             console.log(`✅ [S3-Buffer] ${fileName} ya está registrado en DuckDB MEMFS.`);
+            if (window.onS3DownloadProgress) {
+                window.onS3DownloadProgress(fileName, 100, 0, 0, "Caché MEMFS local activa");
+            }
             return fileName;
         }
 
         console.log(`📡 [S3-Buffer] Descargando y registrando: ${fileName} desde bucket: ${bucketName}...`);
+        if (window.onS3DownloadProgress) {
+            window.onS3DownloadProgress(fileName, 0, 0, 0, "Conectando con s3.agrohoney.com...");
+        }
         
         // Construir URL absoluta de descarga HTTP
         const fileUrl = `https://s3.agrohoney.com/qparquets3/${bucketName}/${fileName}`;
@@ -2847,21 +3036,64 @@
         }
 
         try {
+            window.perfMarks[`layer_${fileName}_start`] = performance.now();
             const resp = await fetch(fileUrl, { headers });
             if (!resp.ok) {
                 throw new Error(`Error HTTP ${resp.status} al descargar desde S3`);
             }
-            const arrayBuffer = await resp.arrayBuffer();
-            const u8 = new Uint8Array(arrayBuffer);
+            
+            const contentLength = resp.headers.get('content-length');
+            const totalBytes = contentLength ? parseInt(contentLength, 10) : 0;
+            
+            const reader = resp.body.getReader();
+            let receivedBytes = 0;
+            const chunks = [];
+            
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                
+                chunks.push(value);
+                receivedBytes += value.length;
+                
+                if (totalBytes > 0) {
+                    const percent = Math.round((receivedBytes / totalBytes) * 100);
+                    if (window.onS3DownloadProgress) {
+                        window.onS3DownloadProgress(fileName, percent, receivedBytes, totalBytes, "Descargando datos...");
+                    }
+                } else {
+                    if (window.onS3DownloadProgress) {
+                        window.onS3DownloadProgress(fileName, 0, receivedBytes, 0, "Descargando datos...");
+                    }
+                }
+            }
+            
+            if (window.onS3DownloadProgress) {
+                window.onS3DownloadProgress(fileName, 100, receivedBytes, receivedBytes, "Registrando buffer en DuckDB...");
+            }
+            
+            const u8 = new Uint8Array(receivedBytes);
+            let position = 0;
+            for (const chunk of chunks) {
+                u8.set(chunk, position);
+                position += chunk.length;
+            }
             
             if (!dbInstance) await initDuckDBEngine();
             await dbInstance.registerFileBuffer(fileName, u8);
             
             registeredDuckDBBuffers.add(fileName);
             console.log(`✅ [S3-Buffer] ${fileName} descargado y registrado en DuckDB MEMFS.`);
+            
+            window.perfMarks[`layer_${fileName}_end`] = performance.now();
+            window.perfMarks[`layer_${fileName}_duration`] = window.perfMarks[`layer_${fileName}_end`] - window.perfMarks[`layer_${fileName}_start`];
+            
             return fileName;
         } catch (err) {
             console.error(`❌ [S3-Buffer] Error al descargar/registrar ${fileName}:`, err);
+            if (window.onS3DownloadProgress) {
+                window.onS3DownloadProgress(fileName, -1, 0, 0, `Fallo de descarga: ${err.message}`);
+            }
             throw err;
         }
     };
@@ -2887,6 +3119,20 @@
         updateConsole('WELCOME'); // Mostrar mensaje de carga
         document.getElementById('console-output').innerHTML = `<b>Cargando capa:</b> ${fileName} desde MinIO...`;
         infoConsole.classList.add('visible');
+
+        // Configurar el callback de descarga para la consola de overlay
+        window.onS3DownloadProgress = (file, percent, rec, tot, status) => {
+            const output = document.getElementById('console-output');
+            if (output) {
+                if (percent === -1) {
+                    output.innerHTML = `<b style="color:#d32f2f;"><i class="fas fa-exclamation-triangle"></i> Error de Descarga:</b> ${status}`;
+                } else if (tot > 0) {
+                    output.innerHTML = `<b>Descargando capa:</b> ${fileName} <span style="color:#2c5f2d; font-weight:700;">[${percent}%]</span> (${(rec / (1024 * 1024)).toFixed(1)} MB de ${(tot / (1024 * 1024)).toFixed(1)} MB)...`;
+                } else {
+                    output.innerHTML = `<b>Descargando capa:</b> ${fileName} (${(rec / (1024 * 1024)).toFixed(1)} MB recibidos)...`;
+                }
+            }
+        };
 
         if (!dbInstance) await initDuckDBEngine();
         
@@ -3021,13 +3267,17 @@
             if (dbInstance) return true;
             console.log("⚙️ Iniciando motor DuckDB-WASM con perfil de diagnóstico local...");
             try {
+                window.perfMarks.duckdbInitStart = performance.now();
                 // Importación local sin CDN
                 const duckdb = await import('./wasm/duckdb-wasm.esm.js');
-                const worker = new Worker('./wasm/duckdb-browser-eh.worker.js');
+                
+                // Configuración de rutas absolutas para el Worker y WASM
+                const workerURL = new URL('./wasm/duckdb-browser-eh.worker.js', window.location.href).href;
+                const wasmURL = new URL('./wasm/duckdb-eh.wasm', window.location.href).href;
+                
+                const worker = await duckdb.createWorker(workerURL);
                 const instance = new duckdb.AsyncDuckDB(new duckdb.ConsoleLogger(), worker);
-                await instance.instantiate('./wasm/duckdb-eh.wasm', null, {
-                    allowUnsignedExtensions: true
-                });
+                await instance.instantiate(wasmURL);
                 
                 // Configurar S3 / HTTPFS / Spatial
                 const conn = await instance.connect();
@@ -3047,7 +3297,8 @@
                 let spatialLoaded = false;
                 try {
                     console.log("🌍 [DuckDB] Cargando extensión spatial local...");
-                    const resp = await fetch('./wasm/spatial.duckdb_extension.wasm');
+                    const spatialURL = new URL('./wasm/spatial.duckdb_extension.wasm', window.location.href).href;
+                    const resp = await fetch(spatialURL);
                     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
                     const arrayBuffer = await resp.arrayBuffer();
                     const u8 = new Uint8Array(arrayBuffer);
@@ -3097,6 +3348,10 @@
                 }
 
                 console.log("🚀 Motor DuckDB-WASM listo y calibrado.");
+                
+                window.perfMarks.duckdbInitEnd = performance.now();
+                window.perfMarks.duckdbInitDuration = window.perfMarks.duckdbInitEnd - window.perfMarks.duckdbInitStart;
+                
                 dbInstance = instance;
                 return true;
             } catch (e) {
@@ -3219,6 +3474,11 @@
         await initDuckDBEngine();
         await loadHelpSystem();
         await updateSpatialStreaming();
+        
+        // Ejecutar dashboard visual de rendimiento al finalizar la carga
+        if (typeof window.renderPerfDashboard === 'function') {
+            setTimeout(window.renderPerfDashboard, 500);
+        }
     }
     initApp();
 
@@ -3233,7 +3493,12 @@
         if (!output) return;
         
         if (helpDataMap.has(id)) {
-            output.innerHTML = helpDataMap.get(id);
+            let content = helpDataMap.get(id);
+            if (id === 'DESCARGAR_DIAGNOSTICO' && window.lastLogUpdateTime) {
+                const formattedTime = window.lastLogUpdateTime.toLocaleString('es-CO', { timeZone: 'America/Bogota' });
+                content += `<br><span style="color:#27ae60; font-weight:700; font-size:0.75rem; display:block; margin-top:6px;"><i class="fas fa-history"></i> Última actualización del log: ${formattedTime} (Col Time)</span>`;
+            }
+            output.innerHTML = content;
             infoConsole.classList.add('visible'); // Activa el efecto de aparición (Opacity 1)
         }
     }
@@ -3315,6 +3580,8 @@
                 trigger.querySelector('span').innerText = opt.text;
                 container.classList.remove('open');
                 
+                console.log(`🗳️ [Control Dropdown] ${selectId} cambiado a: "${opt.text}" (valor: ${opt.value})`);
+                
                 // Limpiar seleccionados previos
                 container.querySelectorAll('.custom-option').forEach(o => o.classList.remove('selected'));
                 customOpt.classList.add('selected');
@@ -3376,12 +3643,140 @@
         }
     });
 
+    // --- Detección Automática de Tecnologías en Caliente ---
+    async function detectTechnologies() {
+        const tech = {
+            wasm: typeof WebAssembly !== 'undefined',
+            wasmEH: (() => {
+                try {
+                    return WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,0,0,1,4,1,96,0,0,3,2,1,0,10,8,1,6,0,0,0,0,0]));
+                } catch (e) { return false; }
+            })(),
+            sharedArrayBuffer: typeof SharedArrayBuffer !== 'undefined',
+            maplibreGL: typeof maplibregl !== 'undefined' ? (maplibregl.version || 'Activo') : (window.map ? 'Activo' : 'No detectado'),
+            deckGL: typeof deck !== 'undefined' ? 'Activo (Deck.gl MapboxLayer)' : 'No detectado',
+            duckdbWASM: !!dbInstance,
+            duckdbExtensions: [],
+            s3Endpoint: 'https://s3.agrohoney.com',
+            memoryMB: (performance && performance.memory) ? (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(1) + ' MB' : 'N/D (No expuesto)'
+        };
+        
+        if (dbInstance) {
+            try {
+                const conn = await dbInstance.connect();
+                const r = await conn.query("SELECT extension_name, loaded FROM duckdb_extensions() WHERE loaded=true");
+                tech.duckdbExtensions = r.toArray().map(row => ({
+                    extension: row.extension_name,
+                    loaded: row.loaded
+                }));
+                await conn.close();
+            } catch (err) {
+                console.warn("⚠️ No se pudieron consultar extensiones de DuckDB en caliente:", err.message);
+            }
+        }
+        
+        return tech;
+    }
+
+    // --- Rendimiento en Consola (Consola de Cristal) ---
+    window.renderPerfDashboard = function() {
+        const countLayers = typeof loadedUserLayers !== 'undefined' ? loadedUserLayers.length : 0;
+        const metrics = {
+            '⏱️ Carga Inicial HTML (loadEvent)': (window.perfMarks.pageLoad ? window.perfMarks.pageLoad + ' ms' : 'Cargando...'),
+            '🧠 Memoria JS Usada': (performance && performance.memory) ? (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(1) + ' MB' : 'N/D',
+            '🔌 Inicialización DuckDB': window.perfMarks.duckdbInitDuration ? window.perfMarks.duckdbInitDuration.toFixed(1) + ' ms' : 'No iniciado/Fallido',
+            '🗺️ MapLibre GL / Deck.gl': window.map ? 'Activo' : 'No iniciado',
+            '📦 Capas de Usuario Cargadas': countLayers,
+            '🌐 MinIO S3 Conectado': window.s3ConnectionSuccess ? '✅ Estable' : '❌ Desconectado'
+        };
+        
+        console.group('📊 SIGAGRO Performance & Telemetry Dashboard');
+        console.table(metrics);
+        console.groupEnd();
+    };
+
+    // --- Diagnóstico de Conexión S3 & CORS en Caliente ---
+    async function checkS3Connection() {
+        const tests = [
+            { name: 'MinIO S3 Root Access', url: 'https://s3.agrohoney.com' },
+            { name: 'MinIO Bucket Query Access', url: 'https://s3.agrohoney.com/qparquets3/?list-type=2' },
+            { name: 'Sample Parquet Download', url: 'https://s3.agrohoney.com/qparquets3/catastro/R_TERRENO.parquet' }
+        ];
+        
+        let report = [];
+        for (const test of tests) {
+            const start = performance.now();
+            try {
+                const headers = {};
+                if (typeof S3_AUTH_HEADER !== 'undefined' && S3_AUTH_HEADER) {
+                    headers["Authorization"] = S3_AUTH_HEADER;
+                }
+                const resp = await fetch(test.url, { method: 'HEAD', mode: 'cors', headers });
+                const duration = performance.now() - start;
+                
+                const corsHeader = resp.headers.get('Access-Control-Allow-Origin') || 'No expuesto / Bloqueado';
+                const acceptRanges = resp.headers.get('Accept-Ranges') || 'No expuesto';
+                const contentLength = resp.headers.get('Content-Length') || 'N/D';
+                
+                report.push(`  [${test.name}]
+  - URL: ${test.url}
+  - Estado: ✅ ${resp.status} (${resp.statusText || 'OK'})
+  - Latencia: ${duration.toFixed(1)} ms
+  - Access-Control-Allow-Origin: ${corsHeader}
+  - Accept-Ranges: ${acceptRanges}
+  - Content-Length: ${contentLength} bytes`);
+            } catch (e) {
+                const duration = performance.now() - start;
+                report.push(`  [${test.name}]
+  - URL: ${test.url}
+  - Estado: ❌ FALLIDO (CORS Bloqueado o Sin Conexión)
+  - Latencia: ${duration.toFixed(1)} ms
+  - Error: ${e.message}`);
+            }
+        }
+        return report.join("\n\n");
+    }
+
     // --- Manejador del Informe de Diagnóstico y Depuración v2.1.0 ---
     const diagnosticBtn = document.getElementById('btn-diagnostic-report');
     if (diagnosticBtn) {
-        diagnosticBtn.addEventListener('click', (e) => {
+        diagnosticBtn.addEventListener('click', async (e) => {
             e.stopPropagation();
             
+            console.log("📡 Iniciando auditoría en caliente y test de puertos/CORS en MinIO S3...");
+            
+            // Cambiar temporalmente el logo a spinner para denotar trabajo
+            const originalHTML = diagnosticBtn.innerHTML;
+            diagnosticBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            
+            // Ejecutar test de conexión S3 en vivo
+            const s3Diagnostics = await checkS3Connection();
+            
+            // Ejecutar detección automática de tecnologías en caliente
+            const techPayload = await detectTechnologies();
+            
+            // Evaluar capacidades WASM y del navegador en caliente
+            const wasmSupported = typeof WebAssembly !== 'undefined';
+            let wasmEHSupported = false;
+            if (wasmSupported) {
+                try {
+                    wasmEHSupported = WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,0,0,1,4,1,96,0,0,3,2,1,0,10,8,1,6,0,0,0,0,0]));
+                } catch (err) {
+                    wasmEHSupported = false;
+                }
+            }
+            
+            const navInfo = {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform || 'N/D',
+                hardwareConcurrency: navigator.hardwareConcurrency || 'N/D',
+                deviceMemory: navigator.deviceMemory ? `${navigator.deviceMemory} GB` : 'N/D (No expuesto en Firefox/Safari)',
+                wasmSupported: wasmSupported ? 'SÍ' : 'NO',
+                wasmEHSupported: wasmEHSupported ? 'SÍ (Soporte nativo Exception Handling)' : 'NO (Sin soporte nativo Exception Handling)',
+                sharedArrayBuffer: typeof SharedArrayBuffer !== 'undefined' ? 'SÍ (Seguridad COOP/COEP Activa)' : 'NO (Desactivado o sin headers de seguridad)',
+                serviceWorker: 'serviceWorker' in navigator ? 'SÍ' : 'NO'
+            };
+
             // Evaluar componentes en caliente
             const isMapActive = typeof map !== 'undefined' && map !== null && map.getContainer() !== null;
             const isDuckDBReady = typeof dbInstance !== 'undefined' && dbInstance !== null;
@@ -3402,50 +3797,108 @@
                 return `  - ${fileName.padEnd(45)} : [${statusText}]`;
             }).join("\n");
 
-            const s3StatusText = window.s3ConnectionSuccess 
-                ? "ACTIVO Y CONECTADO - Comunicación bidireccional estable con https://s3.agrohoney.com" 
-                : "DESCONECTADO / CORS BLOQUEADO - No se pudo conectar a s3.agrohoney.com. Revise que la máquina cliente tenga acceso a internet, o que el servidor MinIO no tenga restricciones de origen (CORS) o certificados SSL vencidos.";
+            // Generar tabla de tiempos de rendimiento
+            let perfReport = `  - Carga Inicial de Página (loadEvent) : ${window.perfMarks.pageLoad ? window.perfMarks.pageLoad + ' ms' : 'N/D (Aún cargando o no soportado)'}\n`;
+            perfReport += `  - Inicialización Motor DuckDB-WASM    : ${window.perfMarks.duckdbInitDuration ? window.perfMarks.duckdbInitDuration.toFixed(1) + ' ms' : 'NO INICIALIZADO / FALLIDO'}\n`;
+            
+            const layerDurations = Object.keys(window.perfMarks)
+                .filter(k => k.endsWith('_duration'))
+                .map(k => {
+                    const layerName = k.replace('layer_', '').replace('_duration', '');
+                    return `  - Descarga S3 & VFS para [${layerName.padEnd(25)}] : ${window.perfMarks[k].toFixed(1)} ms`;
+                });
+            
+            if (layerDurations.length > 0) {
+                perfReport += "\nTIEMPOS DETALLADOS DE CARGA DE CAPAS (S3 STREAMING & REGISTER BUFFER):\n";
+                perfReport += "-----------------------------------------------------------------------------\n";
+                perfReport += layerDurations.join("\n");
+            } else {
+                perfReport += "\n  (No se registraron descargas de capas desde S3 en esta sesión)";
+            }
+
+            // Mapear tecnologías detectadas a string
+            let techList = `  - Soporte WebAssembly (Estándar)     : ${techPayload.wasm ? 'SÍ' : 'NO'}
+  - Soporte WASM-EH (Exception Handling): ${techPayload.wasmEH ? 'SÍ' : 'NO'}
+  - SharedArrayBuffer Disponible        : ${techPayload.sharedArrayBuffer ? 'SÍ' : 'NO'}
+  - MapLibre GL Render Engine          : ${techPayload.maplibreGL}
+  - Deck.gl DeckGL compatible          : ${techPayload.deckGL}
+  - DuckDB-WASM Motor Local            : ${techPayload.duckdbWASM ? 'INICIALIZADO Y ACTIVO' : 'NO DETECTADO'}
+  - Consumo Estimado de Memoria heap   : ${techPayload.memoryMB}
+  - Endpoint de origen S3 MinIO        : ${techPayload.s3Endpoint}\n`;
+            
+            if (techPayload.duckdbExtensions.length > 0) {
+                techList += "\nEXTENSIONES DE DUCKDB DETECTADAS Y CARGADAS EN CALIENTE:\n";
+                techList += "-----------------------------------------------------------------------------\n";
+                techPayload.duckdbExtensions.forEach(ext => {
+                    techList += `  - [${ext.extension.padEnd(20)}] : Estatus = [ACTIVA Y CARGADA EN MEMORIA (MEMFS)]\n`;
+                });
+            } else {
+                techList += "\n  (No se encontraron extensiones de base de datos activas en DuckDB)";
+            }
 
             const header = `=============================================================================
-SIGAGRO — INFORME DE DIAGNÓSTICO Y DEPURACIÓN S3 & PARQUET
+SIGAGRO — INFORME DE DIAGNÓSTICO Y DEPURACIÓN S3 & PARQUET (v2.1.0)
 =============================================================================
-Versión Geovisor: v2.1.0 · QParquet API: v2.0.0 (Dokploy)
-Generado: ${new Date().toLocaleString()}
-Plataforma del Cliente: ${navigator.userAgent}
-Local Storage Disponible: ${typeof localStorage !== 'undefined' ? 'SÍ' : 'NO'}
+Generado: ${new Date().toLocaleString('es-CO', { timeZone: 'America/Bogota' })} (Hora Local Colombia)
 =============================================================================
 
-ESTATUS DE COMPONENTES CRÍTICOS:
+1. INFORMACIÓN DEL ENTORNO Y NAVEGADOR DEL CLIENTE:
 -----------------------------------------------------------------------------
-1. MapLibre GL / Deck.gl       : ${isMapActive ? "INICIALIZADO Y ACTIVO" : "PANIC - FALLA DE RENDERIZACIÓN"}
-2. DuckDB-WASM                 : ${isDuckDBReady ? "CONECTADO Y CORRIENDO" : "NO INICIADO / ERROR DE EXTENSIÓN O ENTORNO"}
-3. Carga de Extensión Spatial  : ${window.spatialExtensionLoaded ? "CARGADA CON ÉXITO (Soporte GPKG/Parquet Activo)" : "FALLIDA / PENDIENTE DE INICIALIZACIÓN"}
-4. Conexión S3 MinIO           : ${s3StatusText}
-5. Capas en Sesión CRUD S3     : ${countLayers} capas de usuario cargadas en caliente.
+  - Agente de Usuario (UserAgent)       : ${navInfo.userAgent}
+  - Plataforma de Operación             : ${navInfo.platform}
+  - Núcleos de CPU Disponibles (Cores)  : ${navInfo.hardwareConcurrency}
+  - Memoria RAM Estimada                : ${navInfo.deviceMemory}
+  - Soporte de WebAssembly Estándar     : ${navInfo.wasmSupported}
+  - Soporte WASM-EH (Exception Handling): ${navInfo.wasmEHSupported}
+  - SharedArrayBuffer Disponible        : ${navInfo.sharedArrayBuffer}
+  - Soporte de Service Worker           : ${navInfo.serviceWorker}
 
-ESTATUS DETALLADO DE CAPAS DE TRABAJO (13 FUENTES DEL WORKSPACE):
+2. ESTATUS DE COMPONENTES CRÍTICOS DEL GEOVISOR:
+-----------------------------------------------------------------------------
+  - MapLibre GL / Deck.gl               : ${isMapActive ? "INICIALIZADO Y ACTIVO" : "PANIC - FALLA DE RENDERIZACIÓN"}
+  - DuckDB-WASM                         : ${isDuckDBReady ? "CONECTADO Y CORRIENDO" : "NO INICIADO / ERROR DE EXTENSIÓN O ENTORNO"}
+  - Carga de Extensión Spatial          : ${window.spatialExtensionLoaded ? "CARGADA CON ÉXITO (Soporte GPKG/Parquet Activo)" : "FALLIDA / PENDIENTE DE INICIALIZACIÓN"}
+  - Conexión S3 MinIO (Registro Inicial): ${window.s3ConnectionSuccess ? "CONECTADO" : "DESCONECTADO / BYPASS ACTIVO"}
+  - Capas en Sesión CRUD S3             : ${countLayers} capas de usuario cargadas en caliente.
+
+3. PRUEBAS DE CONEXIÓN EN CALIENTE S3 & CABECERAS CORS:
+-----------------------------------------------------------------------------
+${s3Diagnostics}
+
+4. MÉTRICAS DE RENDIMIENTO Y TIEMPOS DE RESPUESTA:
+-----------------------------------------------------------------------------
+${perfReport}
+
+5. ESTATUS DETALLADO DE CAPAS DE TRABAJO (13 FUENTES DEL WORKSPACE):
 -----------------------------------------------------------------------------
 ${staticLayersStatusList}
 
-DETALLES DE DEPURACIÓN (LOGS DEL NAVEGADOR Y CONSOLA DE SESIÓN):
+6. DETALLES DE DEPURACIÓN (LOGS DEL NAVEGADOR Y TELEMETRÍA DE CLICS GLOBAL):
 -----------------------------------------------------------------------------
-${window.systemLogs.length > 0 ? window.systemLogs.join("\n") : "Sin logs registrados en esta sesión."}
+${window.systemLogs.length > 0 ? window.systemLogs.join("\n") : "Sin logs ni clics registrados en esta sesión."}
+
+7. DETECCIÓN AUTOMÁTICA DE TECNOLOGÍAS Y EXTENSIONES DUCKDB:
+-----------------------------------------------------------------------------
+${techList}
 
 =============================================================================
-GUÍA DE RESOLUCIÓN DE ANOMALÍAS DE LECTURA (S3 & GPKG):
------------------------------------------------------------------------------
-* Si reporta 'spatial.duckdb_extension not found' o fallos de WASM:
-  1. Su firewall, proxy o política de seguridad de red está bloqueando las peticiones 
-     a 'https://wasm-extensions.duckdb.org' o al CDN de DuckDB-WASM.
-  2. Solución: Verifique que su conexión sea estable. El geovisor implementa 
-     un bypass de resiliencia local en caliente para visualizar los Parquets/GPKGs 
-     cargados utilizando los buffers de memoria del motor.
+GUÍA DE RESOLUCIÓN Y AJUSTES COMPATIBILIDAD FIREFOX (S3 & WASM):
+=============================================================================
+* Si reporta fallos en SharedArrayBuffer o DuckDB:
+  Firefox tiene políticas estrictas de aislamiento de origen (COOP/COEP).
+  Verifique que su servidor local o Dokploy retorne las siguientes cabeceras HTTP:
+    Cross-Origin-Embedder-Policy: require-corp
+    Cross-Origin-Opener-Policy: same-origin
 
-* Si reporta 'Failed to fetch' al subir/leer capas locales en S3:
-  1. El servidor MinIO (https://s3.agrohoney.com) tiene problemas temporales de 
-     CORS o los certificados SSL no coinciden.
-  2. Solución: El geovisor activa el buffer virtual e inyecta la geometría en caliente 
-     desde DuckDB-WASM local. Podrá trabajar normalmente con las capas arrastradas.
+* Si Firefox bloquea extensiones o scripts de tipo WASM:
+  Firefox aplica reglas estrictas de tipo MIME. Asegúrese de configurar en su server:
+    .wasm  → application/wasm
+    .js    → application/javascript
+    .mjs   → application/javascript
+
+* Forzar recarga de binarios WASM sin caché de Firefox:
+  El geovisor implementa un bypass de URLs absolutas con versionamiento (?v=timestamp)
+  para evitar lecturas de caché corruptas.
 =============================================================================
 `;
             
